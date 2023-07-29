@@ -1,0 +1,20 @@
+configfile: "config/config.yaml"
+
+print( """                    GREETINGS FROM:
+ _______  __   __  ______    _______  ___   _  _______ 
+|       ||  | |  ||    _ |  |       ||   | | ||   _   |
+|    ___||  | |  ||   | ||  |    ___||   |_| ||  |_|  |
+|   |___ |  |_|  ||   |_||_ |   |___ |      _||       |
+|    ___||       ||    __  ||    ___||     |_ |       |
+|   |___ |       ||   |  | ||   |___ |    _  ||   _   |
+|_______||_______||___|  |_||_______||___| |_||__| |__|
+""")
+
+with open( "input/accession_selected.txt", "r" ) as inputs:
+    SAMPLES = [line.strip() for line in inputs]
+
+rule all:
+    input:
+        expand( "intermediates/alignment/{sample}.sorted.bam", sample=SAMPLES )
+
+include: "rules/assembly.smk"

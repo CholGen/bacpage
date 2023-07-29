@@ -1,1 +1,14 @@
-samples: None
+# General parameters; point to input files and the like.
+samples: "input/accession_selected.txt"
+path-to-raw-data: "/"
+path-to-run-configuration: "/"
+reference: "resources/vc_reference.fasta"
+
+# Rule specific parameters
+basecalling:
+  guppy_params: "-r -v -x auto"
+
+filter_reads:
+  keep_percent: 90
+  target_bases: 800000000
+  filtlong_params: ""
