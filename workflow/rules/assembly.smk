@@ -84,7 +84,7 @@ rule alignment:
         reference = config["reference"]
     output:
         alignment = "intermediates/alignment/{sample}.sorted.bam",
-        index = "intermediates/alignment/{sample}.sorted.bam.idx"
+        index = "intermediates/alignment/{sample}.sorted.bam.bai"
     threads: 16
     shell:
         """
