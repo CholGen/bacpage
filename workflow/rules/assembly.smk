@@ -190,7 +190,7 @@ rule filter_vcf:
         vcf = rules.combine_vcfs.output.concated_vcf
     params:
         minimum_reads = config["filter_vcf"]["minimum_reads"],
-        minimum_support = config["filter_vcf"]["minimum_supports"]
+        minimum_support = config["filter_vcf"]["minimum_support"]
     output:
         filtered_vcf = temporary( "intermediates/variants/{sample}.filtered.vcf.gz" )
     shell:

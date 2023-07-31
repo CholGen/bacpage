@@ -12,3 +12,17 @@ filter_reads:
   keep_percent: 90
   target_bases: 800000000
   filtlong_params: ""
+
+alignment:
+  minimap_params: ""
+
+calculate_depth:
+  maximum_depth: 10000
+
+filter_vcf:
+  minimum_reads: 100
+  minimum_support: 0.75
+
+minion_qc:
+  format: "png"   # pdf can also be specified, might be useful if X11 not in system
+
