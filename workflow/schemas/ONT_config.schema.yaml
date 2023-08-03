@@ -1,9 +1,12 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 
-description: Snakemake configuration file
+description: Snakemake configuration file for ONT long read pipeline.
 type: object
 
 properties:
+  run_type:
+    description: "Indicates the type of run being conducted"
+    const: "ONT"
   samples:
     description: "Location of metadata for samples being processed by the pipeline."
     type: string
@@ -110,6 +113,7 @@ properties:
       - format
 
 required:
+  - run_type
   - samples
   - path-to-raw-data
   - path-to-run-configuration

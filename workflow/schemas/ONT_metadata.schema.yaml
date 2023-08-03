@@ -1,0 +1,14 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+description: an entry in the sample sheet
+properties:
+  sample:
+    description: "Name or identifier of sample."
+    type: string
+  reads:
+    description: "Location of raw sequencing reads in FASTQ format."
+    type: string
+    pattern: '^.*\\.(fastq|fq)(.gz)*$'
+
+required:
+  - sample
+  - reads

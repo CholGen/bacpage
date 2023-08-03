@@ -1,0 +1,59 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+
+description: Snakemake configuration file for Illumina pipeline
+type: object
+
+properties:
+  run_type:
+    description: "Indicates the type of run being conducted"
+    const: "Illumina"
+  samples:
+    description: "Location of metadata for samples being processed by the pipeline."
+    type: string
+  reference:
+    description: "Location of reference sequence. Must be in fasta format."
+    type: string
+    pattern: "^.*\\.(fasta|fa)$"
+
+  alignment_bwa:
+    description: "Parameters for the alignment step using BWA."
+    type: object
+    properties:
+      bwa_params:
+        description: "Optional parameters passed directly to the bwa program."
+        type: string
+        default: "-M"
+    required:
+      - bwa_params
+
+  trimming:
+    description: "Parameters required for when trimming alignment."
+    type: object
+    properties:
+      minimum_length:
+        description: "Minimum length for a read to be retain after trimming"
+        type: integer
+        exclusiveMinimum: 0
+        default: 30
+      minimum_quality:
+        description: "Minimum quality threshold in sliding window for bases to be retained"
+        type: integer
+        exclusiveMinimum: 0
+        maximum: 60
+        default: 20
+      window_length:
+        description: "Width of sliding window."
+        type: integer
+        exclusiveMinimum: 0
+        default: 4
+    required:
+      - minimum_length
+      - minimum_quality
+      - window_length
+
+required:
+  - run_type
+  - samples
+  - reference
+  - alignment_bwa
+  - trimming

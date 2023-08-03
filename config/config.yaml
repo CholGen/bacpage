@@ -1,4 +1,5 @@
 # General parameters; point to input files and the like.
+run_type: "ONT"
 samples: "input/accession_selected.txt"
 path-to-raw-data: "/"
 path-to-run-configuration: "/"
@@ -16,6 +17,9 @@ filter_reads:
 alignment:
   minimap_params: ""
 
+alignment_bwa:
+  bwa_params: "-M"
+
 calculate_depth:
   maximum_depth: 10000
 
@@ -25,4 +29,5 @@ filter_vcf:
 
 minion_qc:
   format: "png"   # pdf can also be specified, might be useful if X11 not in system
+
 

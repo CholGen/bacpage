@@ -1,0 +1,19 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+description: an entry in the sample sheet
+properties:
+  sample:
+    description: "Name or identifier of sample."
+    type: string
+  read1:
+    description: "Location of first set of reads from a paired-end run in FASTQ format."
+    type: string
+    pattern: '^.*\.(fastq|fq)(.gz)*$'
+  read2:
+    description: "Location of first set of reads from a paired-end run in FASTQ format."
+    type: string
+    pattern: '^.*\.(fastq|fq)(.gz)*$'
+
+required:
+  - sample
+  - read1
+  - read2
