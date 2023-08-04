@@ -52,6 +52,7 @@ rule trim_alignment:
     shell:
         """
         ivar trim \
+            -i {input.alignment} \
             -m {params.minimum_length} \
             -q {params.minimum_quality} \
             -s {params.window_length} 2> {log} |\
