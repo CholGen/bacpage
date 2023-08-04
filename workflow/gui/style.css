@@ -1,0 +1,38 @@
+$sidebar-width: 21;
+
+ScrollableContainer {
+    align: center top;
+}
+
+Button {
+    width: $sidebar-width;
+    border: solid $accent;
+    content-align: left middle;
+    align: center top;
+    padding: 0;
+    margin: 0;
+    background: $background-lighten-1;
+}
+
+Label {
+    margin: 1 3;
+}
+
+#sidebar {
+    width: $sidebar-width;
+    /*border: solid $accent;*/
+    content-align: center middle;
+}
+
+#parameters {
+    border: solid $accent;
+}
+
+#information {
+    border: solid $accent;
+    content-align: left top;
+    height: 10%;
+    margin: 0;
+    padding: 0;
+    dock: bottom;
+}
