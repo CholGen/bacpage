@@ -12,7 +12,7 @@ trimming:
   window_length: 4
 
 coverage_mask:
-  required_depth: 5
+  required_depth: 15
 
 call_variants:
   maximum_depth: 2000
@@ -24,4 +24,7 @@ call_variants:
 filter_variants:
   minimum_depth: 15
   minimum_support: 0.5
-  minimum_strand_depth: 15
+  minimum_strand_depth: 5
+
+call_consensus:
+  consensus_parameters: "--mark-del N"

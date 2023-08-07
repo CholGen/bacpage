@@ -45,7 +45,7 @@ rule generate_low_coverage_mask:
         alignment=rules.alignment_bwa.output.alignment
     output:
         depth="intermediates/illumina/depth/{sample}.depth",
-        bed_file="intermediates/illumina/depth/{sample}.depthmask.bed"
+        depth_mask="intermediates/illumina/depth/{sample}.depthmask.bed"
     params:
         minimum_depth=config["coverage_mask"]["required_depth"]
     shell:
@@ -56,7 +56,7 @@ rule generate_low_coverage_mask:
         awk \
             -v depth="{params.minimum_depth}" \
             '$3 < depth {{printf "%s\\t%d\\t%d\\n", $1, $2 - 1, $2}}' \
-            - > {output.bed_file}
+            - > {output.depth_mask}
         """
 
 
@@ -100,21 +100,68 @@ rule filter_variants:
             - are present in less than {params.minimum_support:.0%} of reads
         """
     input:
-        variants=rules.call_variants_from_alignment,
+        variants=rules.call_variants_from_alignment.output.variants,
     params:
         minimum_depth=config["filter_variants"]["minimum_depth"],
         minimum_strand_depth=config["filter_variants"]["minimum_strand_depth"],
         minimum_support=config["filter_variants"]["minimum_support"]
     output:
-        filtered_variants="intermediates/illumina/variants/{sample}.filt.vcf"
+        filtered_variants="intermediates/illumina/variants/{sample}.bcftools.filt.vcf"
     shell:
         """
-            bcftools filter \
-                --no-version \
-                -i "INFO/AD[1]>{params.minimum_depth} && (INFO/AD[1])/(INFO/AD[0]+INFO/AD[1])>{params.minimum_support} && INFO/ADF[1]>{params.minimum_strand_depth} && INFO/ADR[1]>{params.minimum_strand_depth}" \
-                -o {output.filtered_variants}
-                {input.variants}
+        bcftools filter \
+            --no-version \
+            -i "INFO/AD[1]>{params.minimum_depth} && (INFO/AD[1])/(INFO/AD[0]+INFO/AD[1])>{params.minimum_support} && INFO/ADF[1]>{params.minimum_strand_depth} && INFO/ADR[1]>{params.minimum_strand_depth}" \
+            -o {output.filtered_variants} \
+            {input.variants}
         """
+
+rule align_and_normalize_variants:
+    message: "For sample {wildcards.sample}, Left-align and normalize indels, and remove insertions."
+    input:
+        variants=rules.filter_variants.output.filtered_variants,
+        reference=config["reference"],
+        reference_index=config["reference"] + ".bwt"
+    output:
+        normalized_variants="intermediates/illumina/variants/{sample}.bcftools.filt.norm.vcf.gz",
+        variant_index="intermediates/illumina/variants/{sample}.bcftools.filt.norm.vcf.gz.csi"
+    shell:
+        """
+        bcftools norm \
+            --no-version \
+            -f {input.reference} \
+            {input.variants} |\
+        bcftools filter \
+            --no-version \
+            --exclude 'strlen(REF)<strlen(ALT)' \
+            -Oz \
+            -o {output.normalized_variants} &&\
+        bcftools index {output.normalized_variants}
+        """
+
+
+rule call_concensus:
+    message: "For sample {wildcards.sample}, apply variants to reference to create consensus sequences. Masks sites with less than desired coverage."
+    input:
+        variants=rules.align_and_normalize_variants.output.normalized_variants,
+        depth_mask=rules.generate_low_coverage_mask.output.depth_mask,
+        reference=config["reference"],
+        reference_index=config["reference"] + ".bwt"
+    params:
+        bcftools_parameters=config["call_consensus"]["consensus_parameters"]
+    output:
+        consensus_sequence="intermediates/illumina/consensus/{sample}.consensus.fasta"
+    shell:
+        """
+	    bcftools consensus \
+	        {params.bcftools_parameters} \
+	        --fasta-ref {input.reference} \
+	        --mask {input.depth_mask} \
+	        {input.variants} |\
+        union -filter |\
+        sed "1s/.*/> {wildcards.sample}/" > {output.consensus_sequence}
+        """
+
     #rule trim_alignment:
     #    message: "Trim reads in alignment which are not a high quality."
     #    input:

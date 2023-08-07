@@ -59,7 +59,7 @@ properties:
         description: "Minimum depth at a position"
         type: integer
         minimum: 0
-        default: 5
+        default: 15
     required:
       - required_depth
 
@@ -112,7 +112,7 @@ properties:
         description: "Minimum allelic depth on either strand."
         type: integer
         minimum: 0
-        default: 15
+        default: 5
       minimum_support:
         description: "Minimum number of reads allele must be present in."
         type: number
@@ -124,6 +124,17 @@ properties:
       - minimum_strand_depth
       - minimum_support
 
+  call_consensus:
+    description: "Parameters passes to the consensus calling step"
+    type: object
+    properties:
+      consensus_parameters:
+        description: "Parameters passed to the 'bcftools consensus' program."
+        type: string
+        default: "--mark-del N"
+    required:
+      - consensus_parameters
+
 required:
   - run_type
   - samples
@@ -133,3 +144,4 @@ required:
   - coverage_mask
   - call_variants
   - filter_variants
+  - call_consensus
