@@ -1,12 +1,8 @@
 $sidebar-width: 21;
 
-ScrollableContainer {
-    align: center top;
-}
-
 Button {
     width: $sidebar-width;
-    border: solid $accent;
+    border: solid $panel-lighten-3;
     content-align: left middle;
     align: center top;
     padding: 0;
@@ -14,18 +10,24 @@ Button {
     background: $background-lighten-1;
 }
 
+InfoInput {
+    layout: horizontal;
+    content-align: left middle;
+    align: center middle;
+    padding: 1;
+}
+/*InfoInput {
+    layout: horizontal;
+    margin: 1;
+    border: solid $accent;
+}*/
+
 Label {
     margin: 1 3;
 }
 
-#sidebar {
-    width: $sidebar-width;
-    /*border: solid $accent;*/
-    content-align: center middle;
-}
-
-#parameters {
-    border: solid $accent;
+ScrollableContainer {
+    align: center top;
 }
 
 #information {
@@ -35,4 +37,40 @@ Label {
     margin: 0;
     padding: 0;
     dock: bottom;
+}
+
+#parameters {
+    border: solid $panel-lighten-3;
+    border-title-color: $text;
+}
+
+#parameterlabel {
+    max-width: 25;
+    margin: 1;
+    dock: left;
+}
+
+#parameterinput {
+}
+
+#sidebar {
+    width: $sidebar-width;
+    /*border: solid $accent;*/
+    content-align: center middle;
+}
+
+.hovered {
+    background: $background-lighten-2;
+}
+
+InfoButton:hover {
+    border: solid $accent
+}
+
+InfoInput:hover {
+    background: $background-lighten-2;
+}
+
+InfoInput > Static:hover {
+    background: $background-lighten-2;
 }

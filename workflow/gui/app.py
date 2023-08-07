@@ -1,10 +1,10 @@
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal
-from textual.message import Message
-from textual.widgets import Header, Footer, Button, Label, Static
+from textual.widgets import Header, Footer, Static
 
-DEFAULT_INFORMATION = "Greetings from Eureka. Select any tab on the left to edit parameters for that step."
+from widgets import InfoButton, InfoInput
+from messages import DEFAULT_INFORMATION, MEAN_MESSAGE
 
 BUTTONS = {
     "Samples": "Add information about samples.",
@@ -14,24 +14,6 @@ BUTTONS = {
     "Consensus Calling": "Specify parameters for consensus calling.",
     "Masking": "Specify parameters for masking.",
 }
-
-
-class InfoButton( Button ):
-    class Describe( Message ):
-
-        def __init__( self, description: str ) -> None:
-            self.description = description
-            super().__init__()
-
-    def __init__( self, label: str, description: str ) -> None:
-        self.description = description
-        super().__init__( label=label )
-
-    def on_enter( self ) -> None:
-        self.post_message( self.Describe( self.description ) )
-
-    def on_leave( self ) -> None:
-        self.post_message( self.Describe( DEFAULT_INFORMATION ) )
 
 
 class StopwatchApp( App ):
@@ -51,20 +33,22 @@ class StopwatchApp( App ):
         yield Footer()
 
         container = Container( *(InfoButton( label, desc ) for label, desc in BUTTONS.items()), id="sidebar" )
-        # container.border_title = "Tabs"
-        parameters = Container( Label( "these are the parameters" ), id="parameters" )
+
+        parameters = Container( InfoInput( MEAN_MESSAGE ), InfoInput( MEAN_MESSAGE ), id="parameters" )
         parameters.border_title = "Parameters"
 
         information = Static( DEFAULT_INFORMATION, id="information" )
         information.border_title = "Information"
-        foo = Container( parameters, information )
+        rightside = Container( parameters, information )
 
         with Horizontal( id="mainlayout" ):
             yield container
-            yield foo
+            yield rightside
 
-    def on_info_button_describe( self, message: InfoButton.Describe ) -> None:
-        print( "Called" )
+    def on_info_button_description( self, message: InfoButton.Description ) -> None:
+        self.query_one( "#information" ).update( renderable=message.description )
+
+    def on_info_input_description( self, message: InfoInput.Description ) -> None:
         self.query_one( "#information" ).update( renderable=message.description )
 
 
