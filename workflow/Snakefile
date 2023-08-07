@@ -43,6 +43,7 @@ print( "Done\n" )
 rule all:
     message: "Generate consensus sequence for all samples indicated by {config[samples]}"
     input:
-        expand( "intermediates/illumina/consensus/{sample}.consensus.fasta",sample=SAMPLES )
+        expand( "intermediates/illumina/consensus/{sample}.masked.fasta",sample=SAMPLES )
 
 include: f"rules/consensus_calling_{run_type}.smk"
+include: f"rules/masking_{run_type}.smk"

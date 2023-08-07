@@ -10,10 +10,15 @@ properties:
   samples:
     description: "Location of metadata for samples being processed by the pipeline."
     type: string
+    pattern: "^.*\\.[ct]sv$"
   reference:
-    description: "Location of reference sequence. Must be in fasta format."
+    description: "Location of reference sequence. Must be in fasta format (.fasta|.fa)."
     type: string
     pattern: "^.*\\.(fasta|fa)$"
+  recombinant_mask:
+    description: "Published list of recombinant sites to mask from consensus sequence. Must be a '.gff' file."
+    type: string
+    pattern: "^.*\\.gff$"
 
   alignment_bwa:
     description: "Parameters for the alignment step using BWA."
@@ -145,3 +150,4 @@ required:
   - call_variants
   - filter_variants
   - call_consensus
+  - recombinant_mask

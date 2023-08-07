@@ -140,7 +140,7 @@ rule align_and_normalize_variants:
         """
 
 
-rule call_concensus:
+rule call_consensus:
     message: "For sample {wildcards.sample}, apply variants to reference to create consensus sequences. Masks sites with less than desired coverage."
     input:
         variants=rules.align_and_normalize_variants.output.normalized_variants,
