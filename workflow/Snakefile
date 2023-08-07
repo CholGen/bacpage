@@ -13,7 +13,7 @@ print(
    """
 )
 
-print( "Loading and validating configuration file...",end=" " )
+print( "Loading and validating configuration file...",end="" )
 try:
     assert config != { }, "Config must be specified in command line using '--configfile <path-to-config-file>'"
     assert "run_type" in config, "No reference in config to run_type. Please specify whether run is for 'ONT' long reads or 'Illumina' short reads."
@@ -27,7 +27,7 @@ except Exception:
 
 print( "Done" )
 
-print( "Loading and validating samples metadata...",end=" " )
+print( "Loading and validating samples metadata...",end="" )
 try:
     md = pd.read_csv( config["samples"] )
     validate( md,f"schemas/{run_type}_metadata.schema.yaml" )
@@ -41,7 +41,9 @@ except Exception:
 print( "Done\n" )
 
 rule all:
+    message: "Generate consensus sequence for all samples indicated by {config[samples]}"
     input:
-        expand( "intermediates/illumina/trimmed_bams/{sample}.trimmed.sorted.bam",sample=SAMPLES )
+        expand( "intermediates/illumina/depth/{sample}.depthmask.bed",sample=SAMPLES ),
+        expand( "intermediates/illumina/variants/{sample}.bcftools.vcf",sample=SAMPLES )
 
 include: f"rules/consensus_calling_{run_type}.smk"

@@ -10,3 +10,18 @@ trimming:
   minimum_length: 30
   minimum_quality: 20
   window_length: 4
+
+coverage_mask:
+  required_depth: 5
+
+call_variants:
+  maximum_depth: 2000
+  minimum_mapping_quality: 30
+  minimum_base_quality: 20
+  mpileup_parameters: "-B -a INFO/AD,INFO/ADF,INFO/ADR -Ou"
+  call_parameters: -mv -Ov --ploidy 1
+
+filter_variants:
+  minimum_depth: 15
+  minimum_support: 0.5
+  minimum_strand_depth: 15

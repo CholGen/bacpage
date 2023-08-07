@@ -51,9 +51,85 @@ properties:
       - minimum_quality
       - window_length
 
+  coverage_mask:
+    description: "Parameters required for creation of a bed depth file."
+    type: object
+    properties:
+      required_depth:
+        description: "Minimum depth at a position"
+        type: integer
+        minimum: 0
+        default: 5
+    required:
+      - required_depth
+
+  call_variants:
+    description: "Parameters required for calling variants from an alignment."
+    type: object
+    properties:
+      maximum_depth:
+        description: "Maximum number of reads read at a position."
+        type: integer
+        exclusiveMinimum: 0
+        default: 2000
+      minimum_mapping_quality:
+        description: "Minimum mapping quality for an alignment to be used."
+        type: integer
+        minimum: 0
+        exclusiveMaximum: 255
+        default: 30
+      minimum_base_quality:
+        description: "Minimum base quality for a base to be considered."
+        type: integer
+        exclusiveMinimum: 0
+        maximum: 60
+        default: 20
+      mpileup_parameters:
+        description: "Parameters passed to the 'bcftools mpileup' command."
+        type: string
+        default: "-B -a INFO/AD,INFO/ADF,INFO/ADR -Ou"
+      call_parameters:
+        description: "Paramteres passed to the 'bcftools call' command."
+        type: string
+        default: "-mv -Ov --ploidy 1"
+    required:
+      - maximum_depth
+      - minimum_mapping_quality
+      - minimum_base_quality
+      - mpileup_parameters
+      - call_parameters
+
+  filter_variants:
+    description: "Parameters involved in filtering variants prior to consensus calling."
+    type: object
+    properties:
+      minimum_depth:
+        description: "Minimum allelic depth at a position."
+        type: integer
+        minimum: 0
+        default: 15
+      minimum_strand_depth:
+        description: "Minimum allelic depth on either strand."
+        type: integer
+        minimum: 0
+        default: 15
+      minimum_support:
+        description: "Minimum number of reads allele must be present in."
+        type: number
+        exclusiveMinimum: 0
+        maximum: 1
+        default: 0.5
+    required:
+      - minimum_depth
+      - minimum_strand_depth
+      - minimum_support
+
 required:
   - run_type
   - samples
   - reference
   - alignment_bwa
   - trimming
+  - coverage_mask
+  - call_variants
+  - filter_variants
