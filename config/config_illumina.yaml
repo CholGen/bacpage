@@ -2,6 +2,7 @@
 run_type: "Illumina"
 samples: "input/illumina_sequences.csv"
 reference: "resources/vc_reference.fasta"
+reference_genes: "resources/cholera_ref_genes/"
 recombinant_mask: "resources/cholera_mask.gff"
 
 alignment_bwa:

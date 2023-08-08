@@ -15,10 +15,14 @@ properties:
     description: "Location of reference sequence. Must be in fasta format (.fasta|.fa)."
     type: string
     pattern: "^.*\\.(fasta|fa)$"
+  reference_genes:
+    description: "Location of directory containing reference genes for typing purposes."
+    type: string
   recombinant_mask:
     description: "Published list of recombinant sites to mask from consensus sequence. Must be a '.gff' file."
     type: string
     pattern: "^.*\\.gff$"
+
 
   alignment_bwa:
     description: "Parameters for the alignment step using BWA."
@@ -144,6 +148,7 @@ required:
   - run_type
   - samples
   - reference
+  - reference_genes
   - alignment_bwa
   - trimming
   - coverage_mask

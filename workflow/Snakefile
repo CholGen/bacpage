@@ -1,8 +1,20 @@
 from snakemake.utils import validate
 import pandas as pd
 
+
+def get_genes() -> dict[str, str]:
+    genes = dict()
+    for file in os.listdir( config["reference_genes"] ):
+        if file.endswith( (".fa", ".fasta") ):
+            gene = os.path.splitext( file )[0]
+            path = os.path.join( config["reference_genes"],file )
+            genes[gene] = path
+    return genes
+
+
 print(
-    """                  GREETINGS FROM:
+    """
+                      GREETINGS FROM:
  _______  __   __  ______    _______  ___   _  _______ 
 |       ||  | |  ||    _ |  |       ||   | | ||   _   |
 |    ___||  | |  ||   | ||  |    ___||   |_| ||  |_|  |
@@ -38,12 +50,23 @@ try:
 except Exception:
     print( "Error" )
     raise
-print( "Done\n" )
+print( "Done" )
+
+print( "Identifying gene sequences for typing...",end="" )
+try:
+    GENES = get_genes()
+except Exception:
+    print( "Error" )
+    raise
+print( "Done" )
+print( f"The following genes will be used: [{', '.join( GENES.keys() )}]\n" )
 
 rule all:
     message: "Generate consensus sequence for all samples indicated by {config[samples]}"
     input:
-        expand( "intermediates/illumina/consensus/{sample}.masked.fasta",sample=SAMPLES )
+        expand( "intermediates/illumina/consensus/{sample}.masked.fasta",sample=SAMPLES ),
+        expand( "results/reports/{sample}.typing.csv",sample=SAMPLES )
 
 include: f"rules/consensus_calling_{run_type}.smk"
 include: f"rules/masking_{run_type}.smk"
+include: f"rules/typing_{run_type}.smk"
