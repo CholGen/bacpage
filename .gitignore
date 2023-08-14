@@ -4,6 +4,7 @@
 !config/*
 !resources
 !resources/*
+!resources/*/*.fasta
 !workflow
 !workflow/**
 .gitignore

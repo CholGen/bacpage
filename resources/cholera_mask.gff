@@ -1,0 +1,21 @@
+gff_seqname	artemis	repeat_region	260119	260435	.	-	.	ID=repeat_region:complement(260119..260435);note=*mobile_element_type: insertion sequence incomplete:IS1004
+gff_seqname	artemis	repeat_region	260620	261945	.	+	.	ID=repeat_region:260620..261945;note=*mobile_element_type: insertion sequence:IS1358
+gff_seqname	artemis	repeat_region	262290	263547	.	+	.	ID=repeat_region:262290..263547;note=*mobile_element_type: insertion sequence:ISVch4
+gff_seqname	manual	mobile_element_insertion	523156	550021	.	+	.	ID=mobile_element_insertion:523156..550021;note=VSP-II
+gff_seqname	artemis	repeat_region	531197	532469	.	-	.	ID=repeat_region:complement(531197..532469);note=*mobile_element_type: insertion sequence:Novel ISVch4 like
+gff_seqname	artemis	repeat_region	532845	533887	.	-	.	ID=repeat_region:complement(532845..533887);note=*mobile_element_type: insertion sequence:ISVch8
+gff_seqname	artemis	repeat_region	873209	874231	.	+	.	ID=repeat_region:873209..874231;note=*mobile_element_type: insertion sequence:ISVch1
+gff_seqname	artemis	repeat_region	874234	874439	.	+	.	ID=repeat_region:874234..874439;note=*mobile_element_type: insertion sequence incomplete:ISVch8
+gff_seqname	artemis	repeat_region	874266	875010	.	-	.	ID=repeat_region:complement(874266..875010);note=*mobile_element_type: insertion sequence:Novel ISVvu5 like
+gff_seqname	artemis	repeat_region	935798	936412	.	+	.	ID=repeat_region:935798..936412;note=*mobile_element_type: insertion sequence:IS1004
+gff_seqname	artemis	repeat_region	1583124	1584390	.	+	.	ID=repeat_region:1583124..1584390;note=*mobile_element_type: insertion sequence:ISVch4
+gff_seqname	manual	mobile_element_insertion	1563785	1585290	.	+	.	ID=mobile_element_insertion:1563785..1585290;note=TLC-RS1-CTX
+gff_seqname	artemis	repeat_region	1937511	1938768	.	-	.	ID=repeat_region:complement(1937511..1938768);note=*mobile_element_type: insertion sequence:ISVch4
+gff_seqname	artemis	repeat_region	3180943	3181563	.	-	.	ID=repeat_region:complement(3180943..3181563);note=*mobile_element_type: insertion sequence:IS1004
+gff_seqname	artemis	repeat_region	3253383	3254003	.	-	.	ID=repeat_region:complement(3253383..3254003);note=*mobile_element_type: insertion sequence:IS1004
+gff_seqname	artemis	repeat_region	3262783	3263979	.	+	.	ID=repeat_region:3262783..3263979;note=*mobile_element_type: insertion sequence:ISVch5
+gff_seqname	artemis	repeat_region	3318358	3319615	.	-	.	ID=repeat_region:complement(3318358..3319615);note=*mobile_element_type: insertion sequence:ISVch4
+gff_seqname	artemis	repeat_region	3377639	3378832	.	-	.	ID=repeat_region:complement(3377639..3378832);note=*mobile_element_type: insertion sequence:ISVch5
+gff_seqname	artemis	repeat_region	3389398	3390018	.	+	.	ID=repeat_region:3389398..3390018;note=*mobile_element_type: insertion sequence:IS1004
+gff_seqname	artemis	repeat_region	3396565	3397822	.	+	.	ID=repeat_region:3396565..3397822;note=*mobile_element_type: insertion sequence:ISVch4
+gff_seqname	artemis	repeat_region	3696945	3698202	.	-	.	ID=repeat_region:complement(3696945..3698202);note=*mobile_element_type: insertion sequence:ISVch4
