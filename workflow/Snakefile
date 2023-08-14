@@ -36,7 +36,6 @@ try:
 except Exception:
     print( "Error" )
     raise
-
 print( "Done" )
 
 print( "Loading and validating samples metadata...",end="" )
@@ -60,6 +59,8 @@ except Exception:
     raise
 print( "Done" )
 print( f"The following genes will be used: [{', '.join( GENES.keys() )}]\n" )
+
+workdir: config["output_directory"]
 
 rule all:
     message: "Generate consensus sequence for all samples indicated by {config[samples]}"

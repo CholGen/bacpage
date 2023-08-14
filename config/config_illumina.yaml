@@ -1,9 +1,10 @@
 # General parameters; point to input files and the like.
 run_type: "Illumina"
-samples: "input/illumina_sequences.csv"
-reference: "resources/vc_reference.fasta"
-reference_genes: "resources/cholera_ref_genes/"
-recombinant_mask: "resources/cholera_mask.gff"
+samples: "/home/nate/analysis/2023.07.28_cholera/input/illumina_sequences.csv"
+output_directory: "/home/nate/analysis/temp"
+reference: "/home/nate/analysis/2023.07.28_cholera/resources/vc_reference.fasta"
+reference_genes: "/home/nate/analysis/2023.07.28_cholera/resources/cholera_ref_genes/"
+recombinant_mask: "/home/nate/analysis/2023.07.28_cholera/resources/cholera_mask.gff"
 
 alignment_bwa:
   bwa_params: "-M"
