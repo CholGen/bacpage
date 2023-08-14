@@ -1,0 +1,16 @@
+name: base
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - snakemake = 7.31.0
+  - pandas
+  - filtlong = 0.2.1
+  - fastqc
+  - multiqc
+  - qualimap
+  - bwa = 0.7.17
+  - samtools = 1.17
+  - mafft = 7.464
+  - bedtools = 2.25.0
+  - bcftools = 1.17
