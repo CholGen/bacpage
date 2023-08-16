@@ -66,7 +66,8 @@ rule all:
     message: "Generate consensus sequence for all samples indicated by {config[samples]}"
     input:
         expand( "intermediates/illumina/consensus/{sample}.masked.fasta",sample=SAMPLES ),
-        "results/reports/typing_information.csv"
+        "results/reports/typing_information.csv",
+        "results/reports/mlst_types.csv"
 
 #"results/reports/final_report.html"
 

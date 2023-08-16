@@ -1,4 +1,5 @@
 rule combine_index_genes:
+    message: "Combine reference genes for typing into a single indexed file."
     input:
         sequence=GENES.values()
     output:
@@ -18,7 +19,9 @@ rule combine_index_genes:
 
         shell( "bwa index {output.core_genes}" )
 
+
 rule align_to_genes:
+    message: "Align reads from {wildcards.sample} to typing reference genes."
     input:
         reference=rules.combine_index_genes.output.core_genes,
         reference_index=rules.combine_index_genes.output.index,
@@ -27,8 +30,8 @@ rule align_to_genes:
     params:
         bwa_params=config["alignment_bwa"]["bwa_params"]
     output:
-        alignment="intermediates/illumina/typing/{sample}.typing.bam",
-        alignment_index="intermediates/illumina/typing/{sample}.typing.bam.bai"
+        alignment=temp( "intermediates/illumina/typing/{sample}.typing.bam" ),
+        alignment_index=temp( "intermediates/illumina/typing/{sample}.typing.bam.bai" )
     threads: 8
     shell:
         """
@@ -46,6 +49,7 @@ rule align_to_genes:
 
 
 rule calculate_gene_alignment_states:
+    message: "Determine which typing genes have coverage in {wildcards.sample}."
     input:
         alignment=rules.align_to_genes.output.alignment
     params:
@@ -61,7 +65,9 @@ rule calculate_gene_alignment_states:
             --output {output.stats}
         """
 
+
 rule combine_gene_alignment_stats:
+    message: "Combine the typing stats for each sample into a single report."
     input:
         stats=expand( "intermediates/illumina/typing_stats/{sample}.stats.csv",sample=SAMPLES )
     output:
@@ -69,4 +75,22 @@ rule combine_gene_alignment_stats:
     shell:
         """
         awk '(NR == 1) || (FNR > 1)' {input.stats} > {output.report}
+        """
+
+
+rule mlst_profiling:
+    message: "Scan consensus sequences against PubMLST typing schemes to identify sequence types."
+    input:
+        sequences=expand( "intermediates/illumina/consensus/{sample}.consensus.fasta",sample=SAMPLES )
+    params:
+        scheme=config["mlst_profiling"]["scheme"],
+        mlst_params=config["mlst_profiling"]["mlst_params"]
+    output:
+        types="results/reports/mlst_types.csv"
+    shell:
+        """
+        mlst \
+            --scheme {params.scheme} \
+            {params.mlst_params} \
+            {input.sequences} > {output.types}
         """

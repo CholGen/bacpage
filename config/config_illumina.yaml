@@ -1,7 +1,7 @@
 # General parameters; point to input files and the like.
 run_type: "Illumina"
 samples: "/home/nate/analysis/2023.07.28_cholera/input/illumina_sequences.csv"
-output_directory: "/home/nate/analysis/temp"
+output_directory: "/home/nate/analysis/2023.07.28_cholera/"
 reference: "/home/nate/analysis/2023.07.28_cholera/resources/vc_reference.fasta"
 reference_genes: "/home/nate/analysis/2023.07.28_cholera/resources/cholera_ref_genes/"
 recombinant_mask: "/home/nate/analysis/2023.07.28_cholera/resources/cholera_mask.gff"
@@ -31,3 +31,7 @@ filter_variants:
 
 call_consensus:
   consensus_parameters: "--mark-del N"
+
+mlst_profiling:
+  scheme: "vcholerae"
+  mlst_params: "--quiet --csv --legacy"

@@ -147,6 +147,22 @@ properties:
     required:
       - consensus_parameters
 
+  mlst_profiling:
+    description: "Parameters used while performing MLST profiling."
+    type: object
+    properties:
+      scheme:
+        description: "Organism to target. Must be a scheme known by mlst (use `mlst --info` to check)."
+        type: string
+        default: vcholerae
+      mlst_params:
+        description: "Parameters passed directed to mlst program"
+        type: string
+        default: "--quiet --csv --legacy"
+    required:
+      - scheme
+      - mlst_params
+
 required:
   - run_type
   - samples
@@ -160,3 +176,4 @@ required:
   - filter_variants
   - call_consensus
   - recombinant_mask
+  - mlst_profiling
