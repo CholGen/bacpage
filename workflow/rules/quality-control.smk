@@ -41,11 +41,10 @@ rule combine_reports:
         expand( "results/reports/samtools/{sample}.idxstats.txt",sample=SAMPLES )
     output:
         report="results/reports/qc_report.html",
-        report_directory=directory( "results/reports/qc_data/" )
+        report_directory=directory( "results/reports/qc_report_data/" )
     shell:
         """
         multiqc \
             --filename {output.report} \
-            --outdir {output.report_directory} \
             results/reports/
         """
