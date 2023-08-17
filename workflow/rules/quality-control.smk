@@ -7,6 +7,7 @@ rule fastqc:
     threads: 8
     shell:
         """
+        mkdir {output.directory} && \
         fastqc \
             --outdir {output.directory} \
             --quiet \
