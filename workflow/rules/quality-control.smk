@@ -1,7 +1,7 @@
 rule fastqc:
     input:
-        read1s=[file["read1"] for file in SAMPLES.values()],
-        read2s=[file["read2"] for file in SAMPLES.values()]
+        reads1=lambda wildcards: SAMPLES[wildcards.sample]["read1"],
+        reads2=lambda wildcards: SAMPLES[wildcards.sample]["read2"],
     output:
         directory=directory( "results/reports/fastqc/{sample}/" ),
     threads: 8
@@ -10,8 +10,9 @@ rule fastqc:
         mkdir {output.directory} && \
         fastqc \
             --outdir {output.directory} \
+            --threads {threads} \
             --quiet \
-            {input.read1s} {input.read2s}
+            {input.reads1} {input.reads2}
         """
 
 rule alignment_stats:

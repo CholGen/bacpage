@@ -11,21 +11,6 @@ rule index_reference:
         """
 
 
-#rule concat_fastqc_reports:
-#    input:
-#        reports=rules.fastqc.output.report1s + rules.fastqc.output.report2s
-#    params:
-#        report_directory="results/reports/"
-#    output:
-#        combined_report="results/reports/final_report.html"
-#    shell:
-#        """
-#        multiqc \
-#            --no-data-dir \
-#            --filename {output.combined_report} \
-#            {params.report_directory}
-#        """
-
 rule alignment_bwa:
     message: "Mapping reads for {wildcards.sample} to {input.reference} using `bwa mem`."
     input:
