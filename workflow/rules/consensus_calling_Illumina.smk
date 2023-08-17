@@ -10,38 +10,21 @@ rule index_reference:
         bwa index {input.reference}
         """
 
-rule fastqc:
-    input:
-        read1s=[file["read1"] for file in SAMPLES.values()],
-        read2s=[file["read2"] for file in SAMPLES.values()]
-    output:
-        directory=directory( "results/reports/fastqc/" ),
-        report1s=[file["read1"].replace( ".fastq.gz","_fastqc.html" ) for file in SAMPLES.values()],
-        report2s=[file["read2"].replace( ".fastq.gz","_fastqc.html" ) for file in SAMPLES.values()]
-    threads: 8
-    shell:
-        """
-        mkdir {output.directory} && \
-        fastqc \
-            --outdir {output.directory} \
-            --quiet \
-            {input.read1s} {input.read2s}
-        """
 
-rule concat_fastqc_reports:
-    input:
-        reports=rules.fastqc.output.report1s + rules.fastqc.output.report2s
-    params:
-        report_directory="results/reports/"
-    output:
-        combined_report="results/reports/final_report.html"
-    shell:
-        """
-        multiqc \
-            --no-data-dir \
-            --filename {output.combined_report} \
-            {params.report_directory}
-        """
+#rule concat_fastqc_reports:
+#    input:
+#        reports=rules.fastqc.output.report1s + rules.fastqc.output.report2s
+#    params:
+#        report_directory="results/reports/"
+#    output:
+#        combined_report="results/reports/final_report.html"
+#    shell:
+#        """
+#        multiqc \
+#            --no-data-dir \
+#            --filename {output.combined_report} \
+#            {params.report_directory}
+#        """
 
 rule alignment_bwa:
     message: "Mapping reads for {wildcards.sample} to {input.reference} using `bwa mem`."
@@ -53,8 +36,7 @@ rule alignment_bwa:
     params:
         bwa_params=config["alignment_bwa"]["bwa_params"]
     output:
-        alignment="intermediates/illumina/merged_aligned_bams/{sample}.sorted.bam",
-        alignment_stats="intermediates/illumina/merged_aligned_bams/{sample}.stats"
+        alignment="intermediates/illumina/merged_aligned_bams/{sample}.sorted.bam"
     threads: 8
     shell:
         """
@@ -67,8 +49,7 @@ rule alignment_bwa:
         samtools sort - |\
         samtools addreplacerg \
             -r "ID:{wildcards.sample}" \
-            -o {output.alignment} - && \
-        samtools stats {output.alignment} > {output.alignment_stats} 
+            -o {output.alignment} - 
         """
 
 

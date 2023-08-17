@@ -28,7 +28,7 @@ print(
 
 print( "Loading and validating configuration file...",end="" )
 try:
-    assert config != {}, "Config must be specified in command line using '--configfile <path-to-config-file>'"
+    assert config != { }, "Config must be specified in command line using '--configfile <path-to-config-file>'"
     assert "run_type" in config, "No reference in config to run_type. Please specify whether run is for 'ONT' long reads or 'Illumina' short reads."
     run_type = config["run_type"]
     assert config["run_type"] in ["ONT",
@@ -68,10 +68,12 @@ rule all:
     input:
         expand( "intermediates/illumina/consensus/{sample}.masked.fasta",sample=SAMPLES ),
         "results/reports/typing_information.csv",
-        "results/reports/mlst_types.csv"
+        "results/reports/mlst_types.csv",
+        "results/reports/qc_report.html"
 
 #"results/reports/final_report.html"
 
 include: f"rules/consensus_calling_{run_type}.smk"
 include: f"rules/masking_{run_type}.smk"
 include: f"rules/typing_{run_type}.smk"
+include: "rules/quality-control.smk"
