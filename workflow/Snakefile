@@ -1,5 +1,6 @@
 from snakemake.utils import validate
 import pandas as pd
+import os
 
 
 def get_genes() -> dict[str, str]:

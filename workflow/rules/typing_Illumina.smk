@@ -53,12 +53,13 @@ rule calculate_gene_alignment_states:
     input:
         alignment=rules.align_to_genes.output.alignment
     params:
+        script_location=os.path.join( workflow.basedir,"workflow/scripts/calculate_typing_stats.py" ),
         minimum_coverage=config["coverage_mask"]["required_depth"]
     output:
         stats="intermediates/illumina/typing_stats/{sample}.stats.csv"
     shell:
         """
-        python workflow/scripts/calculate_typing_stats.py \
+        python {params.script_location} \
             --alignment {input.alignment} \
             --min-coverage {params.minimum_coverage} \
             --sample-name {wildcards.sample} \
