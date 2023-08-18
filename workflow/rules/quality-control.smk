@@ -4,7 +4,7 @@ rule fastqc:
         reads2=lambda wildcards: SAMPLES[wildcards.sample]["read2"],
     output:
         directory=directory( "results/reports/fastqc/{sample}/" ),
-    threads: 8
+    threads: 2
     shell:
         """
         mkdir {output.directory} && \
@@ -28,17 +28,31 @@ rule alignment_stats:
         samtools stats {input.alignment} > {output.alignment_stats} 
         """
 
-#rule bamqc:
-#    input:
-#        alignment = rules.alignment_bwa.output.alignment
-#    output:
+rule bamqc:
+    input:
+        alignment=rules.alignment_bwa.output.alignment
+    output:
+        reheaded_alignment="intermediates/illumina/merged_aligned_bams/{sample}.headed.bam",
+        report_directory="results/reports/bamqc/{sample}/"
+    threads: 8
+    shell:
+        """
+        samtools view -H {input.alignment} | \ 
+        sed 's,^@RG.*,@RG\tID:None\tSM:None\tLB:None\tPL:Illumina,g' | \
+        samtools reheader - {input.alignment} > {output.reheaded_alignment} && \
+        qualimap bamqc \
+            -bam {output.reheaded_alignment} \
+            -nt {threads} \
+            -outdir {output.report_directory}
+        """
 
 
 rule combine_reports:
     input:
         expand( "results/reports/fastqc/{sample}/",sample=SAMPLES ),
         expand( "results/reports/samtools/{sample}.stats.txt",sample=SAMPLES ),
-        expand( "results/reports/samtools/{sample}.idxstats.txt",sample=SAMPLES )
+        expand( "results/reports/samtools/{sample}.idxstats.txt",sample=SAMPLES ),
+        expand( "results/reports/bamqc/{sample}/",sample=SAMPLES )
     output:
         report="results/reports/qc_report.html",
         report_directory=directory( "results/reports/qc_report_data/" )
