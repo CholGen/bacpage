@@ -38,7 +38,7 @@ rule bamqc:
     shell:
         """
         samtools view -H {input.alignment} |\ 
-        sed 's,^@RG.*,@RG\tID:None\tSM:None\tLB:None\tPL:Illumina,g' |\
+        sed 's,^@RG.*,@RG\\tID:None\\tSM:None\\tLB:None\\tPL:Illumina,g' |\
         samtools reheader - {input.alignment} > {output.reheaded_alignment} && \
         qualimap bamqc \
             -bam {output.reheaded_alignment} \
