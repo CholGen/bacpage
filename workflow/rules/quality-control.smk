@@ -33,7 +33,7 @@ rule bamqc:
         alignment=rules.alignment_bwa.output.alignment
     output:
         reheaded_alignment="intermediates/illumina/merged_aligned_bams/{sample}.headed.bam",
-        report_directory="results/reports/bamqc/{sample}/"
+        report_directory=directory( "results/reports/bamqc/{sample}/" )
     threads: 8
     shell:
         """
