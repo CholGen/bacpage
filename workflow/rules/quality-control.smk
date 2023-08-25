@@ -47,7 +47,7 @@ rule bamqc:
         """
 
 
-rule combine_reports:
+rule generate_complete_report:
     input:
         expand( "results/reports/fastqc/{sample}/",sample=SAMPLES ),
         expand( "results/reports/samtools/{sample}.stats.txt",sample=SAMPLES ),
