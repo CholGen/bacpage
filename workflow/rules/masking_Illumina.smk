@@ -6,7 +6,7 @@ rule mask_consensus:
     output:
         first_tmp_consensus=temp( "intermediates/illumina/consensus/{sample}.tmp1.fasta" ),
         second_tmp_consensus=temp( "intermediates/illumina/consensus/{sample}.tmp2.fasta" ),
-        masked_consensus="intermediates/illumina/consensus/{sample}.masked.fasta"
+        masked_consensus="results/consensus_sequences/{sample}.masked.fasta"
     shell:
         """
         HEADER=$(cut -f1 {input.recombinant_mask} | uniq | head -n1) && \
