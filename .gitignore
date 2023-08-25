@@ -16,3 +16,5 @@
 !README.md
 !environment.yaml
 !Dockerfile
+!example/**
+!test/**
