@@ -44,7 +44,7 @@ try:
     md = pd.read_csv( config["samples"] )
     validate( md,f"schemas/{run_type}_metadata.schema.yaml" )
     if run_type == "Illumina":
-        md["size"] = md["read1"].apply( os.path.getsize() )
+        md["size"] = md["read1"].apply( os.path.getsize )
         skipped_samples = md.loc[md["size"] < 100, "sample"].to_list()
         md = md.loc[md["size"] >= 100]
         SAMPLES = md.set_index( "sample" )[["read1", "read2"]].to_dict( orient="index" )
