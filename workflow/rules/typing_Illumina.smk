@@ -72,11 +72,16 @@ rule combine_gene_alignment_stats:
     input:
         stats=expand( "intermediates/illumina/typing_stats/{sample}.stats.csv",sample=SAMPLES )
     output:
-        report="results/reports/typing_information.csv"
-    shell:
-        """
-        awk '(NR == 1) || (FNR > 1)' {input.stats} > {output.report}
-        """
+        report="results/reports/typing_information.csv",
+        detailed_report="results/reports/typing_information_detailed.csv"
+    run:
+        import pandas as pd
+
+        stats = [pd.read_csv( file ) for file in input.stats]
+        stats = pd.concat( stats )
+        stats.to_csv( output.detailed_report,index=False )
+        stats = stats.pivot( index="sample",columns="gene",values="frac_covered" ).sort_index()
+        stats.to_csv( output.report )
 
 
 rule mlst_profiling:
