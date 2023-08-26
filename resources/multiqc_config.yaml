@@ -1,0 +1,13 @@
+extra_fn_clean_exts:
+  - ".headed"
+  - type: regex
+    pattern: "_S\d{1,3}_L\d{3}_R[1,2]_\d{3}"
+
+remove_sections:
+  - qualimap-coverage-histogram
+  - qualimap-gc-distribution
+  - samtools-stats
+  - fastqc_per_sequence_quality_scores
+  - fastqc_per_base_n_content
+  - fastqc_overrepresented_sequences
+  - fastqc_status_checks
