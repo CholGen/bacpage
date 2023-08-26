@@ -54,7 +54,7 @@ rule generate_complete_report:
         expand( "results/reports/samtools/{sample}.idxstats.txt",sample=SAMPLES ),
         expand( "results/reports/bamqc/{sample}/",sample=SAMPLES )
     params:
-        multiqc_config=os.path.join( workflow.basedir,"resources/multiqc_config.yaml" )
+        multiqc_config=os.path.join( workflow.basedir,"../resources/multiqc_config.yaml" )
     output:
         report="results/reports/qc_report.html",
         report_directory=directory( "results/reports/qc_report_data/" )
