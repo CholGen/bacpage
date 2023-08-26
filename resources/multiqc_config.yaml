@@ -1,7 +1,7 @@
 extra_fn_clean_exts:
   - ".headed"
   - type: regex
-    pattern: "_S\d{1,3}_L\d{3}_R[1,2]_\d{3}"
+    pattern: "_S\\d{1,3}_L\\d{3}_R[1,2]_\\d{3}"
 
 remove_sections:
   - qualimap-coverage-histogram
@@ -11,3 +11,71 @@ remove_sections:
   - fastqc_per_base_n_content
   - fastqc_overrepresented_sequences
   - fastqc_status_checks
+
+qualimap_config:
+  general_stats_coverage:
+    - 1
+    - 15
+
+module_order:
+  - qualimap
+  - samtools
+  - fastqc
+
+report_section_order:
+  fastqc:
+    order: -1000
+  Samtools:
+    order: -1001
+  qualimap:
+    order: -1002
+
+
+table_columns_visible:
+  FastQC:
+    percent_duplicates: True
+    percent_gc: True
+    avg_sequence_length: False
+    median_sequence_length: True
+    percent_fails: False
+    total_sequences: False
+  Samtools:
+    error_rate: True
+    non-primary_alignments: False
+    reads_mapped: False
+    reads_mapped_percent: False
+    reads_properly_paired_percent: False
+    reads_MQ0_percent: False
+    raw_total_sequences: True
+  QualiMap:
+    avg_gc: False
+    median_insert_size: True
+    1_x_pc: False
+    15_x_pc: True
+    30_x_pc: False
+    median_coverage: True
+    mean_coverage: False
+    percentage_aligned: True
+    mapped_reads: False
+    total_reads: False
+    general_error_rate: False
+
+table_columns_placement:
+  FastQC:
+    median_sequence_length: -999
+    percent_duplicates: -998
+    percent_gc: -997
+  Samtools:
+    raw_total_sequences: -1000
+  QualiMap:
+    percentage_aligned: -996
+    median_insert_size: -995
+    15_x_pc: -994
+    median_coverage: -993
+    error_rate: -992
+
+
+read_count_multiplier: 0.001
+read_count_prefix: "K"
+read_count_desc: "thousands"
+thousandsSep_format: ""

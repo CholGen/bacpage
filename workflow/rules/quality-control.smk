@@ -1,7 +1,9 @@
 rule fastqc:
+    # We're assuming that R1 is representative of R2. This should generally work and I can't think of a reason where
+    # problems would only pop up in one rather than the other.
+    message: "Calculate quality control metrics for raw sequencing reads of {wildcards.sample}."
     input:
         reads1=lambda wildcards: SAMPLES[wildcards.sample]["read1"],
-        reads2=lambda wildcards: SAMPLES[wildcards.sample]["read2"],
     output:
         directory=directory( "results/reports/fastqc/{sample}/" ),
     threads: 2
@@ -12,7 +14,7 @@ rule fastqc:
             --outdir {output.directory} \
             --threads {threads} \
             --quiet \
-            {input.reads1} {input.reads2}
+            {input.reads1}  
         """
 
 rule alignment_stats:
