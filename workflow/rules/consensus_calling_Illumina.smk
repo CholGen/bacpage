@@ -24,7 +24,7 @@ rule alignment_bwa:
         bwa_params=config["alignment_bwa"]["bwa_params"]
     output:
         alignment="intermediates/illumina/merged_aligned_bams/{sample}.sorted.bam"
-    threads: 8
+    threads: min( 8,workflow.cores )
     shell:
         """
         bwa mem \
@@ -99,7 +99,7 @@ rule call_variants_from_alignment:
         call_parameters=config["call_variants"]["call_parameters"]
     output:
         variants="intermediates/illumina/variants/{sample}.bcftools.vcf"
-    threads: 8
+    threads: min( 8,workflow.cores )
     shell:
         """
         bcftools mpileup \

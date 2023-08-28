@@ -25,7 +25,7 @@ rule generate_tree:
         iqtree_parameters=config["tree_building"]["iqtree_parameters"]
     output:
         tree="intermediates/illumina/phylogeny/complete_alignment.fasta.treefile"
-    threads: max( 16,workflow.cores )
+    threads: min( 16,workflow.cores )
     shell:
         """
         iqtree \

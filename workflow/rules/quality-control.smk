@@ -6,7 +6,7 @@ rule fastqc:
         reads1=lambda wildcards: SAMPLES[wildcards.sample]["read1"],
     output:
         directory=directory( "results/reports/fastqc/{sample}/" ),
-    threads: 2
+    threads: min( 2,workflow.cores )
     shell:
         """
         mkdir {output.directory} && \
@@ -36,7 +36,7 @@ rule bamqc:
     output:
         reheaded_alignment="intermediates/illumina/merged_aligned_bams/{sample}.headed.bam",
         report_directory=directory( "results/reports/bamqc/{sample}/" )
-    threads: 8
+    threads: min( 8,workflow.cores )
     shell:
         """
         samtools view -H {input.alignment} |\

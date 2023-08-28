@@ -32,7 +32,7 @@ rule align_to_genes:
     output:
         alignment=temp( "intermediates/illumina/typing/{sample}.typing.bam" ),
         alignment_index=temp( "intermediates/illumina/typing/{sample}.typing.bam.bai" )
-    threads: 8
+    threads: min( 8,workflow.cores )
     shell:
         """
         bwa mem \
