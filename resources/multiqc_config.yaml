@@ -11,6 +11,7 @@ remove_sections:
   - fastqc_per_base_n_content
   - fastqc_overrepresented_sequences
   - fastqc_status_checks
+  - fastqc_adapter_content
 
 qualimap_config:
   general_stats_coverage:

@@ -17,4 +17,5 @@ dependencies:
   - bc = 1.07.1
   - emboss = 6.6.0
   - mlst
-  - iqtree
+  - iqtree=2.2.3
+  - figtree
