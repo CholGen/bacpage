@@ -1,10 +1,12 @@
-# General parameters; point to input files and the like.
+# General parameters; point to input files.
 run_type: "Illumina"
 samples: "/home/nate/analysis/2023.07.28_cholera/input/illumina_sequences.csv"
 output_directory: "/home/nate/analysis/2023.07.28_cholera/"
 reference: "/home/nate/analysis/2023.07.28_cholera/resources/vc_reference.fasta"
 reference_genes: "/home/nate/analysis/2023.07.28_cholera/resources/cholera_ref_genes/"
 recombinant_mask: "/home/nate/analysis/2023.07.28_cholera/resources/cholera_mask.gff"
+background_dataset: "/home/nate/analysis/2023.07.28_cholera/resources/background.fasta"
+build_tree: True
 
 alignment_bwa:
   bwa_params: "-M"
@@ -35,3 +37,9 @@ call_consensus:
 mlst_profiling:
   scheme: "vcholerae"
   mlst_params: "--quiet --csv --legacy"
+
+tree_building:
+  minimum_completeness: 0.9
+  outgroup: "Asia|IDN|ERR025382|UNK|1957"
+  iqtree_parameters: "-nt AUTO -m TEST -bb 1000"
+

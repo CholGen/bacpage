@@ -1,4 +1,4 @@
-# General parameters; point to input files and the like.
+# General parameters; points to input files.
 run_type: "ONT"
 samples: "input/accession_selected.txt"
 path-to-raw-data: "/"

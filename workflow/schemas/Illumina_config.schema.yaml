@@ -25,6 +25,10 @@ properties:
     description: "Published list of recombinant sites to mask from consensus sequence. Must be a '.gff' file."
     type: string
     pattern: "^.*\\.gff$"
+  background_dataset:
+    description: "Genomes to include in the phylogenetic analysis. Must be in fasta format (.fasta|.fa)."
+    type: string
+    pattern: "^.*\\.(fasta|fa)$"
 
 
   alignment_bwa:
@@ -163,12 +167,35 @@ properties:
       - scheme
       - mlst_params
 
+  tree_building:
+    description: "Parameters for building a phylogeny."
+    type: object
+    properties:
+      minimum_completeness:
+        description: "Proportion of genome that must be covered in consensus for sequence to be included in phylogeny."
+        type: number
+        minimum: 0
+        maximum: 1
+        default: 0.75
+      outgroup:
+        description: "The taxa to use as the root during phylogenetic inference."
+        type: string
+      iqtree_parameters:
+        description: "Parameters passed directly to iqtree."
+        type: string
+        default: "-nt AUTO -m TEST -bb 1000"
+    required:
+      - minimum_completeness
+      - outgroup
+      - iqtree_parameters
+
 required:
   - run_type
   - samples
   - output_directory
   - reference
   - reference_genes
+  - background_dataset
   - alignment_bwa
   - trimming
   - coverage_mask
@@ -177,3 +204,4 @@ required:
   - call_consensus
   - recombinant_mask
   - mlst_profiling
+  - tree_building

@@ -74,11 +74,11 @@ rule all:
         expand( "results/consensus_sequences/{sample}.masked.fasta",sample=SAMPLES ),
         "results/reports/typing_information.csv",
         "results/reports/mlst_types.csv",
-        "results/reports/qc_report.html"
-
-#"results/reports/final_report.html"
+        "results/reports/qc_report.html",
+        "intermediates/illumina/phylogeny/complete_alignment.fasta.treefile"
 
 include: f"rules/consensus_calling_{run_type}.smk"
 include: f"rules/masking_{run_type}.smk"
 include: f"rules/typing_{run_type}.smk"
 include: "rules/quality-control.smk"
+include: "rules/tree_building.smk"

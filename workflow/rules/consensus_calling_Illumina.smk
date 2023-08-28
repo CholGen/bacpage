@@ -1,3 +1,5 @@
+import os.path
+
 rule index_reference:
     input:
         reference=config["reference"]
@@ -57,6 +59,30 @@ rule generate_low_coverage_mask:
             '$3 < depth {{printf "%s\\t%d\\t%d\\n", $1, $2 - 1, $2}}' \
             - > {output.depth_mask}
         """
+
+
+checkpoint combine_depth:
+    message: "Calculate percentage of reference thats covered by each sample"
+    input:
+        depth=expand( "intermediates/illumina/depth/{sample}.depth",sample=SAMPLES )
+    params:
+        minimum_depth=config["coverage_mask"]["required_depth"]
+    output:
+        combined="intermediates/misc/coverage.csv"
+    run:
+        import pandas as pd
+        import os
+
+        df = list()
+        for file in input.depth:
+            temp = pd.read_csv( file,sep="\t",names=["genome", "position", "depth"] )
+            temp["sample"] = os.path.split( file )[-1].replace( ".depth","" )
+            df.append( temp )
+        df = pd.concat( df )
+        df = df.groupby( "sample" )["depth"].agg( ["count", "mean", lambda x: sum( x > params.minimum_depth )] )
+        df.columns = ["total_pos", "mean_depth", "pos_covered"]
+        df["frac_covered"] = df["pos_covered"] / df["total_pos"]
+        df.to_csv( output.combined )
 
 
 rule call_variants_from_alignment:
