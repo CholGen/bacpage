@@ -1,17 +1,9 @@
 from snakemake.utils import validate
 import pandas as pd
 import os
+from rules.common import normalize_path, get_genes
 
-
-def get_genes() -> dict[str, str]:
-    genes = dict()
-    for file in os.listdir( config["reference_genes"] ):
-        if file.endswith( (".fa", ".fasta") ):
-            gene = os.path.splitext( file )[0]
-            path = os.path.join( config["reference_genes"],file )
-            genes[gene] = path
-    return genes
-
+CONFIG_PATHS = ["output_directory", "samples", "reference", "reference_genes", "recombinant_mask", "background_dataset"]
 
 print(
     """
@@ -40,13 +32,17 @@ except Exception:
 print( "Done" )
 
 print( "Loading and validating samples metadata...",end="" )
+skipped_samples = list()
 try:
     md = pd.read_csv( config["samples"] )
     validate( md,f"schemas/{run_type}_metadata.schema.yaml" )
     if run_type == "Illumina":
-        md["size"] = md["read1"].apply( os.path.getsize )
-        skipped_samples = md.loc[md["size"] < 100, "sample"].to_list()
-        md = md.loc[md["size"] >= 100]
+        md["read1"] = md["read1"].apply( lambda x: normalize_path( x,workflow.workdir_init ) )
+        md["read2"] = md["read2"].apply( lambda x: normalize_path( x,workflow.workdir_init ) )
+        if config["preprocessing"]["check_size"]:
+            md["size"] = md["read1"].apply( os.path.getsize )
+            skipped_samples = md.loc[md["size"] < config["preprocessing"]["minimum_size"], "sample"].to_list()
+            md = md.loc[md["size"] >= config["preprocessing"]["minimum_size"]]
         SAMPLES = md.set_index( "sample" )[["read1", "read2"]].to_dict( orient="index" )
     elif run_type == "ONT":
         SAMPLES = md.set_index( "sample" )["reads"].to_dict()
@@ -54,12 +50,17 @@ except Exception:
     print( "Error" )
     raise
 print( "Done" )
+
 if len( skipped_samples ) > 0:
     print( f"Skipping samples [{', '.join( skipped_samples )}] because they have no reads." )
 
+# Normalize config paths:
+for key in CONFIG_PATHS:
+    config[key] = normalize_path( config[key],workflow.workdir_init )
+
 print( "Identifying gene sequences for typing...",end="" )
 try:
-    GENES = get_genes()
+    GENES = get_genes( config["reference_genes"] )
 except Exception:
     print( "Error" )
     raise
@@ -75,7 +76,6 @@ rule all:
         "results/reports/typing_information.csv",
         "results/reports/mlst_types.csv",
         "results/reports/qc_report.html",
-        "intermediates/illumina/phylogeny/complete_alignment.fasta.treefile"
 
 include: f"rules/consensus_calling_{run_type}.smk"
 include: f"rules/masking_{run_type}.smk"

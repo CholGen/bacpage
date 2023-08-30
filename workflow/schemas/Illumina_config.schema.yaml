@@ -30,6 +30,21 @@ properties:
     type: string
     pattern: "^.*\\.(fasta|fa)$"
 
+  preprocessing:
+    description: "Metaparameters for processing of input files prior to begining of pipeline"
+    type: object
+    properties:
+      check_size:
+        description: "Whether to remove samples if there fastqs are not a required size. Empty files can disrupt the pipeline."
+        type: boolean
+        default: True
+      minimum_size:
+        description: "Minimum size in bytes an input fastq file must be to pass size filter."
+        type: integer
+        default: 100
+    required:
+      - check_size
+      - minimmum_size
 
   alignment_bwa:
     description: "Parameters for the alignment step using BWA."
@@ -205,3 +220,4 @@ required:
   - recombinant_mask
   - mlst_profiling
   - tree_building
+  - preprocessing
