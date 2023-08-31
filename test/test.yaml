@@ -1,17 +1,22 @@
 # General parameters; point to input files.
 run_type: "Illumina"
 output_directory: "test/"
-samples: "test/sample_metadata.csv"
+samples: "test/sample_data.csv"
 reference: "resources/vc_reference.fasta"
 reference_genes: "resources/cholera_ref_genes/"
 recombinant_mask: "resources/cholera_mask.gff"
 background_dataset: "resources/background.fasta"
 build_tree: False
 
+generate:
+  consensus_sequences: True
+  typing: True
+  quality_control_report: False
+  phylogeny: False
 
 preprocessing:
   check_size: False
-  minimmum_size: 100
+  minimum_size: 100
 
 alignment_bwa:
   bwa_params: "-M"

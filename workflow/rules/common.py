@@ -17,3 +17,18 @@ def get_genes( search_directory: str ) -> dict[str, str]:
             path = os.path.join( search_directory, file )
             genes[gene] = path
     return genes
+
+
+def determine_outputs( samples: dict[str, str], config: dict[str, str] ) -> list[str]:
+    outputs = list()
+    if config["generate"]["consensus_sequences"]:
+        for key in samples.keys():
+            outputs.append( f"results/consensus_sequences/{key}.masked.fasta" )
+    if config["generate"]["typing"]:
+        outputs.append( "results/reports/typing_information.csv" )
+        outputs.append( "results/reports/mlst_types.csv" )
+    if config["generate"]["quality_control_report"]:
+        outputs.append( "results/reports/qc_report.html" )
+    if config["generate"]["phylogeny"]:
+        outputs.append( "intermediates/illumina/phylogeny/complete_alignment.fasta.treefile" )
+    return outputs

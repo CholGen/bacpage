@@ -30,6 +30,32 @@ properties:
     type: string
     pattern: "^.*\\.(fasta|fa)$"
 
+  generate:
+    description: "Indicate which outputs should be generated"
+    type: object
+    properties:
+      consensus_sequences:
+        description: "Whether to generate a consensus sequence for each input sample."
+        type: boolean
+        default: True
+      typing:
+        description: "Whether typing and MLST classification is performed."
+        type: boolean
+        default: True
+      quality_control_report:
+        description: "Whether to generate an HTML report containing sequencing and alignment statistics"
+        type: boolean
+        default: True
+      phylogeny:
+        description: "Whether to included consensus sequences, along with background_dataset, in a phylogeny."
+        type: boolean
+        default: True
+    required:
+      - consensus_sequences
+      - typing
+      - quality_control_report
+      - phylogeny
+
   preprocessing:
     description: "Metaparameters for processing of input files prior to begining of pipeline"
     type: object
@@ -44,7 +70,7 @@ properties:
         default: 100
     required:
       - check_size
-      - minimmum_size
+      - minimum_size
 
   alignment_bwa:
     description: "Parameters for the alignment step using BWA."
@@ -211,6 +237,8 @@ required:
   - reference
   - reference_genes
   - background_dataset
+  - generate
+  - preprocessing
   - alignment_bwa
   - trimming
   - coverage_mask
@@ -220,4 +248,3 @@ required:
   - recombinant_mask
   - mlst_profiling
   - tree_building
-  - preprocessing

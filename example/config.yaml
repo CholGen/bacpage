@@ -1,12 +1,21 @@
 # General parameters; point to input files.
 run_type: "Illumina"
-samples: "<your-project-directory-name>/sample_metadata.csv"
+samples: "<your-project-directory-name>/sample_data.csv"
 output_directory: "<your-project-directory-name>"
 reference: "<sequencing-directory>/resources/vc_reference.fasta"
 reference_genes: "<sequencing-directory>/resources/cholera_ref_genes/"
 recombinant_mask: "<sequencing-directory>/resources/cholera_mask.gff"
 background_dataset: "<sequencing-directory>/resources/background.fasta"
-build_tree: True
+
+generate:
+  consensus_sequences: true
+  typing: true
+  quality_control_report: true
+  phylogeny: true
+
+preprocessing:
+  check_size: true
+  minimum_size: 100
 
 alignment_bwa:
   bwa_params: "-M"
@@ -38,3 +47,7 @@ mlst_profiling:
   scheme: "vcholerae"
   mlst_params: "--quiet --csv --legacy"
 
+tree_building:
+  minimum_completeness: 0.75
+  outgroup: ""
+  iqtree_parameters: -nt AUTO -m TEST -bb 1000
