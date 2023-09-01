@@ -51,4 +51,4 @@ mlst_profiling:
 tree_building:
   minimum_completeness: 0.9
   outgroup: "Asia|IDN|ERR025382|UNK|1957"
-  iqtree_parameters: "-nt AUTO -m GTR -bb 1000"
+  iqtree_parameters: "-nt AUTO -redo -bb 1000"

@@ -48,6 +48,6 @@ mlst_profiling:
   mlst_params: "--quiet --csv --legacy"
 
 tree_building:
-  minimum_completeness: 0.75
-  outgroup: ""
+  minimum_completeness: 0.90
+  outgroup: "Asia|IDN|ERR025382|UNK|1957"
   iqtree_parameters: -nt AUTO -m TEST -bb 1000

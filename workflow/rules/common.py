@@ -30,5 +30,5 @@ def determine_outputs( samples: dict[str, str], config: dict[str, str] ) -> list
     if config["generate"]["quality_control_report"]:
         outputs.append( "results/reports/qc_report.html" )
     if config["generate"]["phylogeny"]:
-        outputs.append( "intermediates/illumina/phylogeny/complete_alignment.fasta.treefile" )
+        outputs.append( "results/phylogeny/phylogeny.tree" )
     return outputs
