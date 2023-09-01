@@ -8,6 +8,16 @@ recombinant_mask: "/home/nate/analysis/2023.07.28_cholera/resources/cholera_mask
 background_dataset: "/home/nate/analysis/2023.07.28_cholera/resources/background.fasta"
 build_tree: True
 
+generate:
+  consensus_sequences: true
+  typing: true
+  quality_control_report: true
+  phylogeny: true
+
+preprocessing:
+  check_size: true
+  minimum_size: 100
+
 alignment_bwa:
   bwa_params: "-M"
 
@@ -41,5 +51,4 @@ mlst_profiling:
 tree_building:
   minimum_completeness: 0.9
   outgroup: "Asia|IDN|ERR025382|UNK|1957"
-  iqtree_parameters: "-nt AUTO -m TEST -bb 1000"
-
+  iqtree_parameters: "-nt AUTO -m GTR -bb 1000"

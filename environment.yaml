@@ -2,20 +2,21 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - snakemake = 7.31.0
-  - pandas
-  - biopython = 1.81
-  - filtlong = 0.2.1
-  - fastqc
-  - multiqc
-  - qualimap
-  - bwa = 0.7.17
-  - samtools = 1.17
-  - mafft = 7.464
-  - bedtools = 2.25.0
-  - bcftools = 1.17
   - bc = 1.07.1
+  - bcftools = 1.17
+  - bedtools = 2.25.0
+  - biopython = 1.81
+  - bwa = 0.7.17
   - emboss = 6.6.0
-  - mlst
-  - iqtree=2.2.3
+  - fastqc
   - figtree
+  - filtlong = 0.2.1
+  - iqtree=2.2.3
+  - mafft = 7.464
+  - mlst
+  - multiqc
+  - pandas
+  - qualimap
+  - samtools = 1.17
+  - snakemake = 7.31.0
+  - snp-sites

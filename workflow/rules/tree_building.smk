@@ -10,16 +10,27 @@ rule concatenate_sequences:
         background=config["background_dataset"],
         complete_sequences=calculate_complete_sequences
     output:
-        alignment="intermediates/illumina/phylogeny/complete_alignment.fasta"
+        alignment=temp( "intermediates/illumina/phylogeny/complete_alignment.fasta" )
     shell:
         """
         cat {input.background} {input.complete_sequences} > {output.alignment}
         """
 
+rule reduce_alignment:
+    message: "Removes redundant columns from the alignment, in order to save space reduce computation cost."
+    input:
+        alignment=rules.concatenate_sequences.output.alignment
+    output:
+        reduced_alignment="intermediates/illumina/phylogeny/reduced_alignment.fasta"
+    shell:
+        """
+        snp-sites -m -o {output.reduced_alignment} {input.alignment}
+        """
+
 # TODO: Add substitution model. GTR+G is probably fine.
 rule generate_tree:
     input:
-        alignment=rules.concatenate_sequences.output.alignment
+        alignment=rules.reduce_alignment.output.reduced_alignment
     params:
         outgroup=config["tree_building"]["outgroup"],
         iqtree_parameters=config["tree_building"]["iqtree_parameters"]

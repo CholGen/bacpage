@@ -23,7 +23,7 @@ rule alignment_bwa:
     params:
         bwa_params=config["alignment_bwa"]["bwa_params"]
     output:
-        alignment="intermediates/illumina/merged_aligned_bams/{sample}.sorted.bam"
+        alignment=temp( "intermediates/illumina/merged_aligned_bams/{sample}.sorted.bam" )
     threads: min( 8,workflow.cores )
     shell:
         """
