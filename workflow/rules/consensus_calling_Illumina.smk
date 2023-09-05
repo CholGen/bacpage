@@ -39,7 +39,7 @@ rule alignment_bwa:
             -o {output.alignment} - 
         """
 
-
+# TODO: bedtools merge can be used to make depth_mask smaller.
 rule generate_low_coverage_mask:
     message: "Create bed file from bam file for {wildcards.sample} indicating sites covered by less than {params.minimum_depth} reads"
     input:
