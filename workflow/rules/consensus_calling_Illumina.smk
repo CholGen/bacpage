@@ -13,6 +13,7 @@ rule index_reference:
         """
 
 
+# Making the output temporary can save space but prevents pipeline from being run piecewise.
 rule alignment_bwa:
     message: "Mapping reads for {wildcards.sample} to {input.reference} using `bwa mem`."
     input:
@@ -23,7 +24,7 @@ rule alignment_bwa:
     params:
         bwa_params=config["alignment_bwa"]["bwa_params"]
     output:
-        alignment=temp( "intermediates/illumina/merged_aligned_bams/{sample}.sorted.bam" )
+        alignment="intermediates/illumina/merged_aligned_bams/{sample}.sorted.bam"
     threads: min( 8,workflow.cores )
     shell:
         """
