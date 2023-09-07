@@ -12,11 +12,16 @@ remove_sections:
   - fastqc_overrepresented_sequences
   - fastqc_status_checks
   - fastqc_adapter_content
+  - fastqc_per_base_sequence_content
+  - fastqc_per_sequence_gc_content
+  - fastqc_sequence_duplication_levels
+  - samtools-idxstats
+  - qualimap-cumulative-genome-fraction-coverage
 
 qualimap_config:
   general_stats_coverage:
     - 1
-    - 15
+    - 10
 
 module_order:
   - qualimap
@@ -34,7 +39,7 @@ report_section_order:
 
 table_columns_visible:
   FastQC:
-    percent_duplicates: True
+    percent_duplicates: False
     percent_gc: True
     avg_sequence_length: False
     median_sequence_length: True
@@ -43,7 +48,7 @@ table_columns_visible:
   Samtools:
     error_rate: True
     non-primary_alignments: False
-    reads_mapped: False
+    reads_mapped: True
     reads_mapped_percent: False
     reads_properly_paired_percent: False
     reads_MQ0_percent: False
@@ -52,7 +57,7 @@ table_columns_visible:
     avg_gc: False
     median_insert_size: True
     1_x_pc: False
-    15_x_pc: True
+    10_x_pc: True
     30_x_pc: False
     median_coverage: True
     mean_coverage: False
@@ -67,16 +72,23 @@ table_columns_placement:
     percent_duplicates: -998
     percent_gc: -997
   Samtools:
+    reads_mapped: -996
     raw_total_sequences: -1000
   QualiMap:
-    percentage_aligned: -996
-    median_insert_size: -995
-    15_x_pc: -994
-    median_coverage: -993
-    error_rate: -992
+    percentage_aligned: -995
+    median_insert_size: -994
+    10_x_pc: -993
+    median_coverage: -992
+    error_rate: -991
 
+table_columns_name:
+  QualiMap:
+    10_x_pc: "Percent Coverage"
+    median_coverage: "Median Depth"
+  Samtools:
+    raw_total_sequences: "Total Reads"
 
-read_count_multiplier: 0.001
-read_count_prefix: "K"
-read_count_desc: "thousands"
+read_count_multiplier: 1
+read_count_prefix: ""
+read_count_desc: ""
 thousandsSep_format: ""

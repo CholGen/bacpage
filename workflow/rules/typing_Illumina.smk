@@ -67,8 +67,8 @@ rule calculate_gene_alignment_states:
         """
 
 
-rule combine_gene_alignment_stats:
-    message: "Combine the typing stats for each sample into a single report."
+rule virulence_factor_profiling:
+    message: "Combine the virulence factor stats for each sample into a single report."
     input:
         stats=expand( "intermediates/illumina/typing_stats/{sample}.stats.csv",sample=SAMPLES )
     output:
