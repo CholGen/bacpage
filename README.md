@@ -27,13 +27,13 @@ bash Mambaforge-$(uname)-$(uname -m).sh
 
 2. Clone the repository:
 ```commandline
-git clone https://github.com/watronfire/Eureka.git
+git clone https://github.com/CholGen/bacpage.git
 ```
 
 3. Install and activate the pipeline's conda environment:
 ```commandline
-mamba install -y -n eureka -f environment.yaml
-mamba activate eureka
+mamba install -y -n bacpage -f environment.yaml
+mamba activate bacpage
 ```
 
 4. Test the installation:

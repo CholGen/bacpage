@@ -5,18 +5,7 @@ from rules.common import normalize_path, get_genes, determine_outputs
 
 CONFIG_PATHS = ["output_directory", "samples", "reference", "reference_genes", "recombinant_mask"]
 
-print(
-    """
-                      GREETINGS FROM:
- _______  __   __  ______    _______  ___   _  _______ 
-|       ||  | |  ||    _ |  |       ||   | | ||   _   |
-|    ___||  | |  ||   | ||  |    ___||   |_| ||  |_|  |
-|   |___ |  |_|  ||   |_||_ |   |___ |      _||       |
-|    ___||       ||    __  ||    ___||     |_ |       |
-|   |___ |       ||   |  | ||   |___ |    _  ||   _   |
-|_______||_______||___|  |_||_______||___| |_||__| |__|
-   """
-)
+print("Initiating BACPAGE..." )
 
 print( "Loading and validating configuration file...",end="" )
 try:
