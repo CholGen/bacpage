@@ -20,7 +20,7 @@ rule alignment_bwa:
         reads1=lambda wildcards: SAMPLES[wildcards.sample]["read1"],
         reads2=lambda wildcards: SAMPLES[wildcards.sample]["read2"],
         reference=config["reference"],
-        reference_index=config["reference"] + ".bwt"
+        reference_index=rules.index_reference.output.reference_index
     params:
         bwa_params=config["alignment_bwa"]["bwa_params"]
     output:
