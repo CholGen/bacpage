@@ -11,12 +11,12 @@ jobs:
       uses: thedoctor0/zip-release@0.7.1
       with:
         type: 'zip'
-        filename: 'pipeline.zip'
+        filename: 'bacpage.zip'
         exclusions: '*.git* Dockerfile config/*.yaml .editorconfig'
     - name: Upload Release
       uses: ncipollo/release-action@v1.13.0
       with:
-        artifacts: "pipeline.zip"
+        artifacts: "bacpage.zip"
         token: ${{ secrets.GITHUB_TOKEN }}
         body: "Latest release of bioinformatics pipeline."
         tag: "v0.1"
