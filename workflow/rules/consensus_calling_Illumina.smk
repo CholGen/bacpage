@@ -170,6 +170,7 @@ rule call_consensus:
     message: "For sample {wildcards.sample}, apply variants to reference to create consensus sequences. Masks sites with less than desired coverage."
     input:
         variants=rules.align_and_normalize_variants.output.normalized_variants,
+        variant_index=rules.align_and_normalize_variants.output.variant_index,
         depth_mask=rules.generate_low_coverage_mask.output.depth_mask,
         reference=config["reference"],
         reference_index=config["reference"] + ".bwt"

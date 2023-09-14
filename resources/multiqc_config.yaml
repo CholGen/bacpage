@@ -85,6 +85,7 @@ table_columns_name:
   QualiMap:
     10_x_pc: "Percent Coverage"
     median_coverage: "Median Depth"
+    percentage_aligned: "Percent Reads Mapped"
   Samtools:
     raw_total_sequences: "Total Reads"
 

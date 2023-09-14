@@ -29,6 +29,9 @@ trimming:
 coverage_mask:
   required_depth: 15
 
+plot_coverage:
+  bin_size: 10000
+
 call_variants:
   maximum_depth: 2000
   minimum_mapping_quality: 30
@@ -47,6 +50,7 @@ call_consensus:
 mlst_profiling:
   scheme: "vcholerae"
   mlst_params: "--quiet --csv --legacy"
+
 
 tree_building:
   minimum_completeness: 0.75

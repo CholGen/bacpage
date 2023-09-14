@@ -3,7 +3,7 @@ import pandas as pd
 import os
 from rules.common import normalize_path, get_genes, determine_outputs
 
-CONFIG_PATHS = ["output_directory", "samples", "reference", "reference_genes", "recombinant_mask", "background_dataset"]
+CONFIG_PATHS = ["output_directory", "samples", "reference", "reference_genes", "recombinant_mask"]
 
 print(
     """
@@ -31,14 +31,18 @@ except Exception:
     raise
 print( "Done" )
 
+# Normalize config paths:
+for key in CONFIG_PATHS:
+    config[key] = normalize_path( config[key],workflow.workdir_init )
+
 print( "Loading and validating samples metadata...",end="" )
 skipped_samples = list()
 try:
     md = pd.read_csv( config["samples"] )
     validate( md,f"schemas/{run_type}_metadata.schema.yaml" )
     if run_type == "Illumina":
-        md["read1"] = md["read1"].apply( lambda x: normalize_path( x,workflow.workdir_init ) )
-        md["read2"] = md["read2"].apply( lambda x: normalize_path( x,workflow.workdir_init ) )
+        md["read1"] = md["read1"].apply( lambda x: normalize_path( x,config["output_directory"] ) )
+        md["read2"] = md["read2"].apply( lambda x: normalize_path( x,config["output_directory"] ) )
         if config["preprocessing"]["check_size"]:
             md["size"] = md["read1"].apply( os.path.getsize )
             skipped_samples = md.loc[md["size"] < config["preprocessing"]["minimum_size"], "sample"].to_list()
@@ -53,10 +57,6 @@ print( "Done" )
 
 if len( skipped_samples ) > 0:
     print( f"Skipping samples [{', '.join( skipped_samples )}] because they have no reads." )
-
-# Normalize config paths:
-for key in CONFIG_PATHS:
-    config[key] = normalize_path( config[key],workflow.workdir_init )
 
 print( "Identifying gene sequences for typing...",end="" )
 try:

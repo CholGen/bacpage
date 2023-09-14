@@ -48,13 +48,32 @@ rule bamqc:
             -outdir {output.report_directory}
         """
 
+rule coverage_plot:
+    input:
+        depth=rules.generate_low_coverage_mask.output.depth
+    params:
+        script_location=os.path.join( workflow.basedir,"scripts/plot_coverage.py" ),
+        bin_size=config["plot_coverage"]["bin_size"],
+        minimum_depth=config["coverage_mask"]["required_depth"]
+    output:
+        coverage_plot="results/reports/depth/{sample}.depth.pdf"
+    shell:
+        """
+        python {params.script_location} \
+            --input {input.depth} \
+            --bin-size {params.bin_size} \
+            --min-depth {params.minimum_depth} \
+            --output {output.coverage_plot}
+        """
+
 
 rule generate_complete_report:
     input:
         expand( "results/reports/fastqc/{sample}/",sample=SAMPLES ),
         expand( "results/reports/samtools/{sample}.stats.txt",sample=SAMPLES ),
         expand( "results/reports/samtools/{sample}.idxstats.txt",sample=SAMPLES ),
-        expand( "results/reports/bamqc/{sample}/",sample=SAMPLES )
+        expand( "results/reports/bamqc/{sample}/",sample=SAMPLES ),
+        expand( "results/reports/depth/{sample}.depth.pdf",sample=SAMPLES )
     params:
         multiqc_config=os.path.join( workflow.basedir,"../resources/multiqc_config.yaml" )
     output:
