@@ -32,7 +32,7 @@ git clone https://github.com/CholGen/bacpage.git
 
 3. Install and activate the pipeline's conda environment:
 ```commandline
-mamba install -y -n bacpage -f environment.yaml
+mamba env create -f environment.yaml
 mamba activate bacpage
 ```
 

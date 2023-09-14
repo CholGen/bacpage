@@ -1,3 +1,4 @@
+name: bacpage
 channels:
   - conda-forge
   - bioconda
