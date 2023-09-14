@@ -28,7 +28,7 @@ properties:
   background_dataset:
     description: "Genomes to include in the phylogenetic analysis. Must be in fasta format (.fasta|.fa)."
     type: string
-    pattern: "^.*\\.(fasta|fa)$"
+    default: "<background-dataset-path>"
 
   generate:
     description: "Indicate which outputs should be generated"
@@ -119,6 +119,18 @@ properties:
         default: 15
     required:
       - required_depth
+
+  plot_coverage:
+    description: "Parameters required for creating a coverage plot."
+    type: object
+    properties:
+      bin_size:
+        description: "Size of bin in basepairs used to calculate coverage across genome."
+        type: integer
+        minimum: 0
+        default: 10000
+    required:
+      - bin_size
 
   call_variants:
     description: "Parameters required for calling variants from an alignment."
@@ -242,6 +254,7 @@ required:
   - alignment_bwa
   - trimming
   - coverage_mask
+  - plot_coverage
   - call_variants
   - filter_variants
   - call_consensus

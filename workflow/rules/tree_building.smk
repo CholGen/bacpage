@@ -2,18 +2,19 @@ def calculate_complete_sequences( wildcards ):
     depths = pd.read_csv( checkpoints.combine_depth.get( **wildcards ).output.combined )
     depths = depths.loc[depths["frac_covered"] > config["tree_building"]["minimum_completeness"]]
     complete_sequences = depths["sample"].apply( lambda x: f"results/consensus_sequences/{x}.masked.fasta" ).to_list()
+    if config["background_dataset"] not in ["", "<background-dataset-path>"]:
+        complete_sequences.append( config["background_dataset"] )
     return complete_sequences
 
 
 rule concatenate_sequences:
     input:
-        background=config["background_dataset"],
-        complete_sequences=calculate_complete_sequences
+        sequences=calculate_complete_sequences
     output:
         alignment=temp( "intermediates/illumina/phylogeny/complete_alignment.fasta" )
     shell:
         """
-        cat {input.background} {input.complete_sequences} > {output.alignment}
+        cat {input.sequences} > {output.alignment}
         """
 
 
@@ -96,7 +97,7 @@ rule generate_tree:
             --output {output.tree}
         """
 
-
+# Add a conditional, if root is specified, root the tree, otherwise, just copy to the results.
 rule generate_rooted_tree:
     input:
         tree=rules.generate_tree.output.tree
