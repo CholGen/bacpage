@@ -22,4 +22,3 @@ dependencies:
   - snakemake = 7.31.0
   - snp-sites
   - augur
-  - ucsc-fatovcf

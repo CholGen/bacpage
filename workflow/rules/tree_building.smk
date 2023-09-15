@@ -37,12 +37,13 @@ rule convert_alignment_to_vcf:
     input:
         alignment=rules.concatenate_sequences.output.alignment
     params:
-        reference=config["tree_building"]["outgroup"]
+        reference=config["tree_building"]["outgroup"],
+        script_location = os.path.join( workflow.basedir,"scripts/faToVcf" )
     output:
         vcf=temp( "intermediates/illumina/phylogeny/alignment.vcf" )
     shell:
         """
-        faToVcf \
+        {params.script_location} \
             -includeRef -ambiguousToN \
             -ref={params.reference:q} \
             {input.alignment} {output.vcf}
