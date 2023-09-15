@@ -32,18 +32,34 @@ rule convert_gff_to_bed:
         bed.to_csv( output.bed,sep="\t",header=False,index=False )
 
 
+#rule convert_alignment_to_vcf:
+#    message: "Converts multiple sequence alignment to sparse alignment, in VCF format."
+#    input:
+#        alignment=rules.concatenate_sequences.output.alignment
+#    params:
+#        reference=config["tree_building"]["outgroup"],
+#        script_location = os.path.join( workflow.basedir,"scripts/faToVcf" )
+#    output:
+#        vcf=temp( "intermediates/illumina/phylogeny/alignment.vcf" )
+#    shell:
+#        """
+#        {params.script_location} \
+#            -includeRef -ambiguousToN \
+#            -ref={params.reference:q} \
+#            {input.alignment} {output.vcf}
+#        """
+
 rule convert_alignment_to_vcf:
     message: "Converts multiple sequence alignment to sparse alignment, in VCF format."
     input:
         alignment=rules.concatenate_sequences.output.alignment
     params:
-        reference=config["tree_building"]["outgroup"],
-        script_location = os.path.join( workflow.basedir,"scripts/faToVcf" )
+        reference=config["tree_building"]["outgroup"]
     output:
         vcf=temp( "intermediates/illumina/phylogeny/alignment.vcf" )
     shell:
         """
-        {params.script_location} \
+        faToVcf \
             -includeRef -ambiguousToN \
             -ref={params.reference:q} \
             {input.alignment} {output.vcf}
@@ -99,6 +115,7 @@ rule generate_tree:
         """
 
 # Add a conditional, if root is specified, root the tree, otherwise, just copy to the results.
+# TODO: Rename tree to name of project directory.
 rule generate_rooted_tree:
     input:
         tree=rules.generate_tree.output.tree
