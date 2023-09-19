@@ -100,3 +100,15 @@ rule mlst_profiling:
             {params.mlst_params} \
             {input.sequences} > {output.types}
         """
+
+rule antibiotic_resistance:
+    input:
+        consensus_sequences = expand( "intermediates/illumina/consensus/{sample}.consensus.fasta",sample=SAMPLES )
+    output:
+        temp_report = temp( "results/reports/antibiotic_resistance.temp.tab" ),
+        summary = "results/reports/antibiotic_resistance.tsv"
+    shell:
+        """
+        abricate {input.consensus_sequences} > {output.temp_report} && \
+        abricate --summary {output.temp_report} > {output.summary}
+        """
