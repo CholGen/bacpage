@@ -104,11 +104,17 @@ rule mlst_profiling:
 rule antibiotic_resistance:
     input:
         consensus_sequences = expand( "intermediates/illumina/consensus/{sample}.consensus.fasta",sample=SAMPLES )
+    params:
+        db = config["antibiotic_resistance"]["database"]
     output:
         temp_report = temp( "results/reports/antibiotic_resistance.temp.tab" ),
         summary = "results/reports/antibiotic_resistance.tsv"
+    threads: min( workflow.cores, 8)
     shell:
         """
-        abricate {input.consensus_sequences} > {output.temp_report} && \
+        abricate {input.consensus_sequences} \
+            --threads {threads} \
+            --nopath \
+            --db {params.db} > {output.temp_report} && \
         abricate --summary {output.temp_report} > {output.summary}
         """

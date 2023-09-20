@@ -242,6 +242,27 @@ properties:
       - outgroup
       - iqtree_parameters
 
+  antibiotic_resistance:
+    description: "Parameters for assessing antibiotic resistance"
+    type: object
+    properties:
+      database:
+        description: "Antibiotic resistance database to use. Must be one recognized by abricate"
+        type: string
+        enum:
+          - "card"
+          - "ecoli_vf"
+          - "plasmidfinder"
+          - "ecoh"
+          - "ncbi"
+          - "resfinder"
+          - "vfdb"
+          - "megares"
+          - "argannot"
+        default: "card"
+    required:
+      - database
+
 required:
   - run_type
   - samples
@@ -261,3 +282,4 @@ required:
   - recombinant_mask
   - mlst_profiling
   - tree_building
+  - antibiotic_resistance

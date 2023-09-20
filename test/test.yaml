@@ -51,8 +51,10 @@ mlst_profiling:
   scheme: "vcholerae"
   mlst_params: "--quiet --csv --legacy"
 
-
 tree_building:
   minimum_completeness: 0.75
   outgroup: ""
   iqtree_parameters: -nt AUTO -m TEST -bb 1000
+
+antibiotic_resistance:
+  database: card
