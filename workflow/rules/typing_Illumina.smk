@@ -101,7 +101,7 @@ rule mlst_profiling:
             {input.sequences} > {output.types}
         """
 
-rule antibiotic_resistance:
+rule antibiotic_resistance_profiling:
     input:
         consensus_sequences = expand( "intermediates/illumina/consensus/{sample}.consensus.fasta",sample=SAMPLES )
     params:
