@@ -9,9 +9,9 @@ background_dataset: "<background-dataset-path>"
 
 generate:
   consensus_sequences: true
-  typing: true
+  typing: false
   quality_control_report: true
-  phylogeny: true
+  phylogeny: false
 
 preprocessing:
   check_size: true

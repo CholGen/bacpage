@@ -177,7 +177,7 @@ rule call_consensus:
     params:
         bcftools_parameters=config["call_consensus"]["consensus_parameters"]
     output:
-        consensus_sequence="intermediates/illumina/consensus/{sample}.consensus.fasta"
+        consensus_sequence="results/consensus/{sample}.consensus.fasta"
     shell:
         """
 	    bcftools consensus \

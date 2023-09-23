@@ -10,7 +10,7 @@ build_tree: False
 
 generate:
   consensus_sequences: True
-  typing: True
+  typing: False
   quality_control_report: False
   phylogeny: False
 

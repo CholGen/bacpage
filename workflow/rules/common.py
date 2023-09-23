@@ -23,7 +23,8 @@ def determine_outputs( samples: dict[str, str], config: dict[str, str] ) -> list
     outputs = list()
     if config["generate"]["consensus_sequences"]:
         for key in samples.keys():
-            outputs.append( f"results/consensus_sequences/{key}.masked.fasta" )
+            outputs.append( f"results/consensus/{key}.masked.fasta" )
+            outputs.append( f"results/consensus/{key}.consensus.fasta" )
     if config["generate"]["typing"]:
         outputs.append( "results/reports/typing_information.csv" )
         outputs.append( "results/reports/mlst_types.csv" )
@@ -31,5 +32,5 @@ def determine_outputs( samples: dict[str, str], config: dict[str, str] ) -> list
     if config["generate"]["quality_control_report"]:
         outputs.append( "results/reports/qc_report.html" )
     if config["generate"]["phylogeny"]:
-        outputs.append( "results/phylogeny/phylogeny.tree" )
+        outputs.append( "results/phylogeny/sparse_alignment.fasta" )
     return outputs
