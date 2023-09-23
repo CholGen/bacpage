@@ -46,8 +46,8 @@ rule generate_low_coverage_mask:
     input:
         alignment=rules.alignment_bwa.output.alignment
     output:
-        depth="intermediates/illumina/depth/{sample}.depth",
-        depth_mask="intermediates/illumina/depth/{sample}.depthmask.bed"
+        depth=temp("intermediates/illumina/depth/{sample}.depth"),
+        depth_mask=temp("intermediates/illumina/depth/{sample}.depthmask.bed")
     params:
         minimum_depth=config["coverage_mask"]["required_depth"]
     shell:

@@ -19,4 +19,4 @@ jobs:
         artifacts: "bacpage.zip"
         token: ${{ secrets.GITHUB_TOKEN }}
         body: "Latest release of bioinformatics pipeline."
-        tag: "v0.3"
+        tag: "v0.4w"
