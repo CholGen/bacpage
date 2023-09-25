@@ -4,7 +4,7 @@ samples: "<project-path>/sample_data.csv"
 output_directory: "<project-path>"
 reference: "<sequencing-path>/resources/vc_reference.fasta"
 reference_genes: "<sequencing-path>/resources/cholera_ref_genes/"
-recombinant_mask: "<sequencing-path>/resources/cholera_mask.gff"
+recombinant_mask: "<sequencing-path>/resources/cholera_gubbins_mask.gff"
 background_dataset: "<background-dataset-path>"
 
 generate:
@@ -26,7 +26,7 @@ trimming:
   window_length: 4
 
 coverage_mask:
-  required_depth: 15
+  required_depth: 10
 
 plot_coverage:
   bin_size: 10000
@@ -39,7 +39,7 @@ call_variants:
   call_parameters: -mv -Ov --ploidy 1
 
 filter_variants:
-  minimum_depth: 15
+  minimum_depth: 10
   minimum_support: 0.5
   minimum_strand_depth: 5
 
