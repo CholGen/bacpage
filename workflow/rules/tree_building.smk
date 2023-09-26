@@ -1,7 +1,7 @@
 def calculate_complete_sequences( wildcards ):
     depths = pd.read_csv( checkpoints.combine_depth.get( **wildcards ).output.combined )
     depths = depths.loc[depths["frac_covered"] > config["tree_building"]["minimum_completeness"]]
-    complete_sequences = depths["sample"].apply( lambda x: f"results/consensus_sequences/{x}.masked.fasta" ).to_list()
+    complete_sequences = depths["sample"].apply( lambda x: f"results/consensus/{x}.masked.fasta" ).to_list()
     if config["background_dataset"] not in ["", "<background-dataset-path>"]:
         complete_sequences.append( config["background_dataset"] )
     return complete_sequences
