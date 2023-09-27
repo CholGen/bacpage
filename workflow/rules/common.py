@@ -27,7 +27,7 @@ def determine_outputs( samples: dict[str, str], config: dict[str, str] ) -> list
             outputs.append( f"results/consensus/{key}.consensus.fasta" )
     if config["generate"]["typing"]:
         outputs.append( "results/reports/typing_information.csv" )
-        outputs.append( "results/reports/mlst_types.csv" )
+        #outputs.append( "results/reports/mlst_types.csv" )
         outputs.append( "results/reports/antibiotic_resistance.tsv" )
     if config["generate"]["quality_control_report"]:
         outputs.append( "results/reports/qc_report.html" )
