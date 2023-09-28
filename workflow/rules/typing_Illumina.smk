@@ -103,7 +103,7 @@ rule mlst_profiling:
 
 rule antibiotic_resistance_profiling:
     input:
-        consensus_sequences = expand( "intermediates/illumina/consensus/{sample}.consensus.fasta",sample=SAMPLES )
+        consensus_sequences = expand( "results/consensus/{sample}.consensus.fasta",sample=SAMPLES )
     params:
         db = config["antibiotic_resistance"]["database"]
     output:
