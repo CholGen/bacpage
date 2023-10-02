@@ -1,64 +1,7 @@
 import argparse
 import os
 
-import yaml
-
-DEFAULT_CONFIG = {
-    'run_type': 'Illumina',
-    'samples': '<project-path>/sample_data.csv',
-    'output_directory': '<project-path>',
-    'reference': '<sequencing-path>/resources/vc_reference.fasta',
-    'reference_genes': '<sequencing-path>/resources/cholera_ref_genes/',
-    'recombinant_mask': '<sequencing-path>/resources/cholera_gubbins_mask.gff',
-    'background_dataset': '<background-dataset-path>',
-    'generate': {
-        'consensus_sequences': True,
-        'typing': False,
-        'quality_control_report': True,
-        'phylogeny': False
-    },
-    'preprocessing': {
-        'check_size': True,
-        'minimum_size': 100
-    },
-    'alignment_bwa': {
-        'bwa_params': '-M'
-    },
-    'trimming': {
-        'minimum_length': 30,
-        'minimum_quality': 20,
-        'window_length': 4
-    },
-    'coverage_mask': {
-        'required_depth': 10
-    },
-    'plot_coverage': {
-        'bin_size': 10000
-    },
-    'call_variants': {
-        'maximum_depth': 2000,
-        'minimum_mapping_quality': 30,
-        'minimum_base_quality': 20,
-        'mpileup_parameters': '-B -a INFO/AD,INFO/ADF,INFO/ADR -Ou',
-        'call_parameters': '-mv -Ov --ploidy 1'
-    },
-    'filter_variants': {
-        'minimum_depth': 10,
-        'minimum_support': 0.5,
-        'minimum_strand_depth': 5
-    },
-    'call_consensus': { 'consensus_parameters': '--mark-del N' },
-    'mlst_profiling': {
-        'scheme': 'vcholerae',
-        'mlst_params': '--quiet --csv --legacy'
-    },
-    'antibiotic_resistance': { 'database': 'card' },
-    'tree_building': {
-        'minimum_completeness': 0.9,
-        'outgroup': 'Asia|IDN|ERR025382|UNK|1957',
-        'iqtree_parameters': '-nt AUTO -m TEST -bb 1000'
-    }
-}
+from jinja2 import Environment, FileSystemLoader
 
 
 def add_command_arguments( parser: argparse.ArgumentParser ):
@@ -88,8 +31,12 @@ def create_project_directory( directory: str ):
         samples_file.write( "c,path-to-c-read1,path-to-c-read2\n" )
 
     # create config file
-    project_config = DEFAULT_CONFIG
-    project_config["samples"] = os.path.join( directory, "sample_data.csv" )
-    project_config['output_directory'] = directory
+    environment = Environment( loader=FileSystemLoader( "workflow/schemas/" ) )
+    template = environment.get_template( "illumina_config.template.yaml" )
+
+    project_config = dict()
+    project_config["sample_data"] = os.path.abspath( os.path.join( directory, "sample_data.csv" ) )
+    project_config['project_path'] = os.path.abspath( directory )
+    content = template.render( project_config )
     with open( os.path.join( directory, "config.yaml" ), "w" ) as config_file:
-        yaml.dump( project_config, config_file )
+        config_file.write( content )
