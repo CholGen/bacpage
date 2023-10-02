@@ -5,7 +5,7 @@ from workflow.src import assemble, example
 COMMANDS = {
     "assemble": [assemble, "Assembles consensus sequence from raw sequencing reads."],
     # "tree" : [tree, "Align sequences and construct a maximum likelihood tree."],
-    # "typing" : [typing, "Classify consensus sequences based on the presense or absense of various genes."],
+    # "typing" : [typing, "Classify consensus sequences based on the presence or absense of various genes."],
     # "submit" : [submit, "Prepare files for submission to online repositories."],
     "example": [example, "Set up project directory for analysis."]
 }
