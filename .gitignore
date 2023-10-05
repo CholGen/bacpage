@@ -17,7 +17,7 @@
 !environment.yaml
 !Dockerfile
 !example/**
-!test_pipeline/**
+!test/test_pipeline/**
 !bacpage.py
 !test/**
 !test/*
