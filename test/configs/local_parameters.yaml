@@ -1,0 +1,60 @@
+# General parameters; point to input files.
+run_type: "Illumina"
+output_directory: "test_pipeline/"
+samples: "test_pipeline/sample_data.csv"
+reference: "vc_reference.fasta"
+reference_genes: "cholera_ref_genes"
+recombinant_mask: "cholera_gubbins_mask.gff"
+background_dataset: "resources/background.fasta"
+build_tree: False
+
+generate:
+  consensus_sequences: True
+  typing: False
+  quality_control_report: False
+  phylogeny: False
+
+preprocessing:
+  check_size: False
+  minimum_size: 100
+
+alignment_bwa:
+  bwa_params: "-M"
+
+trimming:
+  minimum_length: 30
+  minimum_quality: 20
+  window_length: 4
+
+coverage_mask:
+  required_depth: 15
+
+plot_coverage:
+  bin_size: 10000
+
+call_variants:
+  maximum_depth: 2000
+  minimum_mapping_quality: 30
+  minimum_base_quality: 20
+  mpileup_parameters: "-B -a INFO/AD,INFO/ADF,INFO/ADR -Ou"
+  call_parameters: -mv -Ov --ploidy 1
+
+filter_variants:
+  minimum_depth: 15
+  minimum_support: 0.5
+  minimum_strand_depth: 5
+
+call_consensus:
+  consensus_parameters: "--mark-del N"
+
+mlst_profiling:
+  scheme: "vcholerae"
+  mlst_params: "--quiet --csv --legacy"
+
+tree_building:
+  minimum_completeness: 0.75
+  outgroup: ""
+  iqtree_parameters: -nt AUTO -m TEST -bb 1000
+
+antibiotic_resistance:
+  database: card

@@ -14,7 +14,7 @@ def add_command_arguments( parser: argparse.ArgumentParser ):
         "--index", default=0, type=int, help="index of sample name after splitting file name by delim [0]"
     )
     parser.add_argument(
-        "--output", type=str, required=True, help="location to save sample data."
+        "--output", type=str, default="sample_data.csv", help="location to save sample data ['sample_data.csv']"
     )
 
     parser.set_defaults( command=identify_entrypoint )
