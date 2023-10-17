@@ -13,6 +13,11 @@ def test_error_if_project_not_found():
         assemble.run_assemble( "/foo/bar", ".", ".", 1 )
 
 
+def test_exit_if_zero_threads_allocated():
+    with pytest.raises( SystemExit ) as excinfo:
+        assemble.run_assemble( "test/test_pipeline", ".", ".", 0 )
+
+
 def test_error_if_config_not_automatically_found():
     with pytest.raises( AssertionError ):
         assemble.load_configfile( ".", Path( "test/test_fastqs" ).absolute() )

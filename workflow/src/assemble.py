@@ -85,10 +85,11 @@ def run_assemble( project_directory: str, configfile: str, sample_data: str, thr
 
     # Calculate number of threads if not specified
     if threads == 0:
-        raise ValueError(
+        sys.stderr.write(
             "Pipeline cannot function without threads. Please specify a non-zero number of threads with the '--threads' "
             "option or run comman without '--threads' option to automatically detected the number of available threads."
         )
+        sys.exit( -4 )
     elif threads < 0:
         import multiprocessing
         threads = multiprocessing.cpu_count()
