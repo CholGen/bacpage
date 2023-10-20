@@ -15,7 +15,7 @@ def add_command_arguments( parser: argparse.ArgumentParser ):
     parser.description = "Reconstructs maximum likelihood phylogeny from consensus sequences."
 
     parser.add_argument(
-        "--project", type=str, default=".", help="Path to valid project directory [current directory]."
+        "directory", type=str, default=".", help="Path to valid project directory [current directory]."
     )
     parser.add_argument(
         "--configfile", type=str, default=".", help="Path to assembly configuration file ['config.yaml']."
@@ -119,7 +119,7 @@ def reconstruct_phylogeny( project_directory: str, configfile: str, minimum_comp
 
 def phylogeny_entrypoint( args: argparse.Namespace ):
     reconstruct_phylogeny(
-        project_directory=args.project,
+        project_directory=args.directory,
         configfile=args.configfile,
         minimum_completeness=args.mininum_completeness,
         threads=args.threads,

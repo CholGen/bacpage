@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import pandas as pd
 import pytest
@@ -48,5 +49,9 @@ def test_if_all_samples_parsed( sample_data ):
 def test_if_sample_path_valid( sample_data ):
     sample_df = pd.read_csv( sample_data )
     for idx, entry in sample_df.iterrows():
-        assert os.path.exists( entry["read1"] )
-        assert os.path.exists( entry["read2"] )
+        read1 = Path( entry["read1"] )
+        read2 = Path( entry["read2"] )
+        assert read1.exists(), f"{read1} does not exist."
+        assert read1.is_absolute(), f"{read1} should be absolute but isn't."
+        assert read2.exists(), f"{read2} does not exist."
+        assert read2.is_absolute(), f"{read2} should be absolute but isn't."

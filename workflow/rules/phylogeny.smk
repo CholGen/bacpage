@@ -54,7 +54,7 @@ rule generate_sparse_alignment:
 
 
 def calculate_outgroup( wildcards ):
-    outgroup = config["generate_tree"]["outgroup"]
+    outgroup = config["tree_building"]["outgroup"]
     return f"-o {outgroup:q}" if outgroup != "" else ""
 
 

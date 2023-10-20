@@ -47,7 +47,7 @@ def test_raise_error_with_duplicate_sample_names():
 # @pytest.fixture()
 # def build_tree( scope="session" ):
 #    pass
-
+@pytest.mark.slow
 def test_build_tree_successfully():
     project_directory = Path( "test/test_tree_fasta_directory" )
     phylogeny.reconstruct_phylogeny( str( project_directory ), ".", minimum_completeness=0.9, threads=-1, verbose=True )

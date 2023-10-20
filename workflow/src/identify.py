@@ -1,11 +1,11 @@
 import argparse
-import os
+from pathlib import Path
 
 
 def add_command_arguments( parser: argparse.ArgumentParser ):
     parser.description = "Generate a valid sample_data.csv from a directory of FASTQs."
     parser.add_argument(
-        "--directory", default=".", help="location of FASTQ files [current directory]"
+        "directory", default=".", help="location of FASTQ files [current directory]"
     )
     parser.add_argument(
         "--delim", default="_", type=str, help="deliminator to extract sample name from file name [_]"
@@ -25,15 +25,15 @@ def identify_entrypoint( args ):
 
 
 def generate_sample_data( directory, output, delim="_", index=0 ):
+    directory = Path( directory )
     samples = dict()
-    for file in os.listdir( directory ):
-        if file.endswith( ("fastq.gz", "fq.gz") ):
-            sample_name = file.split( delim )[index]
-            full_path = os.path.abspath( os.path.join( directory, file ) )
+    for file in directory.iterdir():
+        if file.name.endswith( ("fastq.gz", "fq.gz") ):
+            sample_name = file.name.split( delim )[index]
             if sample_name in samples:
-                samples[sample_name].append( full_path )
+                samples[sample_name].append( file.absolute() )
             else:
-                samples[sample_name] = [full_path]
+                samples[sample_name] = [file.absolute()]
 
     with open( output, "w" ) as output_file:
         output_file.write( "sample,read1,read2\n" )

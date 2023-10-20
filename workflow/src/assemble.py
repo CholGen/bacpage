@@ -14,7 +14,7 @@ def add_command_arguments( parser: argparse.ArgumentParser ):
     parser.description = "Assembles consensus sequence from raw sequencing reads."
 
     parser.add_argument(
-        "--project", type=str, default=".", help="Path to valid project directory [current directory]."
+        "directory", type=str, default=".", help="Path to valid project directory [current directory]."
     )
     parser.add_argument(
         "--configfile", type=str, default=".", help="Path to assembly configuration file ['config.yaml']."
@@ -31,7 +31,7 @@ def add_command_arguments( parser: argparse.ArgumentParser ):
 
 def assemble_entrypoint( args: argparse.Namespace ):
     run_assemble(
-        project_directory=args.project,
+        project_directory=args.directory,
         configfile=args.configfile,
         sample_data=args.samples,
         threads=args.threads,
