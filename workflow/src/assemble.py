@@ -7,10 +7,7 @@ import snakemake
 import yaml
 from snakemake.utils import validate
 
-DEFAULT_CONFIG = "config.yaml"
-DEFAULT_SAMPLEDATA = "sample_data.csv"
-PACKAGE_DIR = Path( __file__ ).parent.parent.parent.absolute()
-CONFIG_PATHS = ["reference", "reference_genes", "recombinant_mask"]
+from workflow.src import common
 
 
 def add_command_arguments( parser: argparse.ArgumentParser ):
@@ -84,71 +81,43 @@ def run_assemble( project_directory: str, configfile: str, sample_data: str, thr
     # print( f"The following genes will be used: [{', '.join( GENES.keys() )}]\n" )
 
     # Calculate number of threads if not specified
-    if threads == 0:
-        sys.stderr.write(
-            "Pipeline cannot function without threads. Please specify a non-zero number of threads with the '--threads' "
-            "option or run comman without '--threads' option to automatically detected the number of available threads."
-        )
-        sys.exit( -4 )
-    elif threads < 0:
-        import multiprocessing
-        threads = multiprocessing.cpu_count()
-    print( f"Using {threads} threads." )
+    useable_threads = common.calculate_threads( threads )
 
     # Run snakemake command
-    snakefile = PACKAGE_DIR / "workflow/rules/assemble.smk"
+    snakefile = common.PACKAGE_DIR / "workflow/rules/assemble.smk"
     assert snakefile.exists(), f"Snakefile does not exist. Checking {snakefile}"
     if verbose:
         status = snakemake.snakemake(
             snakefile, printshellcmds=True, forceall=True, force_incomplete=True, workdir=project_directory,
-            config=config, cores=threads, lock=False,
+            restart_times=common.RESTART_TIMES,
+            config=config, cores=useable_threads, lock=False,
         )
     else:
         status = snakemake.snakemake(
             snakefile, printshellcmds=True, forceall=True, force_incomplete=True, workdir=project_directory,
-            config=config, cores=threads, lock=False, quiet=True
+            restart_times=common.RESTART_TIMES,
+            config=config, cores=useable_threads, lock=False, quiet=True
         )
     if not status:
         sys.stderr.write( "Snakemake pipeline did not complete successfully. Check for error messages and rerun." )
         sys.exit( -2 )
 
 
-def normalize_path( value: str, working_directory: Path ) -> Path:
-    path = Path( value )
-    if not path.is_absolute():
-        return working_directory / path
-    else:
-        return path
-
-
-def get_genes( search_directory: str ) -> dict[str, str]:
-    search_path = Path( search_directory ).absolute()
-    genes = dict()
-    for file in search_path.iterdir():
-        if file.suffix in [".fa", ".fasta"]:
-            gene = file.stem
-            path = search_path / file
-            genes[gene] = str( path )
-
-    assert len( genes ) > 0, f"No genes were found in {search_path}, are you sure this is the correct location?"
-    return genes
-
-
 def load_configfile( specified_loc: str, project_directory: Path ) -> dict:
     configfile_loc = Path( specified_loc ).absolute()
     if specified_loc == ".":
-        configfile_loc = project_directory / DEFAULT_CONFIG
+        configfile_loc = project_directory / common.DEFAULT_CONFIG
         assert configfile_loc.exists(), "Unable to automatically find config in project directory (searching for 'config.yaml'). Please specify a valid configuration file."
     assert configfile_loc.exists(), f"{configfile_loc} does not exist. Please specify a valid file."
 
     with open( configfile_loc, "r" ) as cf:
         configfile = yaml.safe_load( cf )
 
-    schema_location = PACKAGE_DIR / "workflow/schemas/Illumina_config.schema.yaml"
+    schema_location = common.PACKAGE_DIR / "workflow/schemas/Illumina_config.schema.yaml"
     validate( configfile, schema_location )
 
-    for key in CONFIG_PATHS:
-        configfile[key] = str( normalize_path( configfile[key], PACKAGE_DIR / "resources" ) )
+    for key in common.CONFIG_PATHS:
+        configfile[key] = str( common.normalize_path( configfile[key], common.PACKAGE_DIR / "resources" ) )
 
     return configfile
 
@@ -157,10 +126,10 @@ def load_sampledata( specified_loc: str, project_directory: Path, check_size: bo
                      minimum_size: int = 100 ) -> (pd.DataFrame, list):
     sampledata_loc = Path( specified_loc )
     if specified_loc == ".":
-        sampledata_loc = project_directory / DEFAULT_SAMPLEDATA
+        sampledata_loc = project_directory / common.DEFAULT_SAMPLEDATA
         if not sampledata_loc.exists():
             sys.stderr.write(
-                f"Unable to automatically find sample data file in project directory (searching for '{DEFAULT_SAMPLEDATA}'). Please specify a valid sample data file."
+                f"Unable to automatically find sample data file in project directory (searching for '{common.DEFAULT_SAMPLEDATA}'). Please specify a valid sample data file."
             )
             sys.exit( -3 )
     elif not sampledata_loc.is_absolute():
@@ -171,11 +140,11 @@ def load_sampledata( specified_loc: str, project_directory: Path, check_size: bo
 
     md = pd.read_csv( sampledata_loc )
 
-    schema_location = PACKAGE_DIR / "workflow/schemas/Illumina_metadata.schema.yaml"
+    schema_location = common.PACKAGE_DIR / "workflow/schemas/Illumina_metadata.schema.yaml"
     validate( md, schema_location )
 
-    md["read1"] = md["read1"].apply( lambda x: str( normalize_path( x, project_directory ) ) )
-    md["read2"] = md["read2"].apply( lambda x: str( normalize_path( x, project_directory ) ) )
+    md["read1"] = md["read1"].apply( lambda x: str( common.normalize_path( x, project_directory ) ) )
+    md["read2"] = md["read2"].apply( lambda x: str( common.normalize_path( x, project_directory ) ) )
 
     duplicate_samples = md.loc[md["sample"].duplicated(), "sample"]
     if len( duplicate_samples ) > 0:
