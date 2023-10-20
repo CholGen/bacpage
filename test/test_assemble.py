@@ -71,7 +71,8 @@ def test_duplicate_samples_causes_exit():
     assert excinfo.value.code == -1
 
 
-def test_snakemake_runs_correctly():
+@pytest.mark.slow
+def test_assemble_snakemake_runs_correctly():
     project_directory = Path( "test/test_pipeline/" )
     expected_output = ["results/consensus/test.consensus.fasta"]
     expected_output = [project_directory / file for file in expected_output]
