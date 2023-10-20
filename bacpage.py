@@ -1,10 +1,10 @@
 import argparse
 
-from workflow.src import assemble, example, identify
+from workflow.src import assemble, example, identify, phylogeny
 
 COMMANDS = {
     "assemble": [assemble, "Assembles consensus sequence from raw sequencing reads."],
-    # "phylogeny" : [phylogeny, "Align sequences and construct a maximum likelihood tree."],
+    "phylogeny": [phylogeny, "Align sequences and construct a maximum likelihood tree."],
     # "typing" : [typing, "Classify consensus sequences based on the presence or absense of various genes."],
     # "submit" : [submit, "Prepare files for submission to online repositories."],
     "identify_files": [identify, "Generate a valid sample_data.csv from a directory of FASTQs."],
