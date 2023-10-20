@@ -60,7 +60,11 @@ def calculate_outgroup( wildcards ):
 
 rule generate_tree:
     input:
-        alignment=rules.generate_sparse_alignment.output.sparse_alignment,
+        alignment=rules.generate_sparse_alignment.output.sparse_alignment
+    params:
+        model=config["tree_building"]["model"],
+        iqtree_parameters=config["tree_building"]["iqtree_parameters"],
+        outgroup=calculate_outgroup
     output:
         tree=temp(
             expand(
@@ -72,9 +76,10 @@ rule generate_tree:
     shell:
         """
         iqtree \
-            -nt {threads} \
-            -m GTR \
-            -B 1000 \
+            -nt AUTO \
+            -m {params.model} \
+            {params.outgroup} \
+            {params.iqtree_parameters} \
             -s {input.alignment}
         """
 

@@ -233,13 +233,18 @@ properties:
       outgroup:
         description: "The taxa to use as the root during phylogenetic inference."
         type: string
+      model:
+        description: "Substitution model to use during phylogenetic inference."
+        type: string
+        default: "GTR"
       iqtree_parameters:
         description: "Parameters passed directly to iqtree."
         type: string
-        default: "-nt AUTO -m TEST -bb 1000"
+        default: "-bb 1000"
     required:
       - minimum_completeness
       - outgroup
+      - model
       - iqtree_parameters
 
   antibiotic_resistance:

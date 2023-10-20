@@ -55,6 +55,7 @@ antibiotic_resistance:
 
 tree_building:
   minimum_completeness: 0.90
-  outgroup: "Asia|IDN|ERR025382|UNK|1957"
-  iqtree_parameters: -nt AUTO -m TEST -bb 1000
+  outgroup: ""
+  model: "GTR"
+  iqtree_parameters: "-bb 1000"
 
