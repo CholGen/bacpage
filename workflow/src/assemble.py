@@ -104,6 +104,21 @@ def run_assemble( project_directory: str, configfile: str, sample_data: str, thr
 
 
 def load_configfile( specified_loc: str, project_directory: Path ) -> dict:
+    """ Attempts for find config file using user supplied information. If config file is directly specified, use it, else
+    search for the config file in the project directory.
+
+    Parameters
+    ----------
+    specified_loc: str
+        Path to config file. Pass "." to automatically search for file in project directory.
+    project_directory: pathlib.Path
+        Path to project directory. Used if config file path is not specified and to normalize relative paths in the config file.
+
+    Returns
+    -------
+    dict
+        Config file loaded as a python object.
+    """
     configfile_loc = Path( specified_loc ).absolute()
     if specified_loc == ".":
         configfile_loc = project_directory / common.DEFAULT_CONFIG
