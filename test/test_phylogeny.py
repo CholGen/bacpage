@@ -2,6 +2,7 @@ import shutil
 from pathlib import Path
 
 import pytest
+from Bio import Phylo
 
 from workflow.src import phylogeny
 
@@ -44,16 +45,31 @@ def test_raise_error_with_duplicate_sample_names():
     assert excinfo.value.code == -6
 
 
-# @pytest.fixture()
-# def build_tree( scope="session" ):
-#    pass
-@pytest.mark.slow
-def test_build_tree_successfully():
+@pytest.fixture()
+def phylogeny_run( scope="session" ):
     project_directory = Path( "test/test_tree_fasta_directory" )
     phylogeny.reconstruct_phylogeny( str( project_directory ), ".", minimum_completeness=0.9, threads=-1, verbose=True )
+    yield project_directory
 
-    # Cleanup
     if (project_directory / "results").exists():
         shutil.rmtree( project_directory / "results" )
     if (project_directory / "intermediates").exists():
         shutil.rmtree( project_directory / "intermediates" )
+
+
+@pytest.mark.slow
+def test_tree_reconstruction_successfully( phylogeny_run ):
+    tree = phylogeny_run / "results/phylogeny/phylogeny.tree"
+    assert tree.exists() and tree.is_file(), "Phylogeny was either not created or is not a file."
+
+
+@pytest.mark.slow
+def test_tree_reconstruction_all_taxa_present( phylogeny_run ):
+    tree = phylogeny_run / "results/phylogeny/phylogeny.tree"
+    tree = Phylo.read( tree, "newick" )
+
+    found = [clade.name for clade in tree.get_terminals()]
+    expected = [f"t{i}" for i in range( 1, 15 )]
+
+    assert sorted( found ) == sorted( expected ), "Not all taxa where found in tree."
+    assert 1 < tree.total_branch_length() < 100, f"Branch length ({tree.total_branch_length()}) is not a reasonable magnitude."
