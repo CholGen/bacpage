@@ -1,9 +1,21 @@
+rule rename_fastq:
+    message: "Generate temporary copy of FASTQ file to maintain names for QC."
+    input:
+        reads1=lambda wildcards: config["SAMPLES"][wildcards.sample]["read1"]
+    output:
+        renamed_reads=temp( "intermediates/tmp/{sample}.fastq.gz" )
+    shell:
+        """
+        cp {input.reads1} {output.renamed_reads}
+        """
+
+
 rule fastqc:
     # We're assuming that R1 is representative of R2. This should generally work and I can't think of a reason where
     # problems would only pop up in one rather than the other.
     message: "Calculate quality control metrics for raw sequencing reads of {wildcards.sample}."
     input:
-        reads1=lambda wildcards: SAMPLES[wildcards.sample]["read1"],
+        reads1=rules.rename_fastq.output.renamed_reads
     output:
         directory=directory( "results/reports/fastqc/{sample}/" ),
     threads: min( 2,workflow.cores )
@@ -17,6 +29,7 @@ rule fastqc:
             {input.reads1}  
         """
 
+
 rule alignment_stats:
     input:
         alignment=rules.alignment_bwa.output.alignment
@@ -29,6 +42,7 @@ rule alignment_stats:
         samtools idxstats {input.alignment} > {output.alignment_idxstats} && \
         samtools stats {input.alignment} > {output.alignment_stats} 
         """
+
 
 rule bamqc:
     input:
@@ -48,11 +62,12 @@ rule bamqc:
             -outdir {output.report_directory}
         """
 
+
 rule coverage_plot:
     input:
         depth=rules.generate_low_coverage_mask.output.depth
     params:
-        script_location=os.path.join( workflow.basedir,"scripts/plot_coverage.py" ),
+        script_location=workflow.source_path( "../scripts/plot_coverage.py" ),
         bin_size=config["plot_coverage"]["bin_size"],
         minimum_depth=config["coverage_mask"]["required_depth"]
     output:
@@ -69,13 +84,13 @@ rule coverage_plot:
 
 rule generate_complete_report:
     input:
-        expand( "results/reports/fastqc/{sample}/",sample=SAMPLES ),
-        expand( "results/reports/samtools/{sample}.stats.txt",sample=SAMPLES ),
-        expand( "results/reports/samtools/{sample}.idxstats.txt",sample=SAMPLES ),
-        expand( "results/reports/bamqc/{sample}/",sample=SAMPLES ),
-        expand( "results/reports/depth/{sample}.depth.pdf",sample=SAMPLES )
+        expand( "results/reports/fastqc/{sample}/",sample=config["SAMPLES"] ),
+        expand( "results/reports/samtools/{sample}.stats.txt",sample=config["SAMPLES"] ),
+        expand( "results/reports/samtools/{sample}.idxstats.txt",sample=config["SAMPLES"] ),
+        expand( "results/reports/bamqc/{sample}/",sample=config["SAMPLES"] ),
+        expand( "results/reports/depth/{sample}.depth.pdf",sample=config["SAMPLES"] )
     params:
-        multiqc_config=os.path.join( workflow.basedir,"../resources/multiqc_config.yaml" )
+        multiqc_config=workflow.source_path( "../../resources/multiqc_config.yaml" )
     output:
         report="results/reports/qc_report.html",
         report_directory=directory( "results/reports/qc_report_data/" )

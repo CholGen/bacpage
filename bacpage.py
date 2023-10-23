@@ -4,11 +4,11 @@ from workflow.src import assemble, example, identify, phylogeny
 
 COMMANDS = {
     "assemble": [assemble, "Assembles consensus sequence from raw sequencing reads."],
-    "phylogeny": [phylogeny, "Align sequences and construct a maximum likelihood tree."],
-    # "typing" : [typing, "Classify consensus sequences based on the presence or absense of various genes."],
-    # "submit" : [submit, "Prepare files for submission to online repositories."],
+    "example": [example, "Set up project directory for analysis."],
     "identify_files": [identify, "Generate a valid sample_data.csv from a directory of FASTQs."],
-    "example": [example, "Set up project directory for analysis."]
+    "phylogeny": [phylogeny, "Align sequences and construct a maximum likelihood tree."],
+    # "submit" : [submit, "Prepare files for submission to online repositories."],
+    # "typing" : [typing, "Classify consensus sequences based on the presence or absense of various genes."],
 }
 
 if __name__ == "__main__":

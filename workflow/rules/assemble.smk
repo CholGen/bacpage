@@ -1,6 +1,17 @@
+def estimate_output( wildcards ):
+    output = list()
+    for sample in config["SAMPLES"]:
+        output.append( f"results/consensus/{sample}.consensus.fasta" )
+        if config["QC"]:
+            output.append( f"results/reports/depth/{sample}.depth.pdf" )
+    if config["QC"]:
+        output.append( "results/reports/qc_report.html" )
+    return output
+
+
 rule all:
     input:
-        fastas=expand( "results/consensus/{sample}.consensus.fasta",sample=config["SAMPLES"] )
+        estimate_output
 
 
 rule index_reference:
@@ -193,3 +204,6 @@ rule call_consensus:
         union -filter |\
         sed "1s/.*/> {wildcards.sample}/" > {output.consensus_sequence}
         """
+
+
+include: "quality-control.smk"

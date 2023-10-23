@@ -10,12 +10,24 @@ from workflow.src import assemble
 
 def test_error_if_project_not_found():
     with pytest.raises( AssertionError ):
-        assemble.run_assemble( "/foo/bar", ".", ".", 1 )
+        assemble.run_assemble(
+            project_directory="/foo/bar",
+            configfile=".",
+            sample_data=".",
+            qc=True,
+            threads=1
+        )
 
 
 def test_exit_if_zero_threads_allocated():
     with pytest.raises( SystemExit ) as excinfo:
-        assemble.run_assemble( "test/test_pipeline", ".", ".", 0 )
+        assemble.run_assemble(
+            project_directory="test/test_pipeline",
+            configfile=".",
+            sample_data=".",
+            qc=True,
+            threads=0
+        )
 
 
 def test_error_if_config_not_automatically_found():
@@ -74,10 +86,17 @@ def test_duplicate_samples_causes_exit():
 @pytest.mark.slow
 def test_assemble_snakemake_runs_correctly():
     project_directory = Path( "test/test_pipeline/" )
-    expected_output = ["results/consensus/test.consensus.fasta"]
+    expected_output = ["results/consensus/test.consensus.fasta", "results/reports/depth/test.depth.pdf",
+                       "results/reports/qc_report.html"]
     expected_output = [project_directory / file for file in expected_output]
 
-    assemble.run_assemble( str( project_directory ), ".", ".", -1 )
+    assemble.run_assemble(
+        project_directory=str( project_directory ),
+        configfile=".",
+        sample_data=".",
+        qc=True,
+        threads=-1
+    )
     results = dict()
     for file in expected_output:
         results[file] = file.exists()

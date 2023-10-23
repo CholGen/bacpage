@@ -23,6 +23,9 @@ def add_command_arguments( parser: argparse.ArgumentParser ):
         "--samples", type=str, default=".",
         help="Path to file detailing raw sequencing reads for all samples ['sample_data.csv']."
     )
+    parser.add_argument(
+        "--no-qa", action="store_true", help="Whether to skip quality assessment of assemblies [False]"
+    )
     parser.add_argument( "--threads", type=int, default=-1, help="Number of threads available for assembly [all]." )
     parser.add_argument( "--verbose", action="store_true", help="Print lots of stuff to screen." )
 
@@ -34,12 +37,14 @@ def assemble_entrypoint( args: argparse.Namespace ):
         project_directory=args.directory,
         configfile=args.configfile,
         sample_data=args.samples,
+        qc=not args.no_qa,
         threads=args.threads,
         verbose=args.verbose,
     )
 
 
-def run_assemble( project_directory: str, configfile: str, sample_data: str, threads: int, verbose: bool = False ):
+def run_assemble( project_directory: str, configfile: str, sample_data: str, qc: bool, threads: int,
+                  verbose: bool = False ):
     # Check project directory
     project_directory = Path( project_directory ).absolute()
     assert project_directory.exists() and project_directory.is_dir(), f"Specified project directory {project_directory} does not exist. Please specify a valid directory."
@@ -53,8 +58,11 @@ def run_assemble( project_directory: str, configfile: str, sample_data: str, thr
         raise
     print( "Done" )
 
+    # Perform QC if enabled
+    config["QC"] = qc
+
     # Check sample data
-    print( "Loading and validating samples metadata...", end="" )
+    print( "Loading and validating samples data...", end="" )
     try:
         metadata, skipped_samples = load_sampledata(
             sample_data, project_directory, check_size=config["preprocessing"]["check_size"],
@@ -63,7 +71,7 @@ def run_assemble( project_directory: str, configfile: str, sample_data: str, thr
     except Exception:
         print( "Error" )
         raise
-    print( "Done" )
+    print( f"Found {len( metadata )} samples. " )
 
     if len( skipped_samples ) > 0:
         print( f"Skipping samples [{', '.join( skipped_samples )}] because they have no reads." )
@@ -139,6 +147,27 @@ def load_configfile( specified_loc: str, project_directory: Path ) -> dict:
 
 def load_sampledata( specified_loc: str, project_directory: Path, check_size: bool = False,
                      minimum_size: int = 100 ) -> (pd.DataFrame, list):
+    """ Attempts for find sample data using user supplied information. If sample data file is directly specified, use it, else
+    search for the file in the project directory.
+
+    Parameters
+    ----------
+    specified_loc : str
+        Location of sample data file. Must be in CSV format. Use "." to attempt to automatically find file in project_direcctory.
+    project_directory : pathlib.Path
+        Location of project directory.
+    check_size : bool
+        Indicates whether to validate input file sizes.
+    minimum_size
+        Minimum file size for an input file to be considered valid. Not considered if check_size is False.
+
+    Returns
+    -------
+    pd.DataFrame
+        Dataframe matching sample names to input raw sequencing data.
+    list
+        Sample names which were removed from sample data because their input files are smaller than minimum_size.
+    """
     sampledata_loc = Path( specified_loc )
     if specified_loc == ".":
         sampledata_loc = project_directory / common.DEFAULT_SAMPLEDATA
