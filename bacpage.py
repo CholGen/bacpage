@@ -27,7 +27,8 @@ A bioinformatics toolkit to assemble and analyze BACterial PAthogen GEnomes""",
 
     subparsers = parser.add_subparsers(
         title="Available commands",
-        description="One of the following commands must be specified:"
+        description="One of the following commands must be specified:",
+        required=True
     )
 
     for command, values in COMMANDS.items():
