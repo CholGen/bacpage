@@ -1,7 +1,10 @@
 import argparse
+import sys
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
+
+from workflow.src import common
 
 
 def add_command_arguments( parser: argparse.ArgumentParser ):
@@ -17,12 +20,17 @@ def example_entrypoint( args: argparse.Namespace ):
 
 def create_project_directory( directory: str, quiet: bool = False ):
     project_directory = Path( directory ).absolute()
-    assert not project_directory.exists(), f"{project_directory} already exists."
 
-    # create project directory
-    project_directory.mkdir()
+    if project_directory.exists():
+        if any( project_directory.iterdir() ):
+            sys.stderr.write( f"Could not create project directory. {project_directory} must be empty.\n" )
+            sys.exit( -8 )
+    else:
+        # create project directory
+        project_directory.mkdir()
 
     # create input directory
+    # TODO: Cleanup created files if error occured. Wrap below in a function and use try-except-finally
     (project_directory / "input").mkdir()
 
     # create samples file
@@ -34,7 +42,7 @@ def create_project_directory( directory: str, quiet: bool = False ):
         samples_file.write( "c,path-to-c-read1,path-to-c-read2\n" )
 
     # create config file
-    environment = Environment( loader=FileSystemLoader( "workflow/schemas/" ) )
+    environment = Environment( loader=FileSystemLoader( common.PACKAGE_DIR / "workflow/schemas/" ) )
     template = environment.get_template( "illumina_config.template.yaml" )
 
     project_config = dict()

@@ -53,3 +53,8 @@ def test_sample_file_is_valid_csv( project_directory: str ):
     for col in ["sample", "read1", "read2"]:
         assert col in sf.columns, f"{col} not in columns."
     assert sf.shape == (3, 3)
+
+
+def test_exits_if_project_directory_is_not_empty():
+    with pytest.raises( SystemExit ):
+        example.create_project_directory( directory="test/trees" )
