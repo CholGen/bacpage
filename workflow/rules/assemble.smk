@@ -1,9 +1,9 @@
 def estimate_output( wildcards ):
     output = list()
     for sample in config["SAMPLES"]:
-        output.append( f"results/consensus/{sample}.consensus.fasta" )
+        output.append( f"results/consensus/{wildcards.sample}.consensus.fasta" )
         if config["QC"]:
-            output.append( f"results/reports/depth/{sample}.depth.pdf" )
+            output.append( f"results/reports/depth/{wildcards.sample}.depth.pdf" )
     if config["QC"]:
         output.append( "results/reports/qc_report.html" )
     return output

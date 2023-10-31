@@ -1,8 +1,7 @@
-import shutil
-from pathlib import Path
-
 import pandas as pd
 import pytest
+import shutil
+from pathlib import Path
 from snakemake.utils import validate
 
 from workflow.src import assemble
@@ -14,6 +13,7 @@ def test_error_if_project_not_found():
             project_directory="/foo/bar",
             configfile=".",
             sample_data=".",
+            denovo=False,
             qc=True,
             threads=1
         )
@@ -25,6 +25,7 @@ def test_exit_if_zero_threads_allocated():
             project_directory="test/test_pipeline",
             configfile=".",
             sample_data=".",
+            denovo=False,
             qc=True,
             threads=0
         )

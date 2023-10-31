@@ -1,10 +1,9 @@
 import argparse
-import sys
-from pathlib import Path
-
 import pandas as pd
 import snakemake
+import sys
 import yaml
+from pathlib import Path
 from snakemake.utils import validate
 
 from workflow.src import common
@@ -14,7 +13,10 @@ def add_command_arguments( parser: argparse.ArgumentParser ):
     parser.description = "Assembles consensus sequence from raw sequencing reads."
 
     parser.add_argument(
-        "directory", type=str, default=".", help="Path to valid project directory [current directory]."
+        "directory", type=str, nargs="?", default=".", help="Path to valid project directory [current directory]."
+    )
+    parser.add_argument(
+        "--denovo", action="store_true", help="Perform de novo assembly rather than reference-based assembly."
     )
     parser.add_argument(
         "--configfile", type=str, default=".", help="Path to assembly configuration file ['config.yaml']."
@@ -37,13 +39,14 @@ def assemble_entrypoint( args: argparse.Namespace ):
         project_directory=args.directory,
         configfile=args.configfile,
         sample_data=args.samples,
+        denovo=args.denovo,
         qc=not args.no_qa,
         threads=args.threads,
         verbose=args.verbose,
     )
 
 
-def run_assemble( project_directory: str, configfile: str, sample_data: str, qc: bool, threads: int,
+def run_assemble( project_directory: str, configfile: str, sample_data: str, denovo: bool, qc: bool, threads: int,
                   verbose: bool = False ):
     # Check project directory
     project_directory = Path( project_directory ).absolute()
@@ -76,23 +79,17 @@ def run_assemble( project_directory: str, configfile: str, sample_data: str, qc:
     if len( skipped_samples ) > 0:
         print( f"Skipping samples [{', '.join( skipped_samples )}] because they have no reads." )
 
+    # Add samples dictionary to config, so snakemake can utilize it.
     config["SAMPLES"] = metadata.set_index( "sample" )[["read1", "read2"]].to_dict( orient="index" )
-
-    # Identify reference genes
-    # print( "Identifying gene sequences for typing...", end="" )
-    # try:
-    #    GENES = get_genes( config["reference_genes"] )
-    # except Exception:
-    #    print( "Error" )
-    #    raise
-    # print( "Done" )
-    # print( f"The following genes will be used: [{', '.join( GENES.keys() )}]\n" )
 
     # Calculate number of threads if not specified
     useable_threads = common.calculate_threads( threads )
 
     # Run snakemake command
-    snakefile = common.PACKAGE_DIR / "workflow/rules/assemble.smk"
+    if denovo:
+        snakefile = common.PACKAGE_DIR / "workflow/rules/denovo.smk"
+    else:
+        snakefile = common.PACKAGE_DIR / "workflow/rules/assemble.smk"
     assert snakefile.exists(), f"Snakefile does not exist. Checking {snakefile}"
     if verbose:
         status = snakemake.snakemake(
@@ -107,7 +104,7 @@ def run_assemble( project_directory: str, configfile: str, sample_data: str, qc:
             config=config, cores=useable_threads, lock=False, quiet=True
         )
     if not status:
-        sys.stderr.write( "Snakemake pipeline did not complete successfully. Check for error messages and rerun." )
+        sys.stderr.write( "Snakemake pipeline did not complete successfully. Check for error messages and rerun.\n" )
         sys.exit( -2 )
 
 
