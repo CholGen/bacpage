@@ -62,6 +62,22 @@ rule bamqc:
             -outdir {output.report_directory}
         """
 
+rule assembly_stats:
+    input:
+        assembly=rules.denovo_assembly.output.assembly
+    params:
+        quast_arguments="--fast --space-efficient"
+    output:
+        report_directory=directory( "results/reports/quast/{sample}/" )
+    threads: min( 8,workflow.cores )
+    shell:
+        """
+        quast \
+            {params.quast_arguments} \
+            -o {output.report_directory} \
+            {input.assembly}
+        """
+
 
 rule coverage_plot:
     input:
@@ -82,13 +98,23 @@ rule coverage_plot:
         """
 
 
+def get_qc_inputs( wildcards ):
+    inputs = list()
+    if config["denovo"]:
+        inputs.extend( expand( "results/reports/fastqc/{sample}/",sample=config["SAMPLES"] ) )
+        inputs.extend( expand( "results/reports/quast/{sample}/",sample=config["SAMPLES"] ) )
+    else:
+        inputs.extend( expand( "results/reports/fastqc/{sample}/",sample=config["SAMPLES"] ) )
+        inputs.extend( expand( "results/reports/samtools/{sample}.stats.txt",sample=config["SAMPLES"] ) )
+        inputs.extend( expand( "results/reports/samtools/{sample}.idxstats.txt",sample=config["SAMPLES"] ) )
+        inputs.extend( expand( "results/reports/bamqc/{sample}/",sample=config["SAMPLES"] ) )
+        inputs.extend( expand( "results/reports/depth/{sample}.depth.pdf",sample=config["SAMPLES"] ) )
+    return inputs
+
+
 rule generate_complete_report:
     input:
-        expand( "results/reports/fastqc/{sample}/",sample=config["SAMPLES"] ),
-        expand( "results/reports/samtools/{sample}.stats.txt",sample=config["SAMPLES"] ),
-        expand( "results/reports/samtools/{sample}.idxstats.txt",sample=config["SAMPLES"] ),
-        expand( "results/reports/bamqc/{sample}/",sample=config["SAMPLES"] ),
-        expand( "results/reports/depth/{sample}.depth.pdf",sample=config["SAMPLES"] )
+        get_qc_inputs
     params:
         multiqc_config=workflow.source_path( "../../resources/multiqc_config.yaml" )
     output:
