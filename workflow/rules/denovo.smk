@@ -1,7 +1,7 @@
 def estimate_output( wildcards ):
     output = list()
     for sample in config["SAMPLES"]:
-        output.append( f"results/assembly/{wildcards.sample}.annotated.gff" )
+        output.append( f"results/assembly/{sample}.annotated.gff" )
     if config["QC"]:
         output.append( "results/reports/qc_report.html" )
     return output

@@ -1,9 +1,9 @@
 def estimate_output( wildcards ):
     output = list()
     for sample in config["SAMPLES"]:
-        output.append( f"results/consensus/{wildcards.sample}.consensus.fasta" )
+        output.append( f"results/consensus/{sample}.consensus.fasta" )
         if config["QC"]:
-            output.append( f"results/reports/depth/{wildcards.sample}.depth.pdf" )
+            output.append( f"results/reports/depth/{sample}.depth.pdf" )
     if config["QC"]:
         output.append( "results/reports/qc_report.html" )
     return output
@@ -141,7 +141,7 @@ rule filter_variants:
             - are present in less than {params.minimum_support:.0%} of reads
         """
     input:
-        variants=rules.call_variants_from_alignment.output.variants,
+        variants=rules.call_variants_from_alignment.output.variants
     params:
         minimum_depth=config["filter_variants"]["minimum_depth"],
         minimum_strand_depth=config["filter_variants"]["minimum_strand_depth"],
