@@ -3,6 +3,7 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
+  - python < 3.12
   - bc = 1.07.1
   - bcftools = 1.17
   - bedtools = 2.25.0
