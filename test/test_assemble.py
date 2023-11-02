@@ -1,7 +1,8 @@
-import pandas as pd
-import pytest
 import shutil
 from pathlib import Path
+
+import pandas as pd
+import pytest
 from snakemake.utils import validate
 
 from workflow.src import assemble
@@ -95,8 +96,34 @@ def test_assemble_snakemake_runs_correctly():
         project_directory=str( project_directory ),
         configfile=".",
         sample_data=".",
+        denovo=False,
         qc=True,
         threads=-1
+    )
+    results = dict()
+    for file in expected_output:
+        results[file] = file.exists()
+    assert all( results.values() ), f"Not all expected files generated. Expected {results}"
+
+    if (project_directory / "results").exists():
+        shutil.rmtree( project_directory / "results" )
+    if (project_directory / "intermediates").exists():
+        shutil.rmtree( project_directory / "intermediates" )
+
+
+@pytest.mark.slow
+def test_denono_assembly_snakemake_runs_correctly():
+    project_directory = Path( "test/test_pipeline/" )
+    expected_output = ["results/assembly/test.annotated.gff", "results/reports/qc_report.html"]
+    expected_output = [project_directory / file for file in expected_output]
+
+    assemble.run_assemble(
+        project_directory=str( project_directory ),
+        configfile=".",
+        sample_data=".",
+        denovo=True,
+        qc=True,
+        threads=8
     )
     results = dict()
     for file in expected_output:

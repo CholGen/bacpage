@@ -82,32 +82,7 @@ properties:
         default: "-M"
     required:
       - bwa_params
-
-  trimming:
-    description: "Parameters required for when trimming alignment."
-    type: object
-    properties:
-      minimum_length:
-        description: "Minimum length for a read to be retain after trimming"
-        type: integer
-        exclusiveMinimum: 0
-        default: 30
-      minimum_quality:
-        description: "Minimum quality threshold in sliding window for bases to be retained"
-        type: integer
-        exclusiveMinimum: 0
-        maximum: 60
-        default: 20
-      window_length:
-        description: "Width of sliding window."
-        type: integer
-        exclusiveMinimum: 0
-        default: 4
-    required:
-      - minimum_length
-      - minimum_quality
-      - window_length
-
+  
   coverage_mask:
     description: "Parameters required for creation of a bed depth file."
     type: object
@@ -204,6 +179,135 @@ properties:
     required:
       - consensus_parameters
 
+  ########## DE NOVO ASSEMBLY ##########
+
+  quality_trimming:
+    description: "Parameters required for quality trimming of reads. using Trimmomatic."
+    type: object
+    properties:
+      window_size:
+        description: "When using a sliding window, the length of the window to average quality across."
+        type: integer
+        exclusiveMinimum: 0
+        default: 10
+      minimum_quality:
+        description: "Windows with an average quality less than this will have the left-most base trimmed."
+        type: integer
+        exclusiveMinimum: 0
+        maximum: 60
+        default: 20
+      minimum_length:
+        description: "Minimum length of reads to be retained after trimming"
+        type: integer
+        exclusiveMinimum: 0
+        maximum: 150
+        default: 75
+    required:
+      - window_size
+      - minimum_quality
+      - minimum_length
+
+  adapter_trimming:
+    description: "Parameters required for adapter trimming of reads using bbduk.sh"
+    type: object
+    properties:
+      firstpass_reference:
+        description: "Reference to use during the first pass of trimming."
+        type: string
+        enum:
+          - "adapters"
+          - "artifacts"
+          - "phix"
+          - "lambda"
+          - "pjet"
+          - "mtst"
+          - "kapa"
+        default: "adapters"
+      firstpass_arguments:
+        description: "Arguments passed to bbduk during the first pass of trimming."
+        type: string
+        default: "ktrim=r k=23 mink=11 hdist=1 tpe tbo"
+      secondpass_reference:
+        description: "Reference used during the second pass of trimming."
+        type: string
+        enum:
+          - "adapters"
+          - "artifacts"
+          - "phix"
+          - "lambda"
+          - "pjet"
+          - "mtst"
+          - "kapa"
+        default: "phix"
+      secondpass_arguments:
+        description: "Arguments passed to bbduk during the second pass of trimming."
+        type: string
+        default: "k=31 hdist=1"
+    required:
+      - firstpass_reference
+      - firstpass_arguments
+      - secondpass_reference
+      - secondpass_arguments
+
+  assembly:
+    description: "Parameters passed to shovill for de novo assembly."
+    type: object
+    properties:
+      assembler:
+        description: "Assembler to use"
+        type: string
+        enum:
+          - "spades"
+          - "velvet"
+          - "skesa"
+          - "megahit"
+        default: "spades"
+      assembler_arguments:
+        description: "Optional arguments to pass to assembler."
+        type: string
+        default: ""
+      minimum_contig_length:
+        description: "Minimum length of contig for it to be included in output."
+        type: integer
+        exclusiveMinimum: 0
+        default: 200
+      trim:
+        description: "Whether to perform optional read trimming by shovill."
+        type: boolean
+        default: False
+      correction:
+        description: "Whether to disable correction of minor assembly errors."
+        type: boolean
+        default: False
+      read_correction:
+        description: "Whether to disable correction of sequencing errors"
+        type: boolean
+        default: False
+      read_stitching:
+        description: "Whether to disable stitching of reads prior to assembly"
+        type: boolean
+        default: False
+    required:
+      - assembler
+      - assembler_arguments
+      - minimum_contig_length
+      - trim
+      - correction
+      - read_correction
+      - read_stitching
+
+  contig_assignment:
+    description: "Parameters passed to Prokka for performing assignment of contigs."
+    type: object
+    properties:
+      prokka_arguments:
+        description: "Arguments passed directly to Prokka."
+        type: string
+        default: ""
+    required:
+      - prokka_arguments
+
+
   mlst_profiling:
     description: "Parameters used while performing MLST profiling."
     type: object
@@ -278,7 +382,10 @@ required:
   - generate
   - preprocessing
   - alignment_bwa
-  - trimming
+  - quality_trimming
+  - adapter_trimming
+  - assembly
+  - contig_assignment
   - coverage_mask
   - plot_coverage
   - call_variants

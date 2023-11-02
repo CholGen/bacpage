@@ -1,9 +1,10 @@
 import argparse
+import sys
+from pathlib import Path
+
 import pandas as pd
 import snakemake
-import sys
 import yaml
-from pathlib import Path
 from snakemake.utils import validate
 
 from workflow.src import common
@@ -85,7 +86,8 @@ def run_assemble( project_directory: str, configfile: str, sample_data: str, den
     # Calculate number of threads if not specified
     useable_threads = common.calculate_threads( threads )
 
-    # Run snakemake command
+    # Run the appropriate snakemake command
+    config["DENOVO"] = denovo
     if denovo:
         snakefile = common.PACKAGE_DIR / "workflow/rules/denovo.smk"
     else:

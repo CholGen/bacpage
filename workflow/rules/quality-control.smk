@@ -32,7 +32,7 @@ rule fastqc:
 
 rule alignment_stats:
     input:
-        alignment=rules.alignment_bwa.output.alignment
+        alignment="intermediates/illumina/merged_aligned_bams/{sample}.sorted.bam"
     output:
         alignment_stats="results/reports/samtools/{sample}.stats.txt",
         alignment_idxstats="results/reports/samtools/{sample}.idxstats.txt"
@@ -46,7 +46,7 @@ rule alignment_stats:
 
 rule bamqc:
     input:
-        alignment=rules.alignment_bwa.output.alignment
+        alignment="intermediates/illumina/merged_aligned_bams/{sample}.sorted.bam"
     output:
         reheaded_alignment="intermediates/illumina/merged_aligned_bams/{sample}.headed.bam",
         report_directory=directory( "results/reports/bamqc/{sample}/" )
@@ -62,9 +62,10 @@ rule bamqc:
             -outdir {output.report_directory}
         """
 
+
 rule assembly_stats:
     input:
-        assembly=rules.denovo_assembly.output.assembly
+        assembly="intermediates/illumina/assembly/{sample}_contigs.fasta"
     params:
         quast_arguments="--fast --space-efficient"
     output:
@@ -81,7 +82,7 @@ rule assembly_stats:
 
 rule coverage_plot:
     input:
-        depth=rules.generate_low_coverage_mask.output.depth
+        depth="intermediates/illumina/depth/{sample}.depth"
     params:
         script_location=workflow.source_path( "../scripts/plot_coverage.py" ),
         bin_size=config["plot_coverage"]["bin_size"],
@@ -100,7 +101,7 @@ rule coverage_plot:
 
 def get_qc_inputs( wildcards ):
     inputs = list()
-    if config["denovo"]:
+    if config["DENOVO"]:
         inputs.extend( expand( "results/reports/fastqc/{sample}/",sample=config["SAMPLES"] ) )
         inputs.extend( expand( "results/reports/quast/{sample}/",sample=config["SAMPLES"] ) )
     else:

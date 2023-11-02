@@ -7,6 +7,16 @@ def estimate_output( wildcards ):
     return output
 
 
+def format_cl_arg( wildcards, parameter, name, quoted=False ):
+    if parameter:
+        if quoted:
+            return f"{name} {parameter:q}"
+        else:
+            return f"{name} {parameter}"
+    else:
+        return ""
+
+
 rule all:
     input:
         estimate_output
@@ -21,10 +31,10 @@ rule quality_trimming:
         reads1=lambda wildcards: config["SAMPLES"][wildcards.sample]["read1"],
         reads2=lambda wildcards: config["SAMPLES"][wildcards.sample]["read2"],
     params:
-        window_size=config["trimming"]["window_size"],
-        window_minimum_quality=config["trimming"]["minimum_quality"],
-        minimum_length=config["trimming"]["minimum_length"],
-        baseout="intermediates/trimmed/{sample}.fastq.gz"
+        window_size=config["quality_trimming"]["window_size"],
+        window_minimum_quality=config["quality_trimming"]["minimum_quality"],
+        minimum_length=config["quality_trimming"]["minimum_length"],
+        baseout="intermediates/illumina/trimmed/{sample}.fastq.gz"
     output:
         read1_trimmed="intermediates/illumina/trimmed/{sample}_1P.fastq.gz",
         read1_unpaired=temp( "intermediates/illumina/trimmed/{sample}_1U.fastq.gz" ),
@@ -42,6 +52,7 @@ rule quality_trimming:
             MINLEN:{params.minimum_length} &> {output.stats}
         """
 
+
 # Might be superflouous
 rule adapter_trimming:
     message: "Trim Illumina sequencing adapters and PhiX control from the reads for {wildcards.sample}"
@@ -49,10 +60,10 @@ rule adapter_trimming:
         read1=rules.quality_trimming.output.read1_trimmed,
         read2=rules.quality_trimming.output.read2_trimmed
     params:
-        firstpass_reference="adapters",
-        firstpass_args="ktrim=r k=23 mink=11 hdist=1 tpe tbo",
-        secondpass_reference="phix",
-        secondpass_args="k=31 hdist=1"
+        firstpass_reference=config["adapter_trimming"]["firstpass_reference"],
+        firstpass_args=config["adapter_trimming"]["firstpass_arguments"],
+        secondpass_reference=config["adapter_trimming"]["secondpass_reference"],
+        secondpass_args=config["adapter_trimming"]["secondpass_arguments"]
     output:
         repaired1=temp( "intermediates/illumina/adapters_removed/{sample}_R1.repaired.fastq.gz" ),
         repaired2=temp( "intermediates/illumina/adapters_removed/{sample}_R2.repaired.fastq.gz" ),
@@ -89,11 +100,15 @@ rule denovo_assembly:
         read1=rules.adapter_trimming.output.cleaned_read1,
         read2=rules.adapter_trimming.output.cleaned_read2
     params:
-        minimum_contig_length=200,
-        trim=False,
-        no_read_correction=False,
-        no_stitch=False,
-        no_corr=False,
+        assembler=config["assembly"]["assembler"],
+        assembler_arguments=lambda wildcards: format_cl_arg(
+            wildcards,config["assembly"]["assembler_arguments"],"--opts"
+        ),
+        minimum_contig_length=config["assembly"]["minimum_contig_length"],
+        trim="--trim" if config["assembly"]["trim"] else "",
+        disable_correction="" if config["assembly"]["correction"] else "--nocorr",
+        disable_read_correction="" if config["assembly"]["read_correction"] else "--noreadcorr",
+        disable_read_stitching="" if config["assembly"]["read_stitching"] else "--nostitch",
         temp_contigs=temp( "intermediates/illumina/assembly/{sample}/contigs.fa" ),
         temp_graph=temp( "intermediates/illumina/assembly/{sample}/contigs.gfa" )
     output:
@@ -104,14 +119,21 @@ rule denovo_assembly:
     shell:
         """
         shovill \
+            --assembler {params.assembler} \
+            {params.assembler_arguments} \
             --outdir {output.temp_assembly_dir} \
             --force \
             --R1 {input.read1} \
             --R2 {input.read2} \
-            --minlen {params.minimum_contig_length} &&\
+            --minlen {params.minimum_contig_length} \
+            {params.trim} \
+            {params.disable_correction} \
+            {params.disable_read_correction} \
+            {params.disable_read_stitching} &&\
         mv {params.temp_contigs} {output.assembly} &&\
         mv {params.temp_graph} {output.assembly_graph}
         """
+
 
 rule contig_assignment:
     message: "Identify features of interest in contigs from {wildcards.sample}"
@@ -120,13 +142,15 @@ rule contig_assignment:
     params:
         prefix="intermediates/illumina/assignment/{sample}",
         temp_annotations="intermediates/illumina/assignment/{sample}.gff",
-        prokka_arguments=config["assignment"]["prokka_arguments"]
+        prokka_arguments=config["contig_assignment"]["prokka_arguments"]
     output:
         annotated_contigs="results/assembly/{sample}.annotated.gff",
-        prokka_output=expand( "intermediates/illumina/assignment/{{sample}}.{extension}",extension=["gbk", "fna", "faa",
-                                                                                                    "ffn", "sqn", "fsa",
-                                                                                                    "tbl", "err", "log",
-                                                                                                    "txt", "tsv"] )
+        prokka_output=expand(
+            "intermediates/illumina/assignment/{{sample}}.{extension}",extension=["gbk", "fna", "faa",
+                                                                                  "ffn", "sqn", "fsa",
+                                                                                  "tbl", "err", "log",
+                                                                                  "txt", "tsv"]
+        )
     threads: min( workflow.cores,8 )
     shell:
         """

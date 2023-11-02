@@ -2,9 +2,9 @@
 run_type: "Illumina"
 output_directory: "test_pipeline/"
 samples: "test_pipeline/sample_data.csv"
-reference: "resources/vc_reference.fasta"
-reference_genes: "resources/cholera_ref_genes/"
-recombinant_mask: "resources/cholera_gubbins_mask.gff"
+reference: "vc_reference.fasta"
+reference_genes: "cholera_ref_genes/"
+recombinant_mask: "cholera_gubbins_mask.gff"
 background_dataset: "resources/background.fasta"
 build_tree: False
 

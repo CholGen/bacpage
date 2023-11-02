@@ -20,11 +20,6 @@ preprocessing:
 alignment_bwa:
   bwa_params: "-M"
 
-trimming:
-  minimum_length: 30
-  minimum_quality: 20
-  window_length: 4
-
 coverage_mask:
   required_depth: 10
 
@@ -59,3 +54,25 @@ tree_building:
   model: "GTR"
   iqtree_parameters: "-bb 1000"
 
+quality_trimming:
+  window_size: 10
+  minimum_quality: 20
+  minimum_length: 75
+
+adapter_trimming:
+  firstpass_reference: "adapters"
+  firstpass_arguments: "ktrim=r k=23 mink=11 hdist=1 tpe tbo"
+  secondpass_reference: "phix"
+  secondpass_arguments: "k=31 hdist=1"
+
+assembly:
+  assembler: spades
+  assembler_arguments: ""
+  minimum_contig_length: 200
+  trim: false
+  correction: false
+  read_correction: false
+  read_stitching: false
+
+contig_assignment:
+  prokka_arguments: ""
