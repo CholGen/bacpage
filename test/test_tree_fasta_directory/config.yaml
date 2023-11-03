@@ -54,6 +54,7 @@ mlst_profiling:
 tree_building:
   minimum_completeness: 0.75
   outgroup: ""
+  model: GTR
   iqtree_parameters: -nt AUTO -m TEST -bb 1000
 
 antibiotic_resistance:
@@ -79,5 +80,5 @@ assembly:
   read_correction: false
   read_stitching: false
 
-contig_assigment:
+contig_assignment:
   prokka_arguments: ""

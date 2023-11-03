@@ -65,7 +65,7 @@ rule bamqc:
 
 rule assembly_stats:
     input:
-        assembly="intermediates/illumina/assembly/{sample}_contigs.fasta"
+        assembly="intermediates/illumina/assembly/{sample}.assembly.fasta"
     params:
         quast_arguments="--fast --space-efficient"
     output:

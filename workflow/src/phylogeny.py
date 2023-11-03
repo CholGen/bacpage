@@ -7,8 +7,8 @@ from Bio import SeqIO
 
 from workflow.src import common
 
-OTHER_IUPAC = { 'r', 'y', 's', 'w', 'k', 'm', 'd', 'h', 'b', 'v' }
-VALID_CHARACTERS = [{ 'a' }, { 'c' }, { 'g' }, { 't' }, { 'n' }, OTHER_IUPAC, { '-' }, { '?' }]
+OTHER_IUPAC = {'r', 'y', 's', 'w', 'k', 'm', 'd', 'h', 'b', 'v'}
+VALID_CHARACTERS = [{'a'}, {'c'}, {'g'}, {'t'}, {'n'}, OTHER_IUPAC, {'-'}, {'?'}]
 
 
 def add_command_arguments( parser: argparse.ArgumentParser ):

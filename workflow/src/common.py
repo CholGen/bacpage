@@ -8,7 +8,7 @@ DEFAULT_CONFIG = "config.yaml"
 DEFAULT_SAMPLEDATA = "sample_data.csv"
 PACKAGE_DIR = Path( __file__ ).parent.parent.parent.absolute()
 CONFIG_PATHS = ["reference", "reference_genes", "recombinant_mask"]
-RESTART_TIMES = 1
+RESTART_TIMES = 0
 
 
 def find_files( directory: Path, extensions: list[str] ) -> dict[str, Path]:

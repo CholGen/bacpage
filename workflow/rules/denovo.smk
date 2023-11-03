@@ -24,114 +24,142 @@ rule all:
 
 rule quality_trimming:
     message:
-        """Trim low quality bases from raw sequencing reads of {wildcards.sample}, using a window size of {params.window_size}, a minimum 
-        average quality score of {params.window_minimum_quality}, and a minimum length of {params.minimum_length}.
+        """Trim low quality bases from raw sequencing reads of {wildcards.sample}, using fastp.
         """
     input:
         reads1=lambda wildcards: config["SAMPLES"][wildcards.sample]["read1"],
-        reads2=lambda wildcards: config["SAMPLES"][wildcards.sample]["read2"],
-    params:
-        window_size=config["quality_trimming"]["window_size"],
-        window_minimum_quality=config["quality_trimming"]["minimum_quality"],
-        minimum_length=config["quality_trimming"]["minimum_length"],
-        baseout="intermediates/illumina/trimmed/{sample}.fastq.gz"
+        reads2=lambda wildcards: config["SAMPLES"][wildcards.sample]["read2"]
     output:
-        read1_trimmed="intermediates/illumina/trimmed/{sample}_1P.fastq.gz",
-        read1_unpaired=temp( "intermediates/illumina/trimmed/{sample}_1U.fastq.gz" ),
-        read2_trimmed="intermediates/illumina/trimmed/{sample}_2P.fastq.gz",
-        read2_unpaired=temp( "intermediates/illumina/trimmed/{sample}_2U.fastq.gz" ),
-        stats="intermediates/illumina/trimmed/{sample}_stats.txt"
-    threads: 4
+        read1_trimmed="intermediates/illumina/trimmed/{sample}_R1.fastq.gz",
+        read2_trimmed="intermediates/illumina/trimmed/{sample}_R2.fastq.gz",
+        unpaired=temp( "intermediates/illumina/trimmed/{sample}_U.fastq.gz" )
     shell:
         """
-        trimmomatic PE \
-            -threads {threads} \
-            {input.reads1} {input.reads2} \
-            -baseout {params.baseout} \
-            SLIDINGWINDOW:{params.window_size}:{params.window_minimum_quality} \
-            MINLEN:{params.minimum_length} &> {output.stats}
+        fastp \
+            --in1 {input.reads1} \
+            --in2 {input.reads2} \
+            --out1 {output.read1_trimmed} \
+            --out2 {output.read2_trimmed} \
+            --unpaired1 {output.unpaired} \
+            --unpaired2 {output.unpaired}
         """
 
 
-# Might be superflouous
-rule adapter_trimming:
-    message: "Trim Illumina sequencing adapters and PhiX control from the reads for {wildcards.sample}"
+rule estimate_genome_size:
     input:
-        read1=rules.quality_trimming.output.read1_trimmed,
-        read2=rules.quality_trimming.output.read2_trimmed
+        reads=rules.quality_trimming.output.read1_trimmed
     params:
-        firstpass_reference=config["adapter_trimming"]["firstpass_reference"],
-        firstpass_args=config["adapter_trimming"]["firstpass_arguments"],
-        secondpass_reference=config["adapter_trimming"]["secondpass_reference"],
-        secondpass_args=config["adapter_trimming"]["secondpass_arguments"]
+        prefix="intermediates/illumina/{sample}/foo",
+        kmer_length=21,
+        minimum_occurance=10
     output:
-        repaired1=temp( "intermediates/illumina/adapters_removed/{sample}_R1.repaired.fastq.gz" ),
-        repaired2=temp( "intermediates/illumina/adapters_removed/{sample}_R2.repaired.fastq.gz" ),
-        firstpass_read1=temp( "intermediates/illumina/adapters_removed/{sample}_R1.firstpass.fastq.gz" ),
-        firstpass_read2=temp( "intermediates/illumina/adapters_removed/{sample}_R2.firstpass.fastq.gz" ),
-        firstpass_log="intermediates/illumina/adapters_removed/{sample}.firstpass.log",
-        cleaned_read1="intermediates/illumina/adapters_removed/{sample}_R1.cleaned.fastq.gz",
-        cleaned_read2="intermediates/illumina/adapters_removed/{sample}_R2.cleaned.fastq.gz",
-        secondpass_log="intermediates/illumina/adapters_removed/{sample}.cleaned.log"
+        estimates="intermediates/illumina/trimmed/{sample}.txt",
+        intermediates=temp( directory( "intermediates/illumina/{sample}/" ) )
+    threads: 4
+    resources:
+        mem_gb=8
+    shell:
+        """
+        mkdir {output.intermediates} &&\
+        kmc \
+            -sm -w \
+            -m{resources.mem_gb} \
+            -t{threads} \
+            -k{params.kmer_length} \
+            -ci{params.minimum_occurance} \
+            {input.reads} \
+            {params.prefix} \
+            {output.intermediates} > {output.estimates}
+        """
+
+
+rule read_correction:
+    message: "Corrects sequencing errors in the reads for {wildcards.sample} by sampling kmers with lighter."
+    input:
+        reads1=rules.quality_trimming.output.read1_trimmed,
+        reads2=rules.quality_trimming.output.read2_trimmed,
+        genome_stats=rules.estimate_genome_size.output.estimates
+    params:
+        kmer_length=32,
+        maximum_corrections=1,
+        output_directory="intermediates/illumina/corrected_reads/"
+    output:
+        corrected_reads1="intermediates/illumina/corrected_reads/{sample}_R1.cor.fq.gz",
+        corrected_reads2="intermediates/illumina/corrected_reads/{sample}_R2.cor.fq.gz"
     threads: 8
     shell:
         """
-        repair.sh \
-            in1={input.read1} in2={input.read2} \
-            out1={output.repaired1} out2={output.repaired2} &&\
-        bbduk.sh \
-            in1={output.repaired1} in2={output.repaired2} \
-            out1={output.firstpass_read1} out2={output.firstpass_read2} \
-            ref={params.firstpass_reference} \
-            stats={output.firstpass_log} \
-            {params.firstpass_args} &&\
-        bbduk.sh \
-            in1={output.firstpass_read1} in2={output.firstpass_read2} \
-            out1={output.cleaned_read1} out2={output.cleaned_read2} \
-            ref={params.secondpass_reference} \
-            stats={output.secondpass_log} \
-            {params.secondpass_args}
+        GENOMESIZE=$(fgrep "unique counted" {input.genome_stats} | grep -Eo "(\S+)\s*$" | tail -n1) &&\
+        lighter \
+            -r {input.reads1} \
+            -r {input.reads2} \
+            -K {params.kmer_length} $GENOMESIZE \
+            -t {threads} \
+            -maxcor {params.maximum_corrections} \
+            -od {params.output_directory}
+        """
+
+
+rule read_stitching:
+    message: "Stitch overlapping reads together in {wildcards.sample} using Flash."
+    input:
+        reads1=rules.read_correction.output.corrected_reads1,
+        reads2=rules.read_correction.output.corrected_reads2,
+        raw_reads1=lambda wildcards: config["SAMPLES"][wildcards.sample]["read1"]
+    params:
+        output_directory="intermediates/illumina/stitched_reads/",
+        minimum_overlap=20
+    output:
+        stitched_reads="intermediates/illumina/stitched_reads/{sample}.extendedFrags.fastq.gz",
+        unstitched_read1="intermediates/illumina/stitched_reads/{sample}.notCombined_1.fastq.gz",
+        unstitched_read2="intermediates/illumina/stitched_reads/{sample}.notCombined_2.fastq.gz",
+        histogram=temp( "intermediates/illumina/stitched_reads/{sample}.hist" ),
+        histogram2=temp( "intermediates/illumina/stitched_reads/{sample}.histogram" )
+    threads: 8
+    shell:
+        """
+        MAXOVERLAP=$(zcat < {input.raw_reads1} | awk '{{if(NR%4==2) {{count++; bases += length}} }} END{{print bases/count}}') &&\
+        flash \
+            -m {params.minimum_overlap} \
+            -M $MAXOVERLAP \
+            -d {params.output_directory} \
+            -o {wildcards.sample} \
+            -z \
+            -t {threads} \
+            {input.reads1} \
+            {input.reads2}
         """
 
 
 rule denovo_assembly:
     message: "Assemble reads using a wrapper around SPAdes for {wildcards.sample}"
     input:
-        read1=rules.adapter_trimming.output.cleaned_read1,
-        read2=rules.adapter_trimming.output.cleaned_read2
+        reads1=rules.read_stitching.output.unstitched_read1,
+        reads2=rules.read_stitching.output.unstitched_read2,
+        stitched_reads=rules.read_stitching.output.stitched_reads
     params:
-        assembler=config["assembly"]["assembler"],
-        assembler_arguments=lambda wildcards: format_cl_arg(
-            wildcards,config["assembly"]["assembler_arguments"],"--opts"
-        ),
-        minimum_contig_length=config["assembly"]["minimum_contig_length"],
-        trim="--trim" if config["assembly"]["trim"] else "",
-        disable_correction="" if config["assembly"]["correction"] else "--nocorr",
-        disable_read_correction="" if config["assembly"]["read_correction"] else "--noreadcorr",
-        disable_read_stitching="" if config["assembly"]["read_stitching"] else "--nostitch",
-        temp_contigs=temp( "intermediates/illumina/assembly/{sample}/contigs.fa" ),
-        temp_graph=temp( "intermediates/illumina/assembly/{sample}/contigs.gfa" )
+        unicycle_params="--min_component_size 200 --keep 0 --no_correct --no_pilon",
+        temp_assembly="intermediates/illumina/assembly/{sample}/assembly.fasta",
+        temp_graph="intermediates/illumina/assembly/{sample}/assembly.gfa",
+        temp_log="intermediates/illumina/assembly/{sample}/unicycler.log"
     output:
-        temp_assembly_dir=temp( directory( "intermediates/illumina/assembly/{sample}/" ) ),
-        assembly="intermediates/illumina/assembly/{sample}_contigs.fasta",
-        assembly_graph="intermediates/illumina/assembly/{sample}_contigs.gfa"
+        assembly="intermediates/illumina/assembly/{sample}.assembly.fasta",
+        temporary_directory=temp( directory( "intermediates/illumina/assembly/{sample}/" ) ),
+        assembly_graph="intermediates/illumina/assembly/{sample}.gfa",
+        assembly_log="intermediates/illumina/assembly/{sample}.log"
     threads: 8
     shell:
         """
-        shovill \
-            --assembler {params.assembler} \
-            {params.assembler_arguments} \
-            --outdir {output.temp_assembly_dir} \
-            --force \
-            --R1 {input.read1} \
-            --R2 {input.read2} \
-            --minlen {params.minimum_contig_length} \
-            {params.trim} \
-            {params.disable_correction} \
-            {params.disable_read_correction} \
-            {params.disable_read_stitching} &&\
-        mv {params.temp_contigs} {output.assembly} &&\
-        mv {params.temp_graph} {output.assembly_graph}
+        unicycler \
+            -1 {input.reads1} \
+            -2 {input.reads2} \
+            -s {input.stitched_reads} \
+            -o {output.temporary_directory} \
+            --threads {threads} \
+            {params.unicycle_params} &&\
+        mv {params.temp_assembly} {output.assembly} &&\
+        mv {params.temp_graph} {output.assembly_graph} &&\
+        mv {params.temp_log} {output.assembly_log}
         """
 
 
@@ -140,9 +168,8 @@ rule contig_assignment:
     input:
         contigs=rules.denovo_assembly.output.assembly
     params:
-        prefix="intermediates/illumina/assignment/{sample}",
-        temp_annotations="intermediates/illumina/assignment/{sample}.gff",
-        prokka_arguments=config["contig_assignment"]["prokka_arguments"]
+        output_directory="intermediates/illumina/assignment",
+        temp_annotations="intermediates/illumina/assignment/{sample}.gff"
     output:
         annotated_contigs="results/assembly/{sample}.annotated.gff",
         prokka_output=expand(
@@ -155,7 +182,9 @@ rule contig_assignment:
     shell:
         """
         prokka \
-            --prefix {params.prefix} \
+            --outdir {params.output_directory} \
+            --prefix {wildcards.sample} \
+            --force \
             --cpus {threads} \
             {input.contigs} &&\
         mv {params.temp_annotations} {output.annotated_contigs}
