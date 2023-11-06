@@ -4,7 +4,7 @@ output_directory: "test_pipeline/"
 samples: "test_pipeline/sample_data.csv"
 reference: "vc_reference.fasta"
 reference_genes: "cholera_ref_genes/"
-recombinant_mask: "../test/test_tree_fasta_directory/test_mask.gff"
+recombinant_mask: "../../test/test_tree_fasta_directory/test_mask.gff"
 background_dataset: ""
 build_tree: False
 

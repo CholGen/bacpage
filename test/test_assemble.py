@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 from snakemake.utils import validate
 
-from workflow.src import assemble
+from bacpage.src import assemble
 
 
 def test_error_if_project_not_found():
@@ -45,7 +45,7 @@ def test_automatically_find_config_file():
 def test_config_is_valid_yaml():
     config = assemble.load_configfile( ".", Path( "test/test_pipeline" ).absolute() )
     assert isinstance( config, dict ), f"Returned config is a {type( config )}, expected <class 'dict'>."
-    validate( config, "workflow/schemas/Illumina_config.schema.yaml" )
+    validate( config, "bacpage/schemas/Illumina_config.schema.yaml" )
 
 
 def test_config_finds_local_parameters():
@@ -74,7 +74,7 @@ def test_sample_data_is_valid_dataframe():
     assert isinstance(
         sample_data, pd.DataFrame
     ), f"Returned sample data is {type( sample_data )}, expected <class 'pd.DataFrame'>."
-    validate( sample_data, "workflow/schemas/Illumina_metadata.schema.yaml" )
+    validate( sample_data, "bacpage/schemas/Illumina_metadata.schema.yaml" )
 
 
 def test_duplicate_samples_causes_exit():
@@ -98,7 +98,8 @@ def test_assemble_snakemake_runs_correctly():
         sample_data=".",
         denovo=False,
         qc=True,
-        threads=-1
+        threads=-1,
+        verbose=False
     )
     results = dict()
     for file in expected_output:

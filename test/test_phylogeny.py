@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from Bio import Phylo
 
-from workflow.src import phylogeny
+from bacpage.src import phylogeny
 
 
 def test_recognize_folder_of_fastas():
@@ -48,7 +48,8 @@ def test_raise_error_with_duplicate_sample_names():
 @pytest.fixture()
 def phylogeny_run( scope="session" ):
     project_directory = Path( "test/test_tree_fasta_directory" )
-    phylogeny.reconstruct_phylogeny( str( project_directory ), ".", minimum_completeness=0.9, threads=-1, verbose=True )
+    phylogeny.reconstruct_phylogeny( str( project_directory ), ".", minimum_completeness=0.9, threads=-1,
+                                     verbose=False )
     yield project_directory
 
     if (project_directory / "results").exists():

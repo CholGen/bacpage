@@ -5,7 +5,7 @@ import pytest
 import yaml
 from snakemake.utils import validate
 
-from workflow.src import example
+from bacpage.src import example
 
 
 @pytest.fixture( scope="session" )
@@ -38,7 +38,7 @@ def test_config_file_is_valid_yaml( project_directory: str ):
     config_file = os.path.join( project_directory, "config.yaml" )
     with open( config_file, "r" ) as parameters:
         project_yaml = yaml.safe_load( parameters )
-        validate( project_yaml, "workflow/schemas/Illumina_config.schema.yaml" )
+        validate( project_yaml, "bacpage/schemas/Illumina_config.schema.yaml" )
 
 
 def test_sample_file_exists( project_directory: str ):

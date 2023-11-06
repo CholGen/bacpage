@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from workflow.src import identify
+from bacpage.src import identify
 
 SAMPLES = [
     "ERR976393",
