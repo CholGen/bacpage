@@ -68,4 +68,5 @@ def calculate_threads( threads ):
         import multiprocessing
         threads = multiprocessing.cpu_count()
     print( f"Using {threads} threads." )
+
     return threads
