@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bacpage"
+authors = [
+    {name = "Nate Matteson", email = "nmatteson@bwh.harvard.edu"},
+    {name = "watronfire", email="snowboardman007@gmail.com"}
+]
+description = "An easy-to-use pipeline for the assembly and analysis of bacterial genomes"
+requires-python = ">=3.9,<3.12"
+keywords = ["bacteria", "NGS", "snakemake", "phylogenetics"]
+license = {file = "LICENSE"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Natural Language :: English",
+    "Topic :: Scientific/Engineering :: Bio-Informatics"
+]
+dependencies = [
+    "biopython",
+    "pandas",
+    "pyyaml",
+    "setuptools",
+    "jinja2"
+]
+dynamic = ["readme", "version"]
+
+[tool.setuptools]
+packages = [
+    "bacpage",
+    "bacpage.src",
+    "bacpage.rules",
+    "bacpage.scripts",
+    "bacpage.schemas",
+    "bacpage.resources",
+    "bacpage.resources.cholera_ref_genes"
+]
+
+[tool.setuptools.package-data]
+"*" = ["*.fasta", "*.gff", "*.yaml", "*.smk"]
+
+[project.scripts]
+bacpage = "bacpage.command:main"
+
+[project.urls]
+Homepage = "https://github.com/CholGen/bacpage"
+Repository = "https://github.com/CholGen/bacpage.git"
+
+[tool.setuptools.dynamic]
+readme = {file = "README.md"}
+version = {attr = "bacpage.__version__"}
+

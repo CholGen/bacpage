@@ -19,3 +19,4 @@
 !example/**
 !bacpage.py
 !test/**
+!pyproject.toml
