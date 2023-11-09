@@ -5,8 +5,7 @@ import pandas as pd
 import pytest
 from snakemake.utils import validate
 
-import common_funcs
-from bacpage.src import assemble
+from bacpage.src import assemble, common_funcs
 
 
 def test_error_if_project_not_found():

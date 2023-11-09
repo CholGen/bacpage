@@ -53,3 +53,7 @@ Repository = "https://github.com/CholGen/bacpage.git"
 readme = {file = "README.md"}
 version = {attr = "bacpage.__version__"}
 
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]

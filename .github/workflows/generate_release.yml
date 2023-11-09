@@ -24,6 +24,7 @@ jobs:
           filename: 'bacpage.zip'
           path: 'bacpage environment.yaml '
       - name: Upload Release
+        if: startsWith(github.ref, 'refs/tags')
         uses: ncipollo/release-action@v1.13.0
         with:
           artifacts: "bacpage.zip"

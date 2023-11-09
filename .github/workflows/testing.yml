@@ -18,4 +18,4 @@ jobs:
           cache-environment: true
           environment-file: environment_test.yaml
       - name: Run tests
-        run: micromamba run -n bacpage pytest -k not slow . --no-header --no-summary -q
+        run: micromamba run -n bacpage pytest -k 'not slow' . --junitxml=junit/test-results.xml
