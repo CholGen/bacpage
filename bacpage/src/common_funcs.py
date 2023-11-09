@@ -3,6 +3,7 @@ from importlib.resources import files
 from pathlib import Path
 
 import yaml
+from snakemake import WorkflowError
 from snakemake.utils import validate
 
 DEFAULT_CONFIG = "config.yaml"
@@ -20,6 +21,7 @@ def find_files( directory: Path, extensions: list[str] ) -> dict[str, Path]:
             name = file.stem
             if name in found:
                 sys.stderr.write( f"{name} was found in two or more files. Duplicate sequences cannot be processed." )
+                sys.stderr.write( "fuck off" )
                 sys.exit( -5 )
             path = search_path / file
             found[name] = path
@@ -39,6 +41,21 @@ def normalize_path( value: str, working_directory: Path ) -> Path:
 
 
 def load_configfile( specified_loc: str, project_directory: Path ) -> dict:
+    """ Attempts for find config file using user supplied information. If config file is directly specified, use it, else
+    search for the config file in the project directory.
+
+    Parameters
+    ----------
+    specified_loc: str
+        Path to config file. Pass "." to automatically search for file in project directory.
+    project_directory: pathlib.Path
+        Path to project directory. Used if config file path is not specified and to normalize relative paths in the config file.
+
+    Returns
+    -------
+    dict
+        Config file loaded as a python object.
+    """
     configfile_loc = Path( specified_loc ).absolute()
     if specified_loc == ".":
         configfile_loc = project_directory / DEFAULT_CONFIG
@@ -49,7 +66,14 @@ def load_configfile( specified_loc: str, project_directory: Path ) -> dict:
         configfile = yaml.safe_load( cf )
 
     schema_location = PACKAGE_DIR / "schemas/Illumina_config.schema.yaml"
-    validate( configfile, schema_location )
+
+    try:
+        validate( configfile, schema_location )
+    except WorkflowError as err:
+        message = err.args[0].split( "\n" )
+        print( "Error" )
+        sys.stderr.write( f"{message[0]} {message[1].split( ': ' )[1]}.\n" )
+        sys.exit( -9 )
 
     for key in CONFIG_PATHS:
         configfile[key] = str( normalize_path( configfile[key], PACKAGE_DIR / "resources" ) )

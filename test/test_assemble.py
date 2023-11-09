@@ -5,6 +5,7 @@ import pandas as pd
 import pytest
 from snakemake.utils import validate
 
+import common_funcs
 from bacpage.src import assemble
 
 
@@ -34,22 +35,24 @@ def test_exit_if_zero_threads_allocated():
 
 def test_error_if_config_not_automatically_found():
     with pytest.raises( AssertionError ):
-        assemble.load_configfile( ".", Path( "test/test_fastqs" ).absolute() )
+        common_funcs.load_configfile( ".", Path( "test/test_fastqs" ).absolute() )
 
 
 def test_automatically_find_config_file():
-    config = assemble.load_configfile( ".", Path( "test/test_pipeline" ).absolute() )
+    config = common_funcs.load_configfile( ".", Path( "test/test_pipeline" ).absolute() )
     assert config, "An object should be returned but nothing was."
 
 
 def test_config_is_valid_yaml():
-    config = assemble.load_configfile( ".", Path( "test/test_pipeline" ).absolute() )
+    config = common_funcs.load_configfile( ".", Path( "test/test_pipeline" ).absolute() )
     assert isinstance( config, dict ), f"Returned config is a {type( config )}, expected <class 'dict'>."
     validate( config, "bacpage/schemas/Illumina_config.schema.yaml" )
 
 
 def test_config_finds_local_parameters():
-    config = assemble.load_configfile( "test/configs/local_parameters.yaml", Path( "test/test_pipeline" ).absolute() )
+    config = common_funcs.load_configfile(
+        "test/configs/local_parameters.yaml", Path( "test/test_pipeline" ).absolute()
+    )
     reference = Path( config["reference"] )
     assert reference.is_absolute() and reference.exists(), f"Local reference in resources directory was not correctly found ({reference})."
     reference_genes = Path( config["reference_genes"] )
