@@ -46,7 +46,7 @@ rule alignment_bwa:
             {params.bwa_params} \
             -t {threads} \
             {input.reference} \
-            {input.reads1} {input.reads2} |\
+            {input.reads1} {input.reads2} 2> /dev/null |\
         samtools view -Sb - |\
         samtools sort - |\
         samtools addreplacerg \

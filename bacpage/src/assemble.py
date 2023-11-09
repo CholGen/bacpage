@@ -94,15 +94,17 @@ def run_assemble( project_directory: str, configfile: str, sample_data: str, den
     assert snakefile.exists(), f"Snakefile does not exist. Checking {snakefile}"
     if verbose:
         status = snakemake.snakemake(
-            snakefile, printshellcmds=True, force_incomplete=True, workdir=project_directory,
+            snakefile, force_incomplete=True, workdir=project_directory,
             restart_times=common_funcs.RESTART_TIMES,
             config=config, cores=useable_threads, lock=False,
+            quiet=False, printshellcmds=True, printreason=False
         )
     else:
         status = snakemake.snakemake(
-            snakefile, printshellcmds=True, force_incomplete=True, workdir=project_directory,
+            snakefile, force_incomplete=True, workdir=project_directory,
             restart_times=common_funcs.RESTART_TIMES,
-            config=config, cores=useable_threads, lock=False, quiet=True
+            config=config, cores=useable_threads, lock=False,
+            quiet=True, printshellcmds=False, printreason=False
         )
     if not status:
         sys.stderr.write( "Snakemake pipeline did not complete successfully. Check for error messages and rerun.\n" )

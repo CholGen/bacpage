@@ -1,5 +1,5 @@
 rule rename_fastq:
-    message: "Generate temporary copy of FASTQ file to maintain names for QC."
+    message: "Generate temporary copy of FASTQ file for {wildcards.sample} to maintain names for QC."
     input:
         reads1=lambda wildcards: config["SAMPLES"][wildcards.sample]["read1"]
     output:
@@ -31,6 +31,7 @@ rule fastqc:
 
 
 rule alignment_stats:
+    message: "Calculate the number of reads from {wildcards.sample} which map to the reference genome."
     input:
         alignment="intermediates/illumina/merged_aligned_bams/{sample}.sorted.bam"
     output:
@@ -45,6 +46,7 @@ rule alignment_stats:
 
 
 rule bamqc:
+    message: "Assess the quality of the reference-based assembly of {wildcards.sample}."
     input:
         alignment="intermediates/illumina/merged_aligned_bams/{sample}.sorted.bam"
     output:
@@ -64,6 +66,7 @@ rule bamqc:
 
 
 rule assembly_stats:
+    message: "Assess the quality of the de novo assembly for {wildcards.sample}."
     input:
         assembly="intermediates/illumina/assembly/{sample}.assembly.fasta"
     params:
@@ -81,6 +84,7 @@ rule assembly_stats:
 
 
 rule coverage_plot:
+    message: "Generate a coverage plot for {wildcards.sample}"
     input:
         depth="intermediates/illumina/depth/{sample}.depth"
     params:
@@ -114,6 +118,7 @@ def get_qc_inputs( wildcards ):
 
 
 rule generate_complete_report:
+    message: "Combine individual QC reports into a single HTML report."
     input:
         get_qc_inputs
     params:

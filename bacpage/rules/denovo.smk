@@ -32,7 +32,9 @@ rule quality_trimming:
     output:
         read1_trimmed="intermediates/illumina/trimmed/{sample}_R1.fastq.gz",
         read2_trimmed="intermediates/illumina/trimmed/{sample}_R2.fastq.gz",
-        unpaired=temp( "intermediates/illumina/trimmed/{sample}_U.fastq.gz" )
+        unpaired=temp( "intermediates/illumina/trimmed/{sample}_U.fastq.gz" ),
+        json_report=temp( "intermediates/illumina/trimmed/{sample}.json" ),
+        html_report=temp( "intermediates/illumina/trimmed/{sample}.html" )
     shell:
         """
         fastp \
@@ -41,7 +43,9 @@ rule quality_trimming:
             --out1 {output.read1_trimmed} \
             --out2 {output.read2_trimmed} \
             --unpaired1 {output.unpaired} \
-            --unpaired2 {output.unpaired}
+            --unpaired2 {output.unpaired} \
+            -h {output.html_report} \
+            -j {output.json_report}
         """
 
 
