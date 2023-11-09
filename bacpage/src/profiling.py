@@ -43,6 +43,13 @@ def find_sequences( directory: Path ) -> dict[str, Path]:
     sys.exit( -8 )
 
 
+def postamble( directory: Path ):
+    print()
+    print( "Successfully profiled provided samples." )
+    print(
+        f"A report detailing the antimicrobial resistance genes detected in each sample can be found at {directory / 'results/reports/antibiotic_resistance.tsv'}. " )
+
+
 def profile_sequences( project_directory, configfile, database, threads, verbose ):
     project_path = Path( project_directory ).absolute()
     assert project_path.exists() and project_path.is_dir(), f"Specified project directory {project_path} does not exist. Please specify a valid directory."
@@ -81,6 +88,8 @@ def profile_sequences( project_directory, configfile, database, threads, verbose
     if not status:
         sys.stderr.write( "Snakemake pipeline did not complete successfully. Check for error messages and rerun." )
         sys.exit( -2 )
+
+    postamble( project_directory )
 
 
 def profiling_entrypoint( args: argparse.Namespace ):

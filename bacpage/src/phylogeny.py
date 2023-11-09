@@ -76,6 +76,13 @@ def validate_sequences( sequence_paths: dict[str, Path], background_dataset: Pat
         sys.exit( -6 )
 
 
+def postamble( directory: Path ):
+    print()
+    print( f"Reconstructed phylogeny is available at {directory / 'results/phylogeny/phylogeny.tree'}" )
+    print(
+        "Open the file in any tree viewer to visualize. We recommend figtree (http://tree.bio.ed.ac.uk/software/figtree/)." )
+
+
 def reconstruct_phylogeny( project_directory: str, configfile: str, minimum_completeness: float, threads: int,
                            verbose: bool ):
     project_path = Path( project_directory ).absolute()
@@ -115,6 +122,8 @@ def reconstruct_phylogeny( project_directory: str, configfile: str, minimum_comp
     if not status:
         sys.stderr.write( "Snakemake pipeline did not complete successfully. Check for error messages and rerun." )
         sys.exit( -2 )
+
+    postamble( project_directory )
 
 
 def phylogeny_entrypoint( args: argparse.Namespace ):

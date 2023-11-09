@@ -40,3 +40,8 @@ def generate_sample_data( directory, output, delim="_", index=0 ):
         for sample in samples:
             files = sorted( samples[sample] )
             output_file.write( f"{sample},{files[0]},{files[1]}\n" )
+
+    print()
+    print( f"Identified {len( files )} samples in {directory}." )
+    print( f"Saving the location of these files to {output}." )
+    print( "This project directory is now set up for assembly using `bacpage assemble`." )

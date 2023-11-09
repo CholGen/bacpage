@@ -34,6 +34,26 @@ def add_command_arguments( parser: argparse.ArgumentParser ):
     parser.set_defaults( command=assemble_entrypoint )
 
 
+def postamble( denovo: bool, directory: Path ):
+    if denovo:
+        print()
+        print( "Successfully performed de novo assembly of your samples" )
+        print( f"Annotated assemblies are available at {directory / 'results/assembly/'}." )
+        print(
+            f"Quality metrics of your input data and assemblies are available at {directory / 'reports/qc_report.html'}. Open this file in a web browser to view." )
+        print()
+        print( "To perform antimicrobial resistance profiling, run `bacpage profile`." )
+    else:
+        print()
+        print( "Successfully performed reference-based assembly of your samples." )
+        print( f"Consensus sequences are available at {directory / 'results/consensus'}." )
+        print(
+            f"Quality metrics of your input data and consensus sequences are available at {directory / 'reports/qc_report.html'}. Open this file in a web browser to view." )
+        print()
+        print( "Generate a phylogenetic tree incorporating these samples using `bacpage phylogeny`. " )
+        print( "Or, determine the presense of antimicrobial resistance genes using `bacpage profile`." )
+
+
 def assemble_entrypoint( args: argparse.Namespace ):
     run_assemble(
         project_directory=args.directory,
@@ -109,6 +129,8 @@ def run_assemble( project_directory: str, configfile: str, sample_data: str, den
     if not status:
         sys.stderr.write( "Snakemake pipeline did not complete successfully. Check for error messages and rerun.\n" )
         sys.exit( -2 )
+
+    postamble( denovo, project_directory )
 
 
 def load_sampledata( specified_loc: str, project_directory: Path, check_size: bool = False,
