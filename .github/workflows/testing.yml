@@ -16,7 +16,7 @@ jobs:
 
       - uses: mamba-org/setup-micromamba@v1
         with:
-          environment-file: environment_test.yml
+          environment-file: environment_test.yaml
 
       - name: Run tests
         run: pytest -k not slow . --no-header --no-summary -q
