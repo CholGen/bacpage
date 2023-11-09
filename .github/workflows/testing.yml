@@ -13,10 +13,9 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
-
       - uses: mamba-org/setup-micromamba@v1
         with:
+          cache-environment: true
           environment-file: environment_test.yaml
-
       - name: Run tests
-        run: pytest -k not slow . --no-header --no-summary -q
+        run: micromamba run -n bacpage pytest -k not slow . --no-header --no-summary -q
