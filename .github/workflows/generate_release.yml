@@ -1,22 +1,27 @@
 name: Create Archive
-on: [push]
+on: [ push ]
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-    - uses: actions/checkout@master
-    - name: Archive Release
-      uses: thedoctor0/zip-release@0.7.1
-      with:
-        type: 'zip'
-        filename: 'bacpage.zip'
-        exclusions: '*.git* Dockerfile config/*.yaml .editorconfig'
-    - name: Upload Release
-      uses: ncipollo/release-action@v1.13.0
-      with:
-        artifacts: "bacpage.zip"
-        token: ${{ secrets.GITHUB_TOKEN }}
-        body: "Latest release of bioinformatics pipeline."
-        tag: "v0.5w"
+      - uses: actions/checkout@master
+      - name: Set variables
+        run: |
+          VER=$(cut -f2 -d\" bacpage/__init__.py)
+          echo "VERSION=$VER" >> $GITHUB_ENV
+      - name: Archive Release
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: 'zip'
+          filename: 'bacpage.zip'
+          path: 'bacpage environment.yaml '
+      - name: Upload Release
+        uses: ncipollo/release-action@v1.13.0
+        with:
+          context: .
+          artifacts: "bacpage.zip"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: "Latest release of bioinformatics pipeline."
+          tag: ${{ env.VERSION }}
