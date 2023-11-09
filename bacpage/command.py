@@ -1,14 +1,15 @@
 import argparse
 import sys
 
-from .src import assemble, example, identify, phylogeny, profiling
+from .src import assemble, example, identify, phylogeny, profiling, version
 
 COMMANDS = {
-    "assemble": [assemble, "Assembles consensus sequence from raw sequencing reads."],
-    "example": [example, "Set up project directory for analysis."],
+    "assemble"      : [assemble, "Assembles consensus sequence from raw sequencing reads."],
+    "example"       : [example, "Set up project directory for analysis."],
     "identify_files": [identify, "Generate a valid sample_data.csv from a directory of FASTQs."],
-    "phylogeny": [phylogeny, "Align sequences and construct a maximum likelihood tree."],
-    "profile": [profiling, "Classify consensus sequences based on the presence or absense of various genes."],
+    "phylogeny"     : [phylogeny, "Align sequences and construct a maximum likelihood tree."],
+    "profile"       : [profiling, "Classify consensus sequences based on the presence or absense of various genes."],
+    "version"       : [version, "Prints the version of bacpage and exits."]
     # "submit" : [submit, "Prepare files for submission to online repositories."],
 }
 
