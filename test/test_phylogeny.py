@@ -58,6 +58,11 @@ def phylogeny_run( scope="session" ):
         shutil.rmtree( project_directory / "intermediates" )
 
 
+def test_phylogeny_postamble():
+    project_directory = Path( "test/test_tree_fasta_directory" ).absolute()
+    phylogeny.postamble( project_directory )
+
+
 @pytest.mark.slow
 def test_tree_reconstruction_successfully( phylogeny_run ):
     tree = phylogeny_run / "results/phylogeny/phylogeny.tree"

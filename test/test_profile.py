@@ -52,3 +52,8 @@ def test_profiling_snakemake_works():
     assert all( results.values() ), f"Not all expected files generated. Expected {results}"
 
     expected_output[0].unlink( missing_ok=True )
+
+
+def test_profile_postamble():
+    project_directory = Path( "test/test_profiling/" ).absolute()
+    profiling.postamble( project_directory )

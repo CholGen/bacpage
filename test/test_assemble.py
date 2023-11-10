@@ -114,6 +114,11 @@ def test_assemble_snakemake_runs_correctly():
         shutil.rmtree( project_directory / "intermediates" )
 
 
+def test_assemble_postamble():
+    project_directory = Path( "test/test_pipeline/" ).absolute()
+    assemble.postamble( False, project_directory )
+
+
 @pytest.mark.slow
 def test_denono_assembly_snakemake_runs_correctly():
     project_directory = Path( "test/test_pipeline/" )

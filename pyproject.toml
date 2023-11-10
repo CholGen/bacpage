@@ -50,7 +50,7 @@ Homepage = "https://github.com/CholGen/bacpage"
 Repository = "https://github.com/CholGen/bacpage.git"
 
 [tool.setuptools.dynamic]
-readme = {file = "README.md"}
+readme = {file = "README.md", content-type="text/markdown"}
 version = {attr = "bacpage.__version__"}
 
 [tool.pytest.ini_options]

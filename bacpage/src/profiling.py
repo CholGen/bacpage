@@ -82,14 +82,14 @@ def profile_sequences( project_directory, configfile, database, threads, verbose
     snakefile = common_funcs.PACKAGE_DIR / "rules/profiling.smk"
     assert snakefile.exists(), f"Snakefile {snakefile} does not exist."
     status = snakemake.snakemake(
-        snakefile, printshellcmds=True, forceall=True, force_incomplete=True, workdir=project_directory,
+        snakefile, printshellcmds=True, forceall=True, force_incomplete=True, workdir=project_path,
         restart_times=common_funcs.RESTART_TIMES, config=config, cores=useable_threads, lock=False, quiet=not verbose
     )
     if not status:
         sys.stderr.write( "Snakemake pipeline did not complete successfully. Check for error messages and rerun." )
         sys.exit( -2 )
 
-    postamble( project_directory )
+    postamble( project_path )
 
 
 def profiling_entrypoint( args: argparse.Namespace ):
