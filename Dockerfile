@@ -5,6 +5,5 @@ MAINTAINER Nate M <natem@scripps.edu>
 WORKDIR /home/mambauser/
 RUN micromamba install -y -n base -c conda-forge git
 ARG MAMBA_DOCKERFILE_ACTIVATE=1
-RUN git clone --depth=1 https://github.com/watronfire/Eureka.git
-RUN micromamba install -y -n base -f Eureka/environment.yaml && \
+RUN micromamba install -y -n base -c bioconda -c condaforge bacpage && \
     micromamba clean --all --yes
