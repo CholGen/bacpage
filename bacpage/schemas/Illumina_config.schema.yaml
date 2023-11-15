@@ -88,7 +88,7 @@ properties:
     type: object
     properties:
       required_depth:
-        description: "Minimum depth at a position"
+        description: "Minimum depth for a position to not be masked."
         type: integer
         minimum: 0
         default: 15

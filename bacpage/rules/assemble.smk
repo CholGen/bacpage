@@ -64,11 +64,15 @@ rule generate_low_coverage_mask:
         depth=temp( "intermediates/illumina/depth/{sample}.depth" ),
         depth_mask=temp( "intermediates/illumina/depth/{sample}.depthmask.bed" )
     params:
-        minimum_depth=config["coverage_mask"]["required_depth"]
+        minimum_depth=config["coverage_mask"]["required_depth"],
+        minimum_base_quality=config["call_variants"]["minimum_base_quality"],
+        minimum_mapping_quality=config["call_variants"]["minimum_mapping_quality"],
     shell:
         """
         samtools depth \
-            -a {input.alignment} |\
+            -a {input.alignment} \
+            -q {params.minimum_base_quality} \
+            -Q {params.minimum_mapping_quality} |\
         tee {output.depth} |\
         awk \
             -v depth="{params.minimum_depth}" \
@@ -157,6 +161,27 @@ rule filter_variants:
             {input.variants}
         """
 
+
+rule depth_filter_variants:
+    message: "Something"
+    input:
+        variants=rules.call_variants_from_alignment.output.variants,
+        depth_mask=rules.generate_low_coverage_mask.output.depth_mask
+    params:
+        minimum_depth=config["filter_variants"]["minimum_depth"],
+        minimum_strand_depth=config["filter_variants"]["minimum_strand_depth"],
+        minimum_support=config["filter_variants"]["minimum_support"]
+    output:
+        bcftools_filtered_variants=temp( "intermediates/illumina/variants/{sample}.vcffiltered.bed" ),
+        depth_filtered_variants="intermediates/illumina/variants/{sample}.allmask.bed"
+    shell:
+        """
+        bcftools filter \
+            -i "(INFO/AD[1])/(INFO/AD[0]+INFO/AD[1])>{params.minimum_support} && INFO/ADF[1]>{params.minimum_strand_depth} && INFO/ADR[1]>{params.minimum_strand_depth}" \
+            {input.variants} |\
+        awk '(/^[^#]/ && length($4) == length($5)) {{printf "%s\t%d\t%d\n", $1, $2 - 1, $2}}' > {output.bcftools_filtered_variants} &&\
+        cat {output.bcftools_filtered_variants} {input.depth_mask} | sort | uniq > {output.depth_filtered_variants}
+        """
 
 rule align_and_normalize_variants:
     message: "For sample {wildcards.sample}, Left-align and normalize indels, and remove insertions."

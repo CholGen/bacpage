@@ -123,7 +123,7 @@ def reconstruct_phylogeny( project_directory: str, configfile: str, minimum_comp
         sys.stderr.write( "Snakemake pipeline did not complete successfully. Check for error messages and rerun." )
         sys.exit( -2 )
 
-    postamble( project_directory )
+    postamble( project_path )
 
 
 def phylogeny_entrypoint( args: argparse.Namespace ):
