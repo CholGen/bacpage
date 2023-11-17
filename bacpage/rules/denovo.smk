@@ -142,7 +142,7 @@ rule denovo_assembly:
         reads2=rules.read_stitching.output.unstitched_read2,
         stitched_reads=rules.read_stitching.output.stitched_reads
     params:
-        unicycle_params="--min_component_size 200 --keep 0 --no_correct --no_pilon",
+        unicycle_params="--min_component_size 200 --keep 0",
         temp_assembly="intermediates/illumina/assembly/{sample}/assembly.fasta",
         temp_graph="intermediates/illumina/assembly/{sample}/assembly.gfa",
         temp_log="intermediates/illumina/assembly/{sample}/unicycler.log"

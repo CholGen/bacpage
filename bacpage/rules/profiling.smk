@@ -1,6 +1,7 @@
 rule all:
     input:
-        "results/reports/antibiotic_resistance.tsv"
+        "results/reports/antibiotic_resistance.tsv",
+        "results/reports/antibiotic_resistance_detailed.tsv"
 
 
 rule antibiotic_resistance_profiling:
@@ -9,7 +10,7 @@ rule antibiotic_resistance_profiling:
     params:
         db=config["antibiotic_resistance"]["database"]
     output:
-        temp_report=temp( "results/reports/antibiotic_resistance.temp.tab" ),
+        detailed_report="results/reports/antibiotic_resistance_detailed.tsv",
         summary="results/reports/antibiotic_resistance.tsv"
     threads: min( workflow.cores,8 )
     shell:
@@ -17,8 +18,8 @@ rule antibiotic_resistance_profiling:
         abricate {input.sequences} \
             --threads {threads} \
             --nopath \
-            --db {params.db} > {output.temp_report} && \
-        abricate --summary {output.temp_report} > {output.summary}
+            --db {params.db} > {output.detailed_report} && \
+        abricate --summary {output.detailed_report} > {output.summary}
         """
 
     #rule combine_index_genes:

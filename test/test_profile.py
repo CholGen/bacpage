@@ -38,7 +38,9 @@ def test_raise_error_with_duplicate_samples_in_directory():
 
 def test_profiling_snakemake_works():
     project_directory = Path( "test/test_profiling/" )
-    expected_output = [project_directory / "results/reports/antibiotic_resistance.tsv"]
+    expected_output = ["results/reports/antibiotic_resistance_detailed.tsv",
+                       "results/reports/antibiotic_resistance.tsv"]
+    expected_output = [project_directory / file for file in expected_output]
     profiling.profile_sequences(
         project_directory,
         ".",
