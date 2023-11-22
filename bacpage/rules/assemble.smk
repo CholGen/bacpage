@@ -162,7 +162,7 @@ rule filter_variants:
         """
 
 
-rule depth_filter_variants:
+rule combine_depth_variants_mask:
     message: "Something"
     input:
         variants=rules.call_variants_from_alignment.output.variants,
@@ -172,16 +172,17 @@ rule depth_filter_variants:
         minimum_strand_depth=config["filter_variants"]["minimum_strand_depth"],
         minimum_support=config["filter_variants"]["minimum_support"]
     output:
-        bcftools_filtered_variants=temp( "intermediates/illumina/variants/{sample}.vcffiltered.bed" ),
-        depth_filtered_variants="intermediates/illumina/variants/{sample}.allmask.bed"
+        bcftools_filtered_mask=temp( "intermediates/illumina/variants/{sample}.vcffiltered.bed" ),
+        depth_filtered_mask="intermediates/illumina/variants/{sample}.allmask.bed"
     shell:
         """
         bcftools filter \
             -i "(INFO/AD[1])/(INFO/AD[0]+INFO/AD[1])>{params.minimum_support} && INFO/ADF[1]>{params.minimum_strand_depth} && INFO/ADR[1]>{params.minimum_strand_depth}" \
             {input.variants} |\
-        awk '(/^[^#]/ && length($4) == length($5)) {{printf "%s\t%d\t%d\n", $1, $2 - 1, $2}}' > {output.bcftools_filtered_variants} &&\
-        cat {output.bcftools_filtered_variants} {input.depth_mask} | sort | uniq > {output.depth_filtered_variants}
+        awk '(/^[^#]/ && length($4) == length($5)) {{printf "%s\\t%d\\t%d\\n", $1, $2 - 1, $2}}' > {output.bcftools_filtered_mask} &&\
+        cat {output.bcftools_filtered_mask} {input.depth_mask} | sort -u > {output.depth_filtered_mask}
         """
+
 
 rule align_and_normalize_variants:
     message: "For sample {wildcards.sample}, Left-align and normalize indels, and remove insertions."
@@ -212,7 +213,7 @@ rule call_consensus:
     input:
         variants=rules.align_and_normalize_variants.output.normalized_variants,
         variant_index=rules.align_and_normalize_variants.output.variant_index,
-        depth_mask=rules.generate_low_coverage_mask.output.depth_mask,
+        depth_mask=rules.combine_depth_variants_mask.output.depth_filtered_mask,
         reference=config["reference"],
         reference_index=config["reference"] + ".bwt"
     params:
