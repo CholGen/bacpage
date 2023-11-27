@@ -1,33 +1,19 @@
+def determine_output( wildcards ):
+    if config["TERRA"]:
+        return determine_alignment_from_vcf_input( wildcards )
+    return "results/phylogeny/phylogeny.tree"
+
+
 rule all:
     input:
-        tree="results/phylogeny/phylogeny.tree"
-
-
-rule mask_consensus:
-    message: "Mask wholly recombinant regions of the consensus sequence of {wildcards.sample} using the mask provided in {input.recombinant_mask}"
-    input:
-        consensus=lambda wildcards: config["SAMPLES"][wildcards.sample],
-        recombinant_mask=config["recombinant_mask"]
-    output:
-        first_tmp_consensus=temp( "intermediates/illumina/consensus/{sample}.tmp1.fasta" ),
-        second_tmp_consensus=temp( "intermediates/illumina/consensus/{sample}.tmp2.fasta" ),
-        masked_consensus="results/consensus/{sample}.masked.fasta"
-    shell:
-        """
-        HEADER=$(cut -f1 {input.recombinant_mask} | uniq | head -n1) && \
-        sed "1s/.*/>${{HEADER}}/" {input.consensus} > {output.first_tmp_consensus} && \
-        bedtools maskfasta \
-            -fi {output.first_tmp_consensus} \
-            -bed {input.recombinant_mask} \
-            -fo {output.second_tmp_consensus} && \
-        sed "1s/.*/>{wildcards.sample}/" {output.second_tmp_consensus} > {output.masked_consensus}
-    """
+        determine_output
 
 
 def calculate_complete_sequences( wildcards ):
-    complete_sequences = expand( "results/consensus/{sample}.masked.fasta",sample=config["SAMPLES"] )
+    complete_sequences = config["SAMPLES"].values()
     if config["BACKGROUND"] != "":
-        complete_sequences.append( config["BACKGROUND"] )
+        if not config["BACKGROUND"].endswith( (".vcf", ".vcf.gz", ".bcf", ".bcf.gz") ):
+            complete_sequences.append( config["BACKGROUND"] )
     return complete_sequences
 
 
@@ -35,21 +21,135 @@ rule concatenate_sequences:
     input:
         sequences=calculate_complete_sequences
     output:
-        alignment=temp( "intermediates/illumina/phylogeny/complete_alignment.fasta" )
+        alignment=temp( "intermediates/illumina/alignment/complete_alignment.fasta" )
     shell:
         """
         cat {input.sequences} > {output.alignment}
         """
 
 
-rule generate_sparse_alignment:
+# from https://stackoverflow.com/a/69473926. Need to test at some point.
+rule concatenate_reference:
     input:
-        alignment=rules.concatenate_sequences.output.alignment
+        reference=config["reference"]
     output:
-        sparse_alignment="results/phylogeny/sparse_alignment.fasta"
+        concatenated_reference=temp( "intermediates/illumina/reference.fasta" )
     shell:
         """
-        snp-sites -o {output.sparse_alignment} {input.alignment}
+        sed '1h;/>/d;H;$!d;x;s/\n//2g' {input.reference} > {output.concatenated_reference}
+        """
+
+
+rule convert_to_vcf:
+    input:
+        alignment=rules.concatenate_sequences.output.alignment,
+        reference=rules.concatenate_reference.output.concatenated_reference
+    output:
+        chromosome_name=temp( "intermediates/illumina/alignment/chromosome_name.txt" ),
+        temp_alignment=temp( "intermediates/illumina/alignment/reference_alignment.fasta" ),
+        vcf="intermediates/illumina/alignment/complete_alignment.bcf.gz",
+        vcf_index="intermediates/illumina/alignment/complete_alignment.bcf.gz.csi"
+    shell:
+        """
+        REFERENCE=$(head -n1 {input.reference} | cut -f2 -d \> | cut -f2 -d" ") &&\
+        echo "1 ${{REFERENCE}}" > {output.chromosome_name} &&\
+        cat {input.reference} {input.alignment} > {output.temp_alignment} &&\
+        snp-sites -v {output.temp_alignment} | bcftools annotate --rename-chrs {output.chromosome_name} -O b -o {output.vcf} &&\
+        bcftools index {output.vcf}
+        """
+
+
+# TODO: Would love to test that this works as expected.
+# TODO: test that phylogeny.py throws an error if given a vcf file as input and the #CHROM field doesn't match the reference being used.
+rule combine_sequences_and_background_vcf:
+    input:
+        user_sequences=rules.convert_to_vcf.output.vcf,
+        background_sequences=config["BACKGROUND"]
+    output:
+        combined_vcf="intermediates/illumina/alignment/combined_alignment.bcf.gz"
+    shell:
+        """
+        bcftools merge \
+            --output {output.combined_vcf} \
+            --output-type b \
+            {input.background_sequences} {input.user_sequences} 
+        """
+
+
+def determine_mask_vcf_inputs( wildcards ):
+    if (config["BACKGROUND"] == "") or config["BACKGROUND"].endswith( (".fa", ".fasta") ):
+        return rules.convert_to_vcf.output.vcf
+    return rules.combine_sequences_and_background_vcf.output.combined_vcf
+
+
+rule mask_vcf:
+    input:
+        alignment=determine_mask_vcf_inputs,
+        mask=config["MASK_LOCATION"]
+    output:
+        masked_alignment="intermediates/illumina/alignment/masked_alignment.bcf.gz"
+    shell:
+        """
+        bcftools view \
+            --targets-file ^{input.mask} \
+            --output-type b \
+            --output {output.masked_alignment} \
+            {input.alignment}
+        """
+
+
+def determine_alignment_from_vcf_input( wildcards ):
+    if config["MASK"]:
+        return rules.mask_vcf.output.masked_alignment
+    return determine_mask_vcf_inputs( wildcards )
+
+
+rule generate_alignment_from_vcf:
+    input:
+        vcf=determine_alignment_from_vcf_input,
+        reference=rules.concatenate_reference.output.concatenated_reference
+    output:
+        fasta_alignment="intermediates/illumina/alignment/masked_alignment.fasta"
+    shell:
+        """
+        custom-script \
+            --vcf {input.vcf} \
+            --reference {input.reference} \
+            --output {output.fasta_alignment}
+        """
+
+
+rule run_gubbins:
+    input:
+        alignment=rules.generate_alignment_from_vcf.output.fasta_alignment
+    params:
+        prefix="intermediates/illumina/recombination_detection/gubbins",
+        tree_builder="hybrid",
+        substitution_model=config["tree_building"]["model"],
+        gubbins_options=""
+    threads: 16
+    output:
+        masked_alignment="intermediates/illumina/recombination_detection/gubbins.filtered_polymorphic_sites.fasta",
+        recombinant_sites="intermediates/illumina/recombination_detection/gubbins.recombination_predictions.gff",
+        other=temp( expand( "intermediates/illumina/recombination_detection/gubbins.{extension}",
+            extension=[
+                "recombination_predictions.embl",
+                "branch_base_reconstruction.embl",
+                "summary_of_snp_distribution.vcf",
+                "per_branch_statistics.csv",
+                "filtered_polymorphic_sites.phylip",
+                "node_labelled.final_tree.tre",
+                "log"
+            ]
+        ) )
+    shell:
+        """
+        run_gubbins.py \
+            --prefix {params.prefix} \
+            --tree-builder {params.tree_builder} \
+            --model {params.substitution_model} \
+            --threads {threads} \
+            {input.alignment}
         """
 
 
@@ -58,9 +158,15 @@ def calculate_outgroup( wildcards ):
     return f"-o {outgroup:q}" if outgroup != "" else ""
 
 
+def determine_tree_input( wildcards ):
+    if config["DETECT"]:
+        return rules.run_gubbins.output.masked_alignment
+    return rules.generate_alignment_from_vcf.output.fasta_alignment
+
+
 rule generate_tree:
     input:
-        alignment=rules.generate_sparse_alignment.output.sparse_alignment
+        alignment=determine_tree_input
     params:
         model=config["tree_building"]["model"],
         iqtree_parameters=config["tree_building"]["iqtree_parameters"],
@@ -160,7 +266,7 @@ rule move_tree_and_rename:
 
     #rule concatenate_reference:
     #    input:
-    #        reference=config["reference"]
+    #        reference=rules.concatenate_reference.output.concatenated_reference
     #    output:
     #        reference="intermediates/misc/concatenated_reference.fasta"
     #    shell:

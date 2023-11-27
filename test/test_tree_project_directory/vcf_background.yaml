@@ -5,7 +5,7 @@ samples: "test_pipeline/sample_data.csv"
 reference: "vc_reference.fasta"
 reference_genes: "cholera_ref_genes/"
 recombinant_mask: "cholera_gubbins_mask.gff"
-background_dataset: ""
+background_dataset: "test.vcf"
 build_tree: False
 
 generate:
