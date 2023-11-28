@@ -20,8 +20,7 @@ def find_files( directory: Path, extensions: list[str] ) -> dict[str, Path]:
         if file.suffix in extensions:
             name = file.stem
             if name in found:
-                sys.stderr.write( f"{name} was found in two or more files. Duplicate sequences cannot be processed." )
-                sys.stderr.write( "fuck off" )
+                sys.stderr.write( f"{name} was found in two or more files. Duplicate sequences cannot be processed.\n" )
                 sys.exit( -5 )
             path = search_path / file
             found[name] = path
@@ -85,7 +84,7 @@ def calculate_threads( threads ):
     if threads == 0:
         sys.stderr.write(
             "Pipeline cannot function without threads. Please specify a non-zero number of threads with the '--threads' "
-            "option or run comman without '--threads' option to automatically detected the number of available threads."
+            "option or run comman without '--threads' option to automatically detected the number of available threads.\n"
         )
         sys.exit( -4 )
     elif threads < 0:

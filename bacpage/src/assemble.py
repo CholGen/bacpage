@@ -161,13 +161,13 @@ def load_sampledata( specified_loc: str, project_directory: Path, check_size: bo
         sampledata_loc = project_directory / common_funcs.DEFAULT_SAMPLEDATA
         if not sampledata_loc.exists():
             sys.stderr.write(
-                f"Unable to automatically find sample data file in project directory (searching for '{common_funcs.DEFAULT_SAMPLEDATA}'). Please specify a valid sample data file."
+                f"Unable to automatically find sample data file in project directory (searching for '{common_funcs.DEFAULT_SAMPLEDATA}'). Please specify a valid sample data file.\n"
             )
             sys.exit( -3 )
     elif not sampledata_loc.is_absolute():
         sampledata_loc = project_directory / sampledata_loc
     if not sampledata_loc.exists():
-        sys.stderr.write( f"{sampledata_loc} does not exist. Please specify a valid file." )
+        sys.stderr.write( f"{sampledata_loc} does not exist. Please specify a valid file.\n" )
         sys.exit( -4 )
 
     md = pd.read_csv( sampledata_loc )
@@ -181,7 +181,7 @@ def load_sampledata( specified_loc: str, project_directory: Path, check_size: bo
     duplicate_samples = md.loc[md["sample"].duplicated(), "sample"]
     if len( duplicate_samples ) > 0:
         sys.stderr.write(
-            f"Sample data contains duplicate samples ({', '.join( duplicate_samples.to_list() )}) at rows {duplicate_samples.index.to_list()}"
+            f"Sample data contains duplicate samples ({', '.join( duplicate_samples.to_list() )}) at rows {duplicate_samples.index.to_list()}\n"
         )
         sys.exit( -1 )
 

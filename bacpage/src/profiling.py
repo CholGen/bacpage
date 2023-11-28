@@ -38,7 +38,7 @@ def find_sequences( directory: Path ) -> dict[str, Path]:
             if len( files ) > 0:
                 return files
     sys.stderr.write(
-        f"Unable to find assemblies, consensus sequences, or loose fastas in {directory}. Please indicate a valid project directory."
+        f"Unable to find assemblies, consensus sequences, or loose fastas in {directory}. Please indicate a valid project directory.\n"
     )
     sys.exit( -8 )
 
@@ -86,7 +86,7 @@ def profile_sequences( project_directory, configfile, database, threads, verbose
         restart_times=common_funcs.RESTART_TIMES, config=config, cores=useable_threads, lock=False, quiet=not verbose
     )
     if not status:
-        sys.stderr.write( "Snakemake pipeline did not complete successfully. Check for error messages and rerun." )
+        sys.stderr.write( "Snakemake pipeline did not complete successfully. Check for error messages and rerun.\n" )
         sys.exit( -2 )
 
     postamble( project_path )
