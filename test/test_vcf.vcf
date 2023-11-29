@@ -1,0 +1,12 @@
+##fileformat=VCFv4.1
+##FILTER=<ID=PASS,Description="All filters passed">
+##contig=<ID=reference,length=4033501>
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##bcftools_annotateVersion=1.17+htslib-1.17
+##bcftools_annotateCommand=annotate --rename-chrs chroms.txt -O b -o aln.renamed.vcf.gz; Date=Wed Nov 22 11:20:35 2023
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	Africa|TZA|SAMN19110433|T10|2017	Africa|TZA|SAMN19110437|T13|2016	Africa|TZA|SAMN19110438|T13|2016	Africa|TZA|SAMN19110441|T13|2017	Africa|TZA|SAMN19110439|T13|2016	Africa|TZA|SAMN19110428|T13|2017	Africa|TZA|SAMN19110430|T13|2017	Africa|TZA|SAMN19110431|T13|2017	Africa|TZA|SAMN19110436|T13|2017	Africa|TZA|SAMN19110443|T13|2017
+reference	133	.	A	*,T	.	.	.	GT	0	0	0	0	0	0	0	0	0	0
+reference	179	.	G	*,T	.	.	.	GT	0	0	0	0	0	0	0	0	0	0
+reference	201	.	T	*,G	.	.	.	GT	0	0	0	0	0	0	0	0	0	0
+reference	825	.	A	G	.	.	.	GT	0	0	0	0	0	0	0	0	0	0
+reference	1036	.	T	A,*	.	.	.	GT	0	0	0	0	0	0	0	0	0	0

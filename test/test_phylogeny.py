@@ -56,6 +56,20 @@ def test_error_if_vcf_background_doesnt_match_reference():
     assert excinfo.value.code < 0
 
 
+def test_raise_error_if_reference_present_already():
+    search_directory = "test/test_tree_project_directory"
+    with pytest.raises( SystemExit ) as excinfo:
+        phylogeny.reconstruct_phylogeny(
+            project_directory=search_directory,
+            configfile="test/test_tree_project_directory/duplicate_reference.yaml",
+            minimum_completeness=0,
+            threads=1,
+            verbose=True,
+            dryrun=True
+        )
+    assert excinfo.value.code < 0
+
+
 def test_raise_error_with_duplicate_sample_names():
     search_directory = "test/test_tree_duplicate_sequences"
     with pytest.raises( SystemExit ) as excinfo:
@@ -67,6 +81,36 @@ def test_raise_error_with_duplicate_sample_names():
             verbose=True
         )
     assert excinfo.value.code == -6
+
+
+def test_parse_vcf_names():
+    vcf = Path( "test/test_vcf.vcf" )
+    found = phylogeny.parse_names_vcf( vcf )
+    expected = [
+        "Africa|TZA|SAMN19110433|T10|2017",
+        "Africa|TZA|SAMN19110437|T13|2016",
+        "Africa|TZA|SAMN19110438|T13|2016",
+        "Africa|TZA|SAMN19110441|T13|2017",
+        "Africa|TZA|SAMN19110439|T13|2016",
+        "Africa|TZA|SAMN19110428|T13|2017",
+        "Africa|TZA|SAMN19110430|T13|2017",
+        "Africa|TZA|SAMN19110431|T13|2017",
+        "Africa|TZA|SAMN19110436|T13|2017",
+        "Africa|TZA|SAMN19110443|T13|2017"
+    ]
+    assert sorted( found ) == sorted( expected )
+
+
+def test_vcf_to_fasta():
+    from bacpage.scripts.vcf_to_fasta import convert_vcf
+    import filecmp
+    vcf_file = "test/test_vcf_to_fasta/input.vcf.gz"
+    reference = "test/test_vcf_to_fasta/reference.fasta"
+    output = "test/test_vcf_to_fasta/output.fasta"
+
+    convert_vcf( vcf=vcf_file, reference=reference, output=output )
+    assert Path( output ).exists() and Path( output ).is_file(), f"{output} does not exist or is not a file."
+    assert filecmp.cmp( "test/test_vcf_to_fasta/input.fasta", output, shallow=True )
 
 
 def get_rules_dryrun( snakefile: Path, config: dict[str, Any], workdir: str ):
@@ -88,7 +132,8 @@ def test_correct_rules_run_if_fasta_background():
     )
     estimated_rules = get_rules_dryrun( snakefile, config, search_directory )
     expected_rules = ["concatenate_sequences", "concatenate_reference", "convert_to_vcf", "generate_alignment_from_vcf",
-                      "run_gubbins", "generate_tree", "move_tree_and_rename"]
+                      "sparsify_alignment", "run_gubbins", "generate_tree", "move_tree_and_rename",
+                      "move_recombinant_mask"]
 
     assert sorted( estimated_rules ) == sorted( expected_rules )
 
@@ -106,7 +151,7 @@ def test_correct_rules_run_if_vcf_background():
     estimated_rules = get_rules_dryrun( snakefile, config, search_directory )
     expected_rules = ["concatenate_sequences", "concatenate_reference", "convert_to_vcf",
                       "combine_sequences_and_background_vcf", "generate_alignment_from_vcf", "run_gubbins",
-                      "generate_tree", "move_tree_and_rename"]
+                      "sparsify_alignment", "generate_tree", "move_tree_and_rename", "move_recombinant_mask"]
 
     assert sorted( estimated_rules ) == sorted( expected_rules )
 
@@ -124,7 +169,8 @@ def test_correct_rules_run_if_masking_specified():
     )
     estimated_rules = get_rules_dryrun( snakefile, config, search_directory )
     expected_rules = ["concatenate_sequences", "concatenate_reference", "convert_to_vcf", "mask_vcf",
-                      "generate_alignment_from_vcf", "run_gubbins", "generate_tree", "move_tree_and_rename"]
+                      "generate_alignment_from_vcf", "run_gubbins", "sparsify_alignment", "generate_tree",
+                      "move_recombinant_mask", "move_tree_and_rename"]
 
     assert sorted( estimated_rules ) == sorted( expected_rules )
 
@@ -142,7 +188,8 @@ def test_correct_rules_run_if_recombinant_masking_skipped():
     )
     estimated_rules = get_rules_dryrun( snakefile, config, search_directory )
     expected_rules = ["concatenate_sequences", "concatenate_reference", "convert_to_vcf",
-                      "generate_alignment_from_vcf", "generate_tree", "move_tree_and_rename"]
+                      "generate_alignment_from_vcf", "sparsify_alignment", "generate_tree",
+                      "move_tree_and_rename"]
 
     assert sorted( estimated_rules ) == sorted( expected_rules )
 
@@ -167,8 +214,10 @@ def test_correct_rules_run_if_terra_specified():
 @pytest.fixture
 def phylogeny_run( scope="session" ):
     project_directory = Path( "test/test_tree_fasta_directory" )
-    phylogeny.reconstruct_phylogeny( str( project_directory ), ".", minimum_completeness=0.9, threads=-1,
-                                     verbose=False )
+    phylogeny.reconstruct_phylogeny(
+        str( project_directory ), ".", minimum_completeness=0.9, threads=-1,
+        verbose=False
+    )
     yield project_directory
 
     if (project_directory / "results").exists():

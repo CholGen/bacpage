@@ -7,8 +7,8 @@ from Bio import SeqIO
 
 from bacpage.src import common_funcs
 
-OTHER_IUPAC = {'r', 'y', 's', 'w', 'k', 'm', 'd', 'h', 'b', 'v'}
-VALID_CHARACTERS = [{'a'}, {'c'}, {'g'}, {'t'}, {'n'}, OTHER_IUPAC, {'-'}, {'?'}]
+OTHER_IUPAC = { 'r', 'y', 's', 'w', 'k', 'm', 'd', 'h', 'b', 'v' }
+VALID_CHARACTERS = [{ 'a' }, { 'c' }, { 'g' }, { 't' }, { 'n' }, OTHER_IUPAC, { '-' }, { '?' }]
 
 
 def add_command_arguments( parser: argparse.ArgumentParser ):
@@ -24,12 +24,18 @@ def add_command_arguments( parser: argparse.ArgumentParser ):
         "--minimum-completeness", type=float, default=0.9,
         help="minimum coverage required to be included in analysis [0.9]"
     )
-    parser.add_argument( "--terra", type=bool, action="store_true",
-                         help="Generate input for Terra and print instructions. [False; runs pipeline locally]" )
-    parser.add_argument( "--no-detect", type=bool, action="store_true",
-                         help="Skip performing recombinant region detection [False; perform detection]" )
-    parser.add_argument( "--mask", type=str, default=None,
-                         help="gff file used to mask to all sequences prior to tree building. If not specified, sequences will not be masked [False]" )
+    parser.add_argument(
+        "--terra", type=bool, action="store_true",
+        help="Generate input for Terra and print instructions. [False; runs pipeline locally]"
+    )
+    parser.add_argument(
+        "--no-detect", type=bool, action="store_true",
+        help="Skip performing recombinant region detection [False; perform detection]"
+    )
+    parser.add_argument(
+        "--mask", type=str, default=None,
+        help="gff file used to mask to all sequences prior to tree building. If not specified, sequences will not be masked [False]"
+    )
     parser.add_argument( "--threads", type=int, default=-1, help="Number of threads available for command [all]." )
     parser.add_argument( "--verbose", action="store_true", help="Print lots of stuff to screen." )
 
@@ -67,27 +73,60 @@ def load_input( directory: str, minimum_completeness: float ) -> dict[str, Path]
     return fastas
 
 
-def validate_sequences( sequence_paths: dict[str, Path], background_dataset: Path = None ):
-    seen_names = list()
+def parse_names_fasta( dataset: Path ):
+    return_list = []
+    if dataset and (dataset != ""):
+        for record in SeqIO.parse( dataset, "fasta" ):
+            return_list.append( record.name )
+    return return_list
 
-    if background_dataset and (background_dataset != ""):
-        for record in SeqIO.parse( background_dataset, "fasta" ):
-            seen_names.append( record.name )
+
+def parse_names_vcf( dataset: Path ):
+    with open( dataset, 'r' ) as f:
+        for line in f:
+            if line.startswith( "#CHROM" ):
+                columns = ["#CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO", "FORMAT"]
+                names = line.strip().split( "\t" )
+                names = names[9:]
+    return names
+
+
+def validate_sequences( sequence_paths: dict[str, Path], reference: str, background_dataset: Path = None ):
+    seen_names = list()
 
     for path in sequence_paths.values():
         for record in SeqIO.parse( path, "fasta" ):
             seen_names.append( record.name )
 
+    if background_dataset and background_dataset != "":
+        if background_dataset.suffix in [".fa", ".fasta", ".fsa"]:
+            seen_names.extend( parse_names_fasta( background_dataset ) )
+        if background_dataset.suffix == ".vcf":
+            seen_names.extend( parse_names_vcf( background_dataset ) )
+        else:
+            sys.stderr.write(
+                f"Unable to automatically detect format of {background_dataset}. Please rename with common FASTA or VCF extension."
+            )
+            sys.exit( -1 )
+
     if len( seen_names ) != len( set( seen_names ) ):
         sys.stderr.write( "Sequence names are not unique. Remove duplicate sequences.\n" )
         sys.exit( -6 )
+
+    reference_name = next( SeqIO.parse( reference, "fasta" ) ).id
+    if reference_name in seen_names:
+        sys.stderr.write(
+            "Reference cannot be present in samples or background dataset. Please rename reference or remove it from the background."
+        )
+        sys.exit( -1 )
 
 
 def postamble( directory: Path ):
     print()
     print( f"Reconstructed phylogeny is available at {directory / 'results/phylogeny/phylogeny.tree'}" )
     print(
-        "Open the file in any tree viewer to visualize. We recommend figtree (http://tree.bio.ed.ac.uk/software/figtree/)." )
+        "Open the file in any tree viewer to visualize. We recommend figtree (http://tree.bio.ed.ac.uk/software/figtree/)."
+    )
 
 
 def reconstruct_phylogeny( project_directory: str, configfile: str, minimum_completeness: float = 0,
@@ -98,7 +137,8 @@ def reconstruct_phylogeny( project_directory: str, configfile: str, minimum_comp
 
     if not project_path.exists() or not project_path.is_dir():
         sys.stderr.write(
-            f"Specified project directory {project_path} does not exist. Please specify a valid directory.\n" )
+            f"Specified project directory {project_path} does not exist. Please specify a valid directory.\n"
+        )
         sys.exit( -1 )
 
     input_sequences = load_input( project_directory, minimum_completeness=minimum_completeness )
@@ -118,7 +158,7 @@ def reconstruct_phylogeny( project_directory: str, configfile: str, minimum_comp
     else:
         config["BACKGROUND"] = ""
 
-    validate_sequences( input_sequences, config["BACKGROUND"] )
+    validate_sequences( input_sequences, config["reference"], config["BACKGROUND"] )
 
     config["SAMPLES"] = input_sequences
 
