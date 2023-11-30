@@ -123,6 +123,38 @@ rule generate_alignment_from_vcf:
             --output {output.fasta_alignment}
         """
 
+rule bypass_gubbins:
+    input:
+        vcf=determine_alignment_from_vcf_input,
+        mask=lambda wildcards: config["DETECT"] if isinstance( config["DETECT"],str ) else ""
+    output:
+        masked_vcf="intermediates/illumina/recombination_detection/gubbins_masked.bcf.gz"
+    shell:
+        """
+        bcftools view \
+            --targets-file ^{input.mask} \
+            --output-type b \
+            --output {output.masked_vcf} \
+            {input.vcf}
+        """
+
+
+rule generate_alignment_from_bypassed_gubbins:
+    input:
+        masked_vcf=rules.bypass_gubbins.output.masked_vcf,
+        reference=rules.concatenate_reference.output.concatenated_reference
+    output:
+        fasta_alignment=temp( "intermediates/illumina/recombination_detection/gubbins_masked_skipped.fasta" )
+    params:
+        script_location=workflow.source_path( "../scripts/vcf_to_fasta.py" )
+    shell:
+        """
+        python {params.script_location} \
+            --vcf {input.masked_vcf} \
+            --reference {input.reference} \
+            --output {output.fasta_alignment}
+        """
+
 
 rule run_gubbins:
     input:
@@ -168,6 +200,8 @@ def calculate_outgroup( wildcards ):
 
 def determine_tree_input( wildcards ):
     if config["DETECT"]:
+        if isinstance( config["DETECT"],str ):
+            return rules.generate_alignment_from_bypassed_gubbins.output.fasta_alignment
         return rules.run_gubbins.output.masked_alignment
     return rules.generate_alignment_from_vcf.output.fasta_alignment
 
