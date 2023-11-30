@@ -1,6 +1,5 @@
 import os.path
 
-import pandas as pd
 import pytest
 import yaml
 from snakemake.utils import validate
@@ -41,18 +40,18 @@ def test_config_file_is_valid_yaml( project_directory: str ):
         validate( project_yaml, "bacpage/schemas/Illumina_config.schema.yaml" )
 
 
-def test_sample_file_exists( project_directory: str ):
-    samples_file = os.path.join( project_directory, "sample_data.csv" )
-    assert os.path.exists( samples_file ), f"{samples_file} does not exist."
-    assert os.path.isfile( samples_file ), f"{samples_file} exists but is not a file."
-    assert os.path.getsize( samples_file ) > 100, f"{samples_file} should contain text but is empty."
+# def test_sample_file_exists( project_directory: str ):
+#     samples_file = os.path.join( project_directory, "sample_data.csv" )
+#     assert os.path.exists( samples_file ), f"{samples_file} does not exist."
+#     assert os.path.isfile( samples_file ), f"{samples_file} exists but is not a file."
+#     assert os.path.getsize( samples_file ) > 100, f"{samples_file} should contain text but is empty."
 
 
-def test_sample_file_is_valid_csv( project_directory: str ):
-    sf = pd.read_csv( os.path.join( project_directory, "sample_data.csv" ) )
-    for col in ["sample", "read1", "read2"]:
-        assert col in sf.columns, f"{col} not in columns."
-    assert sf.shape == (3, 3)
+# def test_sample_file_is_valid_csv( project_directory: str ):
+#     sf = pd.read_csv( os.path.join( project_directory, "sample_data.csv" ) )
+#     for col in ["sample", "read1", "read2"]:
+#         assert col in sf.columns, f"{col} not in columns."
+#     assert sf.shape == (3, 3)
 
 
 def test_exits_if_project_directory_is_not_empty():

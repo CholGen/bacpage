@@ -35,11 +35,11 @@ def create_project_directory( directory: str, quiet: bool = False ):
 
     # create samples file
     sample_data = project_directory / "sample_data.csv"
-    with sample_data.open( "w" ) as samples_file:
-        samples_file.write( "sample,read1,read2\n" )
-        samples_file.write( "a,path-to-a-read1,path-to-a-read2\n" )
-        samples_file.write( "b,path-to-b-read1,path-to-b-read2\n" )
-        samples_file.write( "c,path-to-c-read1,path-to-c-read2\n" )
+    # with sample_data.open( "w" ) as samples_file:
+    #    samples_file.write( "sample,read1,read2\n" )
+    #    samples_file.write( "a,path-to-a-read1,path-to-a-read2\n" )
+    #    samples_file.write( "b,path-to-b-read1,path-to-b-read2\n" )
+    #    samples_file.write( "c,path-to-c-read1,path-to-c-read2\n" )
 
     # create config file
     environment = Environment( loader=FileSystemLoader( common_funcs.PACKAGE_DIR / "schemas/" ) )
@@ -59,9 +59,7 @@ def create_project_directory( directory: str, quiet: bool = False ):
         print( "The structure of the project directory is as follows:" )
         print( project_directory.name + "/" )
         print( "├── input/" )
-        print( "├── sample_data.csv" )
         print( "└── config.yaml" )
         print( "" )
         print( "To assemble genomes, place raw sequencing FASTQs in the input directory." )
-        print( "Next, use `bacpage identify` to fill in sample_data.csv with information about your samples." )
-        print( "Finally, use `bacpage assemble` to generate consensus sequences." )
+        print( "Then, use `bacpage assemble` to generate consensus sequences or de novo assembles." )
