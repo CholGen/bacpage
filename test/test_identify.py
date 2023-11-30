@@ -20,7 +20,8 @@ SAMPLES = [
 def sample_data( tmp_path_factory ) -> str:
     directory = tmp_path_factory.mktemp( "testing_directory" )
     sample_data = os.path.join( directory, "sample_data.csv" )
-    identify.generate_sample_data( "test/test_fastqs", sample_data )
+    sample_locations = identify.generate_sample_data( "test/test_fastqs" )
+    identify.write_samples_to_file( sample_locations, sample_data )
     return sample_data
 
 
