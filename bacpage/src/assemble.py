@@ -6,8 +6,7 @@ import pandas as pd
 import snakemake
 from snakemake.utils import validate
 
-import identify
-from bacpage.src import common_funcs
+from bacpage.src import common_funcs, identify
 
 
 def add_command_arguments( parser: argparse.ArgumentParser ):
