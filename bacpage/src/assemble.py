@@ -6,6 +6,7 @@ import pandas as pd
 import snakemake
 from snakemake.utils import validate
 
+import identify
 from bacpage.src import common_funcs
 
 
@@ -24,6 +25,12 @@ def add_command_arguments( parser: argparse.ArgumentParser ):
     parser.add_argument(
         "--samples", type=str, default=".",
         help="Path to file detailing raw sequencing reads for all samples ['sample_data.csv']."
+    )
+    parser.add_argument(
+        "--delim", default="_", type=str, help="deliminator to extract sample name from file name [_]"
+    )
+    parser.add_argument(
+        "--index", default=0, type=int, help="index of sample name after splitting file name by delim [0]"
     )
     parser.add_argument(
         "--no-qa", action="store_true", help="Whether to skip quality assessment of assemblies [False]"
@@ -61,13 +68,15 @@ def assemble_entrypoint( args: argparse.Namespace ):
         sample_data=args.samples,
         denovo=args.denovo,
         qc=not args.no_qa,
+        delim=args.delim,
+        index=args.index,
         threads=args.threads,
         verbose=args.verbose,
     )
 
 
 def run_assemble( project_directory: str, configfile: str, sample_data: str, denovo: bool, qc: bool, threads: int,
-                  verbose: bool = False ):
+                  verbose: bool = False, delim: str = "_", index: int = 0 ):
     # Check project directory
     project_directory = Path( project_directory ).absolute()
     assert project_directory.exists() and project_directory.is_dir(), f"Specified project directory {project_directory} does not exist. Please specify a valid directory."
@@ -88,8 +97,12 @@ def run_assemble( project_directory: str, configfile: str, sample_data: str, den
     print( "Loading and validating samples data...", end="" )
     try:
         metadata, skipped_samples = load_sampledata(
-            sample_data, project_directory, check_size=config["preprocessing"]["check_size"],
-            minimum_size=config["preprocessing"]["minimum_size"]
+            specified_loc=sample_data,
+            project_directory=project_directory,
+            check_size=config["preprocessing"]["check_size"],
+            minimum_size=config["preprocessing"]["minimum_size"],
+            delim=delim,
+            index=index
         )
     except Exception:
         print( "Error" )
@@ -133,8 +146,33 @@ def run_assemble( project_directory: str, configfile: str, sample_data: str, den
     postamble( denovo, project_directory )
 
 
+def find_sampledata( specified_loc: str, project_directory: Path, delim: str = "_", index: int = 0 ) -> Path:
+    if specified_loc != ".":
+        specified_path = Path( specified_loc )
+        if not specified_path.exists():
+            sys.stderr.write(
+                f"Cannot parse sample data because {specified_loc} does not exists. Please specify a valid path." )
+            sys.exit( -1 )
+        return specified_path
+
+    detected_path = project_directory / common_funcs.DEFAULT_SAMPLEDATA
+    if detected_path.exists():
+        return detected_path
+
+    search_directory = project_directory / "input"
+    if not search_directory.exists():
+        sys.stderr.write(
+            f"Cannot automatically find samples because {common_funcs.DEFAULT_SAMPLEDATA} and {project_directory / 'input'} do not exist. Please specify a sample data file or add input files to `input/`." )
+        sys.exit( -1 )
+
+    samples = identify.generate_sample_data( directory=search_directory, delim=delim, index=index )
+    samples_cache = detected_path
+    identify.write_samples_to_file( sample_data=samples, output=samples_cache )
+    return samples_cache
+
+
 def load_sampledata( specified_loc: str, project_directory: Path, check_size: bool = False,
-                     minimum_size: int = 100 ) -> (pd.DataFrame, list):
+                     minimum_size: int = 100, delim: str = "_", index: int = 0 ) -> (pd.DataFrame, list):
     """ Attempts for find sample data using user supplied information. If sample data file is directly specified, use it, else
     search for the file in the project directory.
 
@@ -146,8 +184,12 @@ def load_sampledata( specified_loc: str, project_directory: Path, check_size: bo
         Location of project directory.
     check_size : bool
         Indicates whether to validate input file sizes.
-    minimum_size
+    minimum_size : int
         Minimum file size for an input file to be considered valid. Not considered if check_size is False.
+    delim : str
+        When automatically searching for samples from sequencing files, use this delim to split the file name. Default is "_".
+    index : int
+        When automatically searching for samples from seuqencing files, take this field from the split file name as the sample name. Default is 0.
 
     Returns
     -------
@@ -156,19 +198,12 @@ def load_sampledata( specified_loc: str, project_directory: Path, check_size: bo
     list
         Sample names which were removed from sample data because their input files are smaller than minimum_size.
     """
-    sampledata_loc = Path( specified_loc )
-    if specified_loc == ".":
-        sampledata_loc = project_directory / common_funcs.DEFAULT_SAMPLEDATA
-        if not sampledata_loc.exists():
-            sys.stderr.write(
-                f"Unable to automatically find sample data file in project directory (searching for '{common_funcs.DEFAULT_SAMPLEDATA}'). Please specify a valid sample data file.\n"
-            )
-            sys.exit( -3 )
-    elif not sampledata_loc.is_absolute():
-        sampledata_loc = project_directory / sampledata_loc
-    if not sampledata_loc.exists():
-        sys.stderr.write( f"{sampledata_loc} does not exist. Please specify a valid file.\n" )
-        sys.exit( -4 )
+    sampledata_loc = find_sampledata(
+        specified_loc=specified_loc,
+        project_directory=project_directory,
+        delim=delim,
+        index=index
+    )
 
     md = pd.read_csv( sampledata_loc )
 

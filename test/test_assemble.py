@@ -63,7 +63,7 @@ def test_config_finds_local_parameters():
 def test_error_if_sample_data_not_automatically_found():
     with pytest.raises( SystemExit ) as excinfo:
         assemble.load_sampledata( ".", Path( "test/test_fastqs" ).absolute() )
-    assert excinfo.value.code == -3
+    assert excinfo.value.code < 0
 
 
 def test_automatically_find_sample_data():
