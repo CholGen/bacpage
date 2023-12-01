@@ -10,13 +10,14 @@ A successful run generates consensus sequences, typing information, phylogenetic
 # Features
 We anticipate the pipeline will be able to perform the following functions:
 - [x] Reference-based assembly of Illumina paired-end reads
-- [ ] *De novo* assembly of Illumina paired-end reads
+- [x] *De novo* assembly of Illumina paired-end reads
 - [ ] *De novo* assembly of ONT long reads
 - [x] Run quality control checks
 - [x] Variant calling using [bcftools](https://github.com/samtools/bcftools)
 - [x] Maximum-likelihood phylogenetic inference of processed samples and background dataset using [iqtree](https://github.com/iqtree/iqtree2) 
 - [x] MLST profiling and virulence factor detection
-- [ ] Antimicrobial resistance genes and plasmid detection
+- [x] Antimicrobial resistance genes detection
+- [ ] Plasmid detection
 
 # Installation
 1. Install `miniconda` by running the following two command:
@@ -32,15 +33,22 @@ git clone https://github.com/CholGen/bacpage.git
 
 3. Install and activate the pipeline's conda environment:
 ```commandline
+cd bacpage/
 mamba env create -f environment.yaml
 mamba activate bacpage
 ```
 
-4. Test the installation:
+4. Install the `bacpage` command:
 ```commandline
-snakemake --configfile test/test.yaml --all-temp --cores 8
+pip install .
 ```
-This command should run to completion without a problem. Please create an issue if this is not the case.
+
+5. Test the installation:
+```commandline
+bacpage -h
+bacpage version
+```
+These command should print the help and version of the program. Please create an issue if this is not the case.
 
 # Usage
 0. Navigate to the pipeline's directory.
