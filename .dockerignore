@@ -1,0 +1,14 @@
+.github
+.git
+.pytest_cache
+.snakemake
+config/
+example/
+test/
+.dockerignore
+.editorconfig
+.gitattributes
+.gitignore
+Dockerfile
+environment.yaml
+environment_test.yaml

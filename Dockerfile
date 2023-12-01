@@ -3,7 +3,12 @@ LABEL authors="Nate Matteson"
 MAINTAINER Nate M <natem@scripps.edu>
 
 WORKDIR /home/mambauser/
-RUN micromamba install -y -n base -c conda-forge git
+COPY --chown=$MAMBA_USER:$MAMBA_USER . ./bacpage/
+
+WORKDIR /home/mambauser/bacpage/
+RUN micromamba install -y -n base -f environment_docker.yaml \
+    && micromamba clean --all --yes
 ARG MAMBA_DOCKERFILE_ACTIVATE=1
-RUN micromamba install -y -n base -c bioconda -c condaforge bacpage && \
-    micromamba clean --all --yes
+RUN pip install .
+
+WORKDIR /home/mambauser/
