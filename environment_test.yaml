@@ -25,4 +25,5 @@ dependencies:
   - prokka
   - quast
   - abricate
+  - gubbins
   - pytest
