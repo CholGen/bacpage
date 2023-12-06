@@ -9,7 +9,7 @@ from snakemake.utils import validate
 DEFAULT_CONFIG = "config.yaml"
 DEFAULT_SAMPLEDATA = "sample_data.csv"
 PACKAGE_DIR = files( "bacpage" )
-CONFIG_PATHS = ["reference", "reference_genes", "recombinant_mask"]
+CONFIG_PATHS = {"Illumina": ["reference"], "phylogeny": ["reference", "recombinant_mask"], "assemble": ["reference"]}
 RESTART_TIMES = 0
 
 
@@ -39,7 +39,7 @@ def normalize_path( value: str, working_directory: Path ) -> Path:
         return path
 
 
-def load_configfile( specified_loc: str, project_directory: Path ) -> dict:
+def load_configfile( specified_loc: str, project_directory: Path, schema: str = "Illumina" ) -> dict:
     """ Attempts for find config file using user supplied information. If config file is directly specified, use it, else
     search for the config file in the project directory.
 
@@ -49,6 +49,8 @@ def load_configfile( specified_loc: str, project_directory: Path ) -> dict:
         Path to config file. Pass "." to automatically search for file in project directory.
     project_directory: pathlib.Path
         Path to project directory. Used if config file path is not specified and to normalize relative paths in the config file.
+    schema: str
+        Specify a different schema to use to validate configuration file.
 
     Returns
     -------
@@ -64,17 +66,19 @@ def load_configfile( specified_loc: str, project_directory: Path ) -> dict:
     with open( configfile_loc, "r" ) as cf:
         configfile = yaml.safe_load( cf )
 
-    schema_location = PACKAGE_DIR / "schemas/Illumina_config.schema.yaml"
+    schema_location = PACKAGE_DIR / f"schemas/{schema}_config.schema.yaml"
 
     try:
         validate( configfile, schema_location )
     except WorkflowError as err:
-        message = err.args[0].split( "\n" )
+        # message = err.args[0].split( "\n" )
         print( "Error" )
-        sys.stderr.write( f"{message[0]} {message[1].split( ': ' )[1]}.\n" )
+        # sys.stderr.write( f"{message[0]} {message[1].split( ': ' )[1]}.\n" )
+        sys.stderr.write( err.args[0] )
         sys.exit( -9 )
 
-    for key in CONFIG_PATHS:
+    config_paths = CONFIG_PATHS.get( schema, [] )
+    for key in config_paths:
         configfile[key] = str( normalize_path( configfile[key], PACKAGE_DIR / "resources" ) )
 
     return configfile

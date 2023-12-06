@@ -75,7 +75,7 @@ def assemble_entrypoint( args: argparse.Namespace ):
 
 
 def run_assemble( project_directory: str, configfile: str, sample_data: str, denovo: bool, qc: bool, threads: int,
-                  verbose: bool = False, delim: str = "_", index: int = 0 ):
+                  verbose: bool = False, delim: str = "_", index: int = 0, dryrun: bool = False ):
     # Check project directory
     project_directory = Path( project_directory ).absolute()
     assert project_directory.exists() and project_directory.is_dir(), f"Specified project directory {project_directory} does not exist. Please specify a valid directory."
@@ -83,7 +83,7 @@ def run_assemble( project_directory: str, configfile: str, sample_data: str, den
     # Check config file
     print( "Loading and validating configuration file...", end="" )
     try:
-        config = common_funcs.load_configfile( configfile, project_directory )
+        config = common_funcs.load_configfile( configfile, project_directory, schema="assemble" )
     except Exception:
         print( "Error" )
         raise
@@ -124,6 +124,8 @@ def run_assemble( project_directory: str, configfile: str, sample_data: str, den
     else:
         snakefile = common_funcs.PACKAGE_DIR / "rules/assemble.smk"
     assert snakefile.exists(), f"Snakefile does not exist. Checking {snakefile}"
+    if dryrun:
+        return config, snakefile
     if verbose:
         status = snakemake.snakemake(
             snakefile, force_incomplete=True, workdir=project_directory,

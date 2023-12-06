@@ -1,17 +1,8 @@
 # General parameters; point to input files.
 run_type: "Illumina"
-samples: "{{ sample_data }}"
-output_directory: "{{ project_path }}"
 reference: "vc_reference.fasta"
-reference_genes: "resources/cholera_ref_genes/"
 recombinant_mask: "resources/cholera_gubbins_mask.gff"
 background_dataset: "<background-dataset-path>"
-
-generate:
-  consensus_sequences: true
-  typing: false
-  quality_control_report: true
-  phylogeny: false
 
 preprocessing:
   check_size: true
@@ -40,10 +31,6 @@ filter_variants:
 
 call_consensus:
   consensus_parameters: "--mark-del N"
-
-mlst_profiling:
-  scheme: "vcholerae"
-  mlst_params: "--quiet --csv --legacy"
 
 antibiotic_resistance:
   database: card
