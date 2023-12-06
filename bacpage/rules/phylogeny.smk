@@ -2,7 +2,7 @@ def determine_output( wildcards ):
     if config["TERRA"]:
         return determine_alignment_from_vcf_input( wildcards )
     outputs = ["results/phylogeny/phylogeny.tree", "results/phylogeny/sparse_alignment.fasta"]
-    if config["DETECT"]:
+    if config["DETECT"] and not isinstance( config["DETECT"],str ):
         outputs.append( "results/phylogeny/recombinant_regions.gff" )
     return outputs
 
@@ -13,7 +13,7 @@ rule all:
 
 
 def calculate_complete_sequences( wildcards ):
-    complete_sequences = config["SAMPLES"].values()
+    complete_sequences = list( config["SAMPLES"].values() )
     if config["BACKGROUND"] != "":
         if not config["BACKGROUND"].suffix in [".vcf", ".vcf.gz", ".bcf", ".bcf.gz"]:
             complete_sequences.append( config["BACKGROUND"] )

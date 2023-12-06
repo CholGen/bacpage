@@ -9,7 +9,7 @@ import pytest
 import snakemake
 from Bio import Phylo
 
-from bacpage.src import phylogeny
+from bacpage.src import phylogeny, common_funcs
 
 
 def test_recognize_folder_of_fastas():
@@ -41,6 +41,16 @@ def test_raise_error_with_duplicate_samples_in_directory():
     with pytest.raises( SystemExit ) as excinfo:
         found = phylogeny.load_input( directory=search_directory, minimum_completeness=0.9 )
     assert excinfo.value.code == -5
+
+
+def test_config_finds_local_parameters():
+    config = common_funcs.load_configfile(
+        "test/configs/local_parameters.yaml", Path( "test/test_pipeline" ).absolute(), schema="phylogeny"
+    )
+    reference = Path( config["reference"] )
+    assert reference.is_absolute() and reference.exists(), f"Local reference in resources directory was not correctly found ({reference})."
+    recombinant_mask = Path( config["recombinant_mask"] )
+    assert recombinant_mask.is_absolute() and recombinant_mask.exists(), f"Local reference gene directory was not correctly found ({recombinant_mask})."
 
 
 def test_error_if_vcf_background_doesnt_match_reference():
@@ -124,7 +134,7 @@ def test_correct_rules_run_if_fasta_background():
     search_directory = "test/test_tree_project_directory"
     config, snakefile = phylogeny.reconstruct_phylogeny(
         project_directory=search_directory,
-        configfile=".",
+        configfile="test/test_tree_project_directory/background_fasta.yaml",
         minimum_completeness=0,
         threads=1,
         verbose=True,
@@ -224,10 +234,21 @@ def test_correct_rules_run_if_gubbins_mask_supplied():
         dryrun=True,
     )
     estimated_rules = get_rules_dryrun( snakefile, config, search_directory )
-    expected_rules = ["concatenate_sequences", "concatenate_reference", "convert_to_vcf", "mask_vcf",
+    expected_rules = ["concatenate_sequences", "concatenate_reference", "convert_to_vcf",
                       "bypass_gubbins", "generate_alignment_from_bypassed_gubbins", "sparsify_alignment",
-                      "generate_tree",
-                      "move_recombinant_mask", "move_tree_and_rename"]
+                      "generate_tree", "move_tree_and_rename"]
+    assert sorted( estimated_rules ) == sorted( expected_rules )
+
+
+def test_abridged_config_accepted():
+    search_directory = "test/test_tree_project_directory"
+    config = "test/configs/phylogeny_only.yaml"
+    config, snakefile = phylogeny.reconstruct_phylogeny(
+        project_directory=search_directory,
+        configfile=config,
+        dryrun=True
+    )
+    assert config is not None
 
 
 @pytest.fixture

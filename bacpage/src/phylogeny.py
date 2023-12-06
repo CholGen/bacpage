@@ -7,8 +7,8 @@ from Bio import SeqIO
 
 from bacpage.src import common_funcs
 
-OTHER_IUPAC = { 'r', 'y', 's', 'w', 'k', 'm', 'd', 'h', 'b', 'v' }
-VALID_CHARACTERS = [{ 'a' }, { 'c' }, { 'g' }, { 't' }, { 'n' }, OTHER_IUPAC, { '-' }, { '?' }]
+OTHER_IUPAC = {'r', 'y', 's', 'w', 'k', 'm', 'd', 'h', 'b', 'v'}
+VALID_CHARACTERS = [{'a'}, {'c'}, {'g'}, {'t'}, {'n'}, OTHER_IUPAC, {'-'}, {'?'}]
 
 
 def add_command_arguments( parser: argparse.ArgumentParser ):
@@ -105,7 +105,7 @@ def validate_sequences( sequence_paths: dict[str, Path], reference: str, backgro
     if background_dataset and background_dataset != "":
         if background_dataset.suffix in [".fa", ".fasta", ".fsa"]:
             seen_names.extend( parse_names_fasta( background_dataset ) )
-        if background_dataset.suffix == ".vcf":
+        elif background_dataset.suffix == ".vcf":
             seen_names.extend( parse_names_vcf( background_dataset ) )
         else:
             sys.stderr.write(
@@ -149,7 +149,7 @@ def reconstruct_phylogeny( project_directory: str, configfile: str, minimum_comp
     # Check config file
     print( "Loading and validating configuration file...", end="" )
     try:
-        config = common_funcs.load_configfile( configfile, project_path )
+        config = common_funcs.load_configfile( configfile, project_path, schema="phylogeny" )
     except Exception:
         print( "Error" )
         raise
@@ -176,9 +176,19 @@ def reconstruct_phylogeny( project_directory: str, configfile: str, minimum_comp
     if mask:
         mask_loc = Path( mask ).absolute()
         if not mask_loc.exists():
-            sys.stderr.write( f"{mask_loc} does not exist. Please specify a valid GFF file." )
+            sys.stderr.write(
+                f"{mask_loc}, specified on command line, does not exist. Please specify a valid GFF file." )
+            sys.exit( -1 )
         config["MASK"] = True
         config["MASK_LOCATION"] = str( mask_loc )
+    # elif config["recombinant_mask"] != "":
+    #    mask_loc = Path( config["recombinant_mask"] ).absolute()
+    #    if not mask_loc.exists():
+    #        sys.stderr.write(
+    #            f"{mask_loc}, specified in config file, does not exist. Please specify a valid GFF file or leave blank." )
+    #        sys.exit( -1 )
+    #    config["MASK"] = True
+    #    config["MASK_LOCATION"] = str( mask_loc )
 
     # Calculate number of threads
     useable_threads = common_funcs.calculate_threads( threads )

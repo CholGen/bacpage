@@ -50,14 +50,10 @@ def test_config_is_valid_yaml():
 
 def test_config_finds_local_parameters():
     config = common_funcs.load_configfile(
-        "test/configs/local_parameters.yaml", Path( "test/test_pipeline" ).absolute()
+        "test/configs/local_parameters.yaml", Path( "test/test_pipeline" ).absolute(),
     )
     reference = Path( config["reference"] )
     assert reference.is_absolute() and reference.exists(), f"Local reference in resources directory was not correctly found ({reference})."
-    reference_genes = Path( config["reference_genes"] )
-    assert reference_genes.is_absolute() and reference_genes.exists(), f"Local reference gene directory was not correctly found ({reference_genes})."
-    recombinant_mask = Path( config["recombinant_mask"] )
-    assert recombinant_mask.is_absolute() and recombinant_mask.exists(), f"Local reference gene directory was not correctly found ({recombinant_mask})."
 
 
 def test_error_if_sample_data_not_automatically_found():

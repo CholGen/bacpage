@@ -9,7 +9,7 @@ from snakemake.utils import validate
 DEFAULT_CONFIG = "config.yaml"
 DEFAULT_SAMPLEDATA = "sample_data.csv"
 PACKAGE_DIR = files( "bacpage" )
-CONFIG_PATHS = ["reference", "reference_genes", "recombinant_mask"]
+CONFIG_PATHS = {"Illumina": ["reference"], "phylogeny": ["reference", "recombinant_mask"]}
 RESTART_TIMES = 0
 
 
@@ -39,7 +39,7 @@ def normalize_path( value: str, working_directory: Path ) -> Path:
         return path
 
 
-def load_configfile( specified_loc: str, project_directory: Path ) -> dict:
+def load_configfile( specified_loc: str, project_directory: Path, schema: str = "Illumina" ) -> dict:
     """ Attempts for find config file using user supplied information. If config file is directly specified, use it, else
     search for the config file in the project directory.
 
@@ -64,17 +64,18 @@ def load_configfile( specified_loc: str, project_directory: Path ) -> dict:
     with open( configfile_loc, "r" ) as cf:
         configfile = yaml.safe_load( cf )
 
-    schema_location = PACKAGE_DIR / "schemas/Illumina_config.schema.yaml"
+    schema_location = PACKAGE_DIR / f"schemas/{schema}_config.schema.yaml"
 
     try:
         validate( configfile, schema_location )
     except WorkflowError as err:
-        message = err.args[0].split( "\n" )
+        # message = err.args[0].split( "\n" )
         print( "Error" )
-        sys.stderr.write( f"{message[0]} {message[1].split( ': ' )[1]}.\n" )
+        # sys.stderr.write( f"{message[0]} {message[1].split( ': ' )[1]}.\n" )
+        sys.stderr.write( err.args[0] )
         sys.exit( -9 )
 
-    for key in CONFIG_PATHS:
+    for key in CONFIG_PATHS[schema]:
         configfile[key] = str( normalize_path( configfile[key], PACKAGE_DIR / "resources" ) )
 
     return configfile
