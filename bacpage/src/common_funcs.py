@@ -9,7 +9,7 @@ from snakemake.utils import validate
 DEFAULT_CONFIG = "config.yaml"
 DEFAULT_SAMPLEDATA = "sample_data.csv"
 PACKAGE_DIR = files( "bacpage" )
-CONFIG_PATHS = {"Illumina": ["reference"], "phylogeny": ["reference", "recombinant_mask"]}
+CONFIG_PATHS = {"Illumina": ["reference"], "phylogeny": ["reference", "recombinant_mask"], "assemble": ["reference"]}
 RESTART_TIMES = 0
 
 
@@ -49,6 +49,8 @@ def load_configfile( specified_loc: str, project_directory: Path, schema: str = 
         Path to config file. Pass "." to automatically search for file in project directory.
     project_directory: pathlib.Path
         Path to project directory. Used if config file path is not specified and to normalize relative paths in the config file.
+    schema: str
+        Specify a different schema to use to validate configuration file.
 
     Returns
     -------
@@ -75,7 +77,8 @@ def load_configfile( specified_loc: str, project_directory: Path, schema: str = 
         sys.stderr.write( err.args[0] )
         sys.exit( -9 )
 
-    for key in CONFIG_PATHS[schema]:
+    config_paths = CONFIG_PATHS.get( schema, [] )
+    for key in config_paths:
         configfile[key] = str( normalize_path( configfile[key], PACKAGE_DIR / "resources" ) )
 
     return configfile

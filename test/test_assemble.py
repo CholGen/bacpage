@@ -56,6 +56,22 @@ def test_config_finds_local_parameters():
     assert reference.is_absolute() and reference.exists(), f"Local reference in resources directory was not correctly found ({reference})."
 
 
+def test_abridged_config_accepted():
+    search_directory = "test/test_tree_project_directory"
+    config = "test/configs/assemble_only.yaml"
+    config, snakemake = assemble.run_assemble(
+        project_directory=search_directory,
+        configfile=config,
+        sample_data=".",
+        denovo=False,
+        qc=False,
+        threads=1,
+        dryrun=True
+    )
+
+    assert config is not None
+
+
 def test_error_if_sample_data_not_automatically_found():
     with pytest.raises( SystemExit ) as excinfo:
         assemble.load_sampledata( ".", Path( "test/test_fastqs" ).absolute() )
