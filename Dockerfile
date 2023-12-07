@@ -11,4 +11,7 @@ RUN micromamba install -y -n base -f environment_docker.yaml \
 ARG MAMBA_DOCKERFILE_ACTIVATE=1
 RUN pip install .
 
+N# Specify path to gain access to conda environment without terminal model
+ENV PATH="/opt/conda/bin:/opt/conda/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
 WORKDIR /home/mambauser/
