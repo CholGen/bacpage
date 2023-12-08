@@ -99,7 +99,9 @@ task ref_based_assembly {
     }
     command <<<
         bacpage setup tmp/
-        echo "sample,read1,read2\n~{sample_name},~{read1},~{read2}" > tmp/sample_data.csv
+        echo $'sample,read1,read2\n~{sample_name},~{read1},~{read2}' > tmp/sample_data.csv
+
+        cat tmp/sample_data.csv
 
         # TODO: generate the config.yaml from optional inputs.
         cat << EOF > tmp/config.yaml
@@ -146,7 +148,7 @@ task ref_based_assembly {
         mv tmp/results/consensus/~{sample_name}.consensus.fasta consensus.fasta
     >>>
     output {
-        File consensus_sequence = "tmp/results/consensus/~{sample_name}.consensus.fasta"
+        File consensus_sequence = "~{sample_name}.consensus.fasta"
     }
     runtime {
         docker: "watronfire/bacpage:latest"
