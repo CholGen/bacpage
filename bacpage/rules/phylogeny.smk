@@ -39,7 +39,13 @@ rule concatenate_reference:
         concatenated_reference=temp( "intermediates/illumina/reference.fasta" )
     shell:
         """
-        sed '1h;/>/d;H;$!d;x;s/\\n/@/;s/\\n//g;s/@/\\n/' {input.reference} > {output.concatenated_reference}
+        SEDOPTION=
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+          SEDOPTION="-i ''"
+        fi
+        
+        sed '1h;/>/d;H;$!d;x;s/\\n/@/;s/\\n//g;s/@/\\n/' {input.reference} |\
+        sed $SEDOPTION -e '$a\\' > {output.concatenated_reference}
         """
 
 
@@ -54,7 +60,7 @@ rule convert_to_vcf:
         vcf_index="intermediates/illumina/alignment/complete_alignment.bcf.gz.csi"
     shell:
         """
-        REFERENCE=$(head -n1 {input.reference} | cut -f2 -d \> | cut -f2 -d" ") &&\
+        REFERENCE=$(head -n1 {input.reference} | cut -f2 -d \> | cut -f1 -d" ") &&\
         echo "1 ${{REFERENCE}}" > {output.chromosome_name} &&\
         cat {input.reference} {input.alignment} > {output.temp_alignment} &&\
         snp-sites -v {output.temp_alignment} | bcftools annotate --samples ^'${{REFERENCE}}' --rename-chrs {output.chromosome_name} -O b -o {output.vcf} &&\
