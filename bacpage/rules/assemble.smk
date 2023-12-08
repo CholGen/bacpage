@@ -204,7 +204,7 @@ rule call_consensus:
 	        --mask {input.depth_mask} \
 	        {input.variants} |\
         union -filter |\
-        sed "1s/.*/> {wildcards.sample}/" > {output.consensus_sequence}
+        sed "1s/.*/>{wildcards.sample}/" > {output.consensus_sequence}
         """
 
 
