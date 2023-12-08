@@ -1,6 +1,5 @@
 # General parameters; point to input files.
 run_type: "Illumina"
-samples: "test_pipeline/sample_data.csv"
 reference: "vc_reference.fasta"
 
 preprocessing:
