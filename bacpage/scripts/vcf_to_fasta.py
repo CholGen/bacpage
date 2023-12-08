@@ -16,21 +16,18 @@ def convert_vcf( vcf: str, reference: str, output: str ):
     samples = [sample for sample in samples if sample != reference_id]
 
     records = list()
-    for sample in samples:
-        consensus = run(
-            f"bcftools consensus -f {reference} -s '{sample}' {vcf}", shell=True, capture_output=True, text=True
-        )
-        try:
+    with open( output, "w" ) as output_file:
+        for sample in samples:
+            consensus = run(
+                f"bcftools consensus --mark-del N -f {reference} -s '{sample}' {vcf}", shell=True, capture_output=True,
+                text=True
+            )
             record = SeqIO.read( StringIO( consensus.stdout ), "fasta" )
-        except ValueError:
-            print( consensus )
-            raise
-        record.id = sample
-        record.name = ""
-        record.description = ""
-        records.append( record )
-
-    SeqIO.write( records, output, "fasta" )
+            record.id = sample
+            record.name = ""
+            record.description = ""
+            record.seq = record.seq.replace( "*", "N" ).upper()
+            SeqIO.write( record, output_file, "fasta" )
 
 
 if __name__ == "__main__":
