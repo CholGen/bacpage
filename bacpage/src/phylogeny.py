@@ -215,7 +215,7 @@ def phylogeny_entrypoint( args: argparse.Namespace ):
     reconstruct_phylogeny(
         project_directory=args.directory,
         configfile=args.configfile,
-        minimum_completeness=args.mininum_completeness,
+        minimum_completeness=args.minimum_completeness,
         terra=args.terra,
         mask=args.mask,
         detect_file=args.detect,
