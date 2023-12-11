@@ -145,7 +145,7 @@ task ref_based_assembly {
         bacpage assemble tmp/
 
         # zip results
-        mv tmp/results/consensus/~{sample_name}.consensus.fasta consensus.fasta
+        mv tmp/results/consensus/~{sample_name}.consensus.fasta ~{sample_name}.consensus.fasta
     >>>
     output {
         File consensus_sequence = "~{sample_name}.consensus.fasta"

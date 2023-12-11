@@ -5,7 +5,7 @@ workflow phylogeny_reconstruction {
         Array[File] consensus_sequences
         File reference = "https://github.com/CholGen/bacpage/raw/split_into_command/bacpage/resources/vc_reference.fasta"
         File recombinant_mask = "https://github.com/CholGen/bacpage/raw/split_into_command/bacpage/resources/cholera_mask.gff"
-        File background_dataset = ""
+        File background_dataset = "https://github.com/watronfire/Alignment-Repo/raw/main/vibrio-cholerae/o1_cholera_v1.vcf.gz"
 
         Float? minimum_completeness = 0.9
         String? outgroup = ""
