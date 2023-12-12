@@ -81,7 +81,8 @@ rule combine_sequences_and_background_vcf:
         bcftools merge \
             --output {output.combined_vcf} \
             --output-type b \
-            {input.background_sequences} {input.user_sequences} 
+            {input.background_sequences} {input.user_sequences} &&\
+        bcftools index {output.combined_vcf}
         """
 
 
@@ -91,16 +92,16 @@ rule convert_gff_to_bed:
         mask=config["MASK_LOCATION"],
         reference=rules.concatenate_reference.output.concatenated_reference
     output:
-        mask_bed="intermediates/temp/alignment_mask.bed"
+        mask_bed="intermediates/illumina/alignment_mask.txt"
     run:
         import pandas as pd
 
-        reference_name = shell( "head -n1 {input.reference} | cut -f2 -d \> | cut -f2 -d' '",read=True ).strip()
+        reference_name = shell( "head -n1 {input.reference} | cut -f2 -d \> | cut -f1 -d' '",read=True ).strip()
         df = pd.read_csv( input.mask,sep="\t",header=None )
         df["CHROM"] = reference_name
         df = df[["CHROM", 3, 4]]
         df.columns = ["CHROM", "BEG", "END"]
-        df.to_csv( output.mask_bed,index=False,sep="\t" )
+        df.to_csv( output.mask_bed,header=False,index=False,sep="\t" )
 
 
 def determine_mask_vcf_inputs( wildcards ):
@@ -121,7 +122,8 @@ rule mask_vcf:
             --targets-file ^{input.mask} \
             --output-type b \
             --output {output.masked_alignment} \
-            {input.alignment}
+            {input.alignment} &&\
+        bcftools index {output.masked_alignment}
         """
 
 
@@ -161,6 +163,7 @@ rule bypass_gubbins:
             --output-type b \
             --output {output.masked_vcf} \
             {input.vcf}
+        bcftools index {output.masked_vcf}
         """
 
 
