@@ -9,7 +9,7 @@ import pytest
 import snakemake
 from Bio import Phylo
 
-from bacpage.src import phylogeny, common_funcs
+from bacpage.src import common_funcs, phylogeny
 
 
 def test_recognize_folder_of_fastas():
@@ -126,6 +126,7 @@ def test_vcf_to_fasta():
 def get_rules_dryrun( snakefile: Path, config: dict[str, Any], workdir: str ):
     with redirect_stdout( StringIO() ) as f:
         value = snakemake.snakemake( snakefile, forceall=True, workdir=workdir, config=config, summary=True )
+    assert value, "Snakemake file is not valid"
     df = pd.read_csv( StringIO( f.getvalue() ), sep="\t" )
     return df["rule"].unique()
 
@@ -178,7 +179,8 @@ def test_correct_rules_run_if_masking_specified():
         dryrun=True,
     )
     estimated_rules = get_rules_dryrun( snakefile, config, search_directory )
-    expected_rules = ["concatenate_sequences", "concatenate_reference", "convert_to_vcf", "mask_vcf",
+    expected_rules = ["concatenate_sequences", "concatenate_reference", "convert_to_vcf", "convert_gff_to_bed",
+                      "mask_vcf",
                       "generate_alignment_from_vcf", "run_gubbins", "sparsify_alignment", "generate_tree",
                       "move_recombinant_mask", "move_tree_and_rename"]
 
