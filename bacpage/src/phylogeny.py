@@ -1,14 +1,15 @@
 import argparse
 import sys
 from pathlib import Path
+from subprocess import run
 
 import snakemake
 from Bio import SeqIO
 
 from bacpage.src import common_funcs
 
-OTHER_IUPAC = {'r', 'y', 's', 'w', 'k', 'm', 'd', 'h', 'b', 'v'}
-VALID_CHARACTERS = [{'a'}, {'c'}, {'g'}, {'t'}, {'n'}, OTHER_IUPAC, {'-'}, {'?'}]
+OTHER_IUPAC = { 'r', 'y', 's', 'w', 'k', 'm', 'd', 'h', 'b', 'v' }
+VALID_CHARACTERS = [{ 'a' }, { 'c' }, { 'g' }, { 't' }, { 'n' }, OTHER_IUPAC, { '-' }, { '?' }]
 
 
 def add_command_arguments( parser: argparse.ArgumentParser ):
@@ -86,12 +87,8 @@ def parse_names_fasta( dataset: Path ):
 
 
 def parse_names_vcf( dataset: Path ):
-    with open( dataset, 'r' ) as f:
-        for line in f:
-            if line.startswith( "#CHROM" ):
-                columns = ["#CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO", "FORMAT"]
-                names = line.strip().split( "\t" )
-                names = names[9:]
+    response = run( f"bcftools query -l {dataset}", shell=True, capture_output=True, text=True )
+    names = response.stdout.strip().split( "\n" )
     return names
 
 
@@ -144,8 +141,6 @@ def reconstruct_phylogeny( project_directory: str, configfile: str, minimum_comp
         )
         sys.exit( -1 )
 
-    input_sequences = load_input( project_directory, minimum_completeness=minimum_completeness )
-
     # Check config file
     print( "Loading and validating configuration file...", end="" )
     try:
@@ -161,7 +156,10 @@ def reconstruct_phylogeny( project_directory: str, configfile: str, minimum_comp
     else:
         config["BACKGROUND"] = ""
 
+    print( "Loading and validating input sequences...", end="" )
+    input_sequences = load_input( project_directory, minimum_completeness=minimum_completeness )
     validate_sequences( input_sequences, config["reference"], config["BACKGROUND"] )
+    print( f"Done. Found {len( input_sequences )} sequences in directory." )
 
     config["SAMPLES"] = input_sequences
 
@@ -177,7 +175,8 @@ def reconstruct_phylogeny( project_directory: str, configfile: str, minimum_comp
         mask_loc = Path( mask ).absolute()
         if not mask_loc.exists():
             sys.stderr.write(
-                f"{mask_loc}, specified on command line, does not exist. Please specify a valid GFF file." )
+                f"{mask_loc}, specified on command line, does not exist. Please specify a valid GFF file."
+            )
             sys.exit( -1 )
         config["MASK"] = True
         config["MASK_LOCATION"] = str( mask_loc )

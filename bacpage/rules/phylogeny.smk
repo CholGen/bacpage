@@ -85,6 +85,24 @@ rule combine_sequences_and_background_vcf:
         """
 
 
+rule convert_gff_to_bed:
+    message: "Coverts GFF file to BED file readable by BCFtools."
+    input:
+        mask=config["MASK_LOCATION"],
+        reference=rules.concatenate_reference.output.concatenated_reference
+    output:
+        mask_bed="intermediates/temp/alignment_mask.bed"
+    run:
+        import pandas as pd
+
+        reference_name = shell( "head -n1 {input.reference} | cut -f2 -d \> | cut -f2 -d' '",read=True ).strip()
+        df = pd.read_csv( input.mask,sep="\t",header=None )
+        df["CHROM"] = reference_name
+        df = df[["CHROM", 3, 4]]
+        df.columns = ["CHROM", "BEG", "END"]
+        df.to_csv( output.mask_bed,index=False,sep="\t" )
+
+
 def determine_mask_vcf_inputs( wildcards ):
     if (config["BACKGROUND"] == "") or (config["BACKGROUND"].suffix in [".fa", ".fasta"]):
         return rules.convert_to_vcf.output.vcf
@@ -94,7 +112,7 @@ def determine_mask_vcf_inputs( wildcards ):
 rule mask_vcf:
     input:
         alignment=determine_mask_vcf_inputs,
-        mask=config["MASK_LOCATION"]
+        mask=rules.convert_gff_to_bed.output.mask_bed
     output:
         masked_alignment="intermediates/illumina/alignment/masked_alignment.bcf.gz"
     shell:
@@ -128,6 +146,7 @@ rule generate_alignment_from_vcf:
             --reference {input.reference} \
             --output {output.fasta_alignment}
         """
+
 
 rule bypass_gubbins:
     input:
