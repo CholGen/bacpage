@@ -1,11 +1,12 @@
-# BACPAGE
-This repository contains an easy-to-use pipeline for the assembly and analysis of bacterial genomes using ONT long-read or Illumina short-read technology.
+<p align="center">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset=".github/logo_light.png">
+      <source media="(prefers-color-scheme: light)" srcset=".github/logo_dark.png">
+      <img alt="bacpage" src=".github/logo_dark.png" width=500 align="center">
+    </picture>
+</p>
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset=".github/logo_light.png">
-  <source media="(prefers-color-scheme: light)" srcset=".github/logo_dark.png">
-  <img alt="bacpage" src=".github/logo_dark.png">
-</picture>
+This repository contains an easy-to-use pipeline for the assembly and analysis of bacterial genomes using ONT long-read or Illumina short-read technology.
 
 # Introduction
 Advances in sequencing technology during the COVID-19 pandemic has led to massive increases in the generation of sequencing data. Many bioinformatics tools have been developed to analyze this data, but very few tools can be utilized by individuals without prior bioinformatics training.
