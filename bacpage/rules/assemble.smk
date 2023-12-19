@@ -70,7 +70,7 @@ rule generate_low_coverage_mask:
     shell:
         """
         samtools depth \
-            -a {input.alignment} \
+            -aa {input.alignment} \
             -q {params.minimum_base_quality} \
             -Q {params.minimum_mapping_quality} |\
         tee {output.depth} |\
@@ -189,7 +189,7 @@ rule call_consensus:
     input:
         variants=rules.align_and_normalize_variants.output.normalized_variants,
         variant_index=rules.align_and_normalize_variants.output.variant_index,
-        depth_mask=rules.combine_depth_variants_mask.output.depth_filtered_mask,
+        depth_mask=rules.generate_low_coverage_mask.output.depth_mask,
         reference=config["reference"],
         reference_index=config["reference"] + ".bwt"
     params:
