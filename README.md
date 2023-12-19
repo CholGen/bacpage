@@ -2,8 +2,8 @@
 This repository contains an easy-to-use pipeline for the assembly and analysis of bacterial genomes using ONT long-read or Illumina short-read technology.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset=".github/logo_dark.png">
-  <source media="(prefers-color-scheme: light)" srcset=".github/logo_light.png">
+  <source media="(prefers-color-scheme: dark)" srcset=".github/logo_light.png">
+  <source media="(prefers-color-scheme: light)" srcset=".github/logo_dark.png">
   <img alt="bacpage" src=".github/logo_dark.png">
 </picture>
 
