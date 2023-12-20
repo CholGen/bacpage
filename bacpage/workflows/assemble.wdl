@@ -29,8 +29,8 @@ workflow reference_based_assembly {
 
         String? consensus_parameters = "--mark-del N"
 
-        Int disk_size = 16 # in GiB? Should check the size of the input.
-        Int memory = 16
+        Int disk_size = 8 # in GiB? Should check the size of the input.
+        Int memory = 4
         Int cpu = 8
     }
     call ref_based_assembly {
@@ -142,7 +142,7 @@ task ref_based_assembly {
           consensus_parameters: ~{consensus_parameters}
         EOF
 
-        bacpage assemble tmp/
+        bacpage assemble --no-qa tmp/
 
         # zip results
         mv tmp/results/consensus/~{sample_name}.consensus.fasta ~{sample_name}.consensus.fasta
