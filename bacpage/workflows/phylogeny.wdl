@@ -4,8 +4,8 @@ workflow phylogeny_reconstruction {
     input {
         Array[File] consensus_sequences
         File reference = "https://github.com/CholGen/bacpage/raw/split_into_command/bacpage/resources/vc_reference.fasta"
-        File recombinant_mask = "https://github.com/CholGen/bacpage/raw/split_into_command/bacpage/resources/cholera_mask.gff"
-        File background_dataset = "https://github.com/watronfire/Alignment-Repo/raw/main/vibrio-cholerae/o1_cholera_v1.vcf.gz"
+        File? recombinant_mask = "https://github.com/CholGen/bacpage/raw/split_into_command/bacpage/resources/cholera_mask.gff"
+        File? background_dataset = "https://github.com/watronfire/Alignment-Repo/raw/main/vibrio-cholerae/o1_cholera_v1.vcf.gz"
 
         Float? minimum_completeness = 0.9
         String? outgroup = ""
@@ -16,7 +16,7 @@ workflow phylogeny_reconstruction {
         Int memory = 16
         Int cpu = 16
     }
-    call phylogeny_reconstruction {
+    call build_phylogeny {
         input:
             consensus_sequences = consensus_sequences,
             reference = reference,
@@ -31,18 +31,18 @@ workflow phylogeny_reconstruction {
             cpu = cpu,
     }
     output {
-        File phylogeny = phylogeny_reconstruction.phylogeny
-        File sparse_alignment = phylogeny_reconstruction.sparse_alignment
-        File? recombinant_regions = phylogeny_reconstruction.recombinant_regions
+        File phylogeny = build_phylogeny.phylogeny
+        File sparse_alignment = build_phylogeny.sparse_alignment
+        File? recombinant_regions = build_phylogeny.recombinant_regions
     }
 }
 
-task phylogeny_reconstruction {
+task build_phylogeny {
     input {
         Array[File] consensus_sequences
         File reference = "https://github.com/CholGen/bacpage/raw/split_into_command/bacpage/resources/vc_reference.fasta"
-        File recombinant_mask = "https://github.com/CholGen/bacpage/raw/split_into_command/bacpage/resources/cholera_mask.gff"
-        File background_dataset = ""
+        File? recombinant_mask = "https://github.com/CholGen/bacpage/raw/split_into_command/bacpage/resources/cholera_mask.gff"
+        File? background_dataset = ""
 
         Float? minimum_completeness = 0.9
         String? outgroup = ""
@@ -56,25 +56,26 @@ task phylogeny_reconstruction {
     command <<<
         # TODO Definitely need to do some setup here.
         mkdir tmp/
-        cp ~{consensus_sequences} tmp/
+        cp ~{sep=" " consensus_sequences} tmp/
 
         # Construct config
         cat << EOF > tmp/config.yaml
         reference: ~{reference}
-        recombinant_mask: ~{recombinant_mask}
-        background_dataset: ~{background_dataset}
+        recombinant_mask: "~{default="" recombinant_mask}"
+        background_dataset: "~{default="" background_dataset}"
 
         tree_building:
           minimum_completeness: ~{minimum_completeness}
-          outgroup: ~{outgroup}
+          outgroup: "~{default="" outgroup}"
           model: ~{model}
           iqtree_parameters: ~{iqtree_parameters}
         EOF
 
-        bacpage phylogeny project_directory/
+        cat tmp/config.yaml
+        bacpage phylogeny --no-detect tmp/
 
         # Move output
-        mv project_directory/results/phylogeny/phylogeny.tree project_directory/results/phylogeny/sparse_alignment.fasta project_directory/results/phylogeny/recombinant_regions.gff .
+        mv tmp/results/phylogeny/phylogeny.tree tmp/results/phylogeny/sparse_alignment.fasta tmp/results/phylogeny/recombinant_regions.gff .
     >>>
     output {
         File phylogeny = "phylogeny.tree"
