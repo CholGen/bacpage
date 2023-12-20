@@ -59,7 +59,7 @@ def test_config_finds_local_parameters():
 def test_abridged_config_accepted():
     search_directory = "test/test_tree_project_directory"
     config = "test/configs/assemble_only.yaml"
-    config, snakemake = assemble.run_assemble(
+    config, snakefile = assemble.run_assemble(
         project_directory=search_directory,
         configfile=config,
         sample_data=".",
