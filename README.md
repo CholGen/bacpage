@@ -41,9 +41,14 @@ bash Mambaforge-$(uname)-$(uname -m).sh
 git clone https://github.com/CholGen/bacpage.git
 ```
 
-3. Install and activate the pipeline's conda environment:
+3. Switch to the development branch of the pipeline:
 ```commandline
 cd bacpage/
+git checkout -b split_into_command
+```
+
+3. Install and activate the pipeline's conda environment:
+```commandline
 mamba env create -f environment.yaml
 mamba activate bacpage
 ```
