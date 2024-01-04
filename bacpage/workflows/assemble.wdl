@@ -98,6 +98,7 @@ task ref_based_assembly {
         Int cpu = 8
     }
     command <<<
+
         bacpage setup tmp/
         echo $'sample,read1,read2\n~{sample_name},~{read1},~{read2}' > tmp/sample_data.csv
 
