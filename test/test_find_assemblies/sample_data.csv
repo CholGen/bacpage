@@ -1,0 +1,2 @@
+sample,read1,read2
+test,input/test_R1.fastq.gz,input/test_R2.fastq.gz

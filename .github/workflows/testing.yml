@@ -1,0 +1,21 @@
+name: Test pipeline quickly
+
+on: [ pull_request, push, workflow_dispatch ]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ "ubuntu-latest" ]
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - uses: mamba-org/setup-micromamba@v1
+        with:
+          cache-environment: true
+          environment-file: environment_test.yaml
+      - name: Run tests
+        run: micromamba run -n bacpage python -m pytest --rootdir=. -k 'not slow' . --junitxml=junit/test-results.xml

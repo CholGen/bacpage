@@ -1,0 +1,55 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$ID: "phylogeny"
+
+description: Snakemake configuration file for Illumina pipeline
+type: object
+
+properties:
+  run_type:
+    description: "Indicates the type of run being conducted"
+    const: "Illumina"
+  reference:
+    description: "Location of reference sequence. Must be in fasta format (.fasta|.fa)."
+    type: string
+    pattern: "^.*\\.(fasta|fa)$"
+  recombinant_mask:
+    description: "Published list of recombinant sites to mask from consensus sequence. Must be a '.gff' file."
+    type: string
+    pattern: "^$|^.*\\.gff$"
+  background_dataset:
+    description: "Genomes to include in the phylogenetic analysis. Must be in fasta format (.fasta|.fa)."
+    type: string
+    default: "<background-dataset-path>"
+
+  tree_building:
+    description: "Parameters for building a phylogeny."
+    type: object
+    properties:
+      minimum_completeness:
+        description: "Proportion of genome that must be covered in consensus for sequence to be included in phylogeny."
+        type: number
+        minimum: 0
+        maximum: 1
+        default: 0.75
+      outgroup:
+        description: "The taxa to use as the root during phylogenetic inference."
+        type: string
+      model:
+        description: "Substitution model to use during phylogenetic inference."
+        type: string
+        default: "GTR"
+      iqtree_parameters:
+        description: "Parameters passed directly to iqtree."
+        type: string
+        default: "-bb 1000"
+    required:
+      - minimum_completeness
+      - outgroup
+      - model
+      - iqtree_parameters
+
+required:
+  - reference
+  - recombinant_mask
+  - background_dataset
+  - tree_building

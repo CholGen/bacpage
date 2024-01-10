@@ -1,0 +1,65 @@
+# General parameters; point to input files.
+run_type: "Illumina"
+reference: "vc_reference.fasta"
+recombinant_mask: "resources/cholera_gubbins_mask.gff"
+background_dataset: "<background-dataset-path>"
+
+preprocessing:
+  check_size: true
+  minimum_size: 100
+
+alignment_bwa:
+  bwa_params: "-M"
+
+coverage_mask:
+  required_depth: 10
+
+plot_coverage:
+  bin_size: 10000
+
+call_variants:
+  maximum_depth: 2000
+  minimum_mapping_quality: 30
+  minimum_base_quality: 20
+  mpileup_parameters: "-B -a INFO/AD,INFO/ADF,INFO/ADR -Ou"
+  call_parameters: -mv -Ov --ploidy 1
+
+filter_variants:
+  minimum_depth: 10
+  minimum_support: 0.5
+  minimum_strand_depth: 5
+
+call_consensus:
+  consensus_parameters: "--mark-del N"
+
+antibiotic_resistance:
+  database: card
+
+tree_building:
+  minimum_completeness: 0.90
+  outgroup: ""
+  model: "GTR"
+  iqtree_parameters: "-bb 1000"
+
+quality_trimming:
+  window_size: 10
+  minimum_quality: 20
+  minimum_length: 75
+
+adapter_trimming:
+  firstpass_reference: "adapters"
+  firstpass_arguments: "ktrim=r k=23 mink=11 hdist=1 tpe tbo"
+  secondpass_reference: "phix"
+  secondpass_arguments: "k=31 hdist=1"
+
+assembly:
+  assembler: spades
+  assembler_arguments: ""
+  minimum_contig_length: 200
+  trim: false
+  correction: false
+  read_correction: false
+  read_stitching: false
+
+contig_assignment:
+  prokka_arguments: ""

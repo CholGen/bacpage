@@ -5,8 +5,8 @@
 !resources
 !resources/*
 !resources/*/*.fasta
-!workflow
-!workflow/**
+!bacpage
+!bacpage/**
 .gitignore
 !.gitattributes
 !.editorconfig
@@ -17,4 +17,6 @@
 !environment.yaml
 !Dockerfile
 !example/**
+!bacpage.py
 !test/**
+!pyproject.toml

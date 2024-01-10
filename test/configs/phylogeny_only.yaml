@@ -1,0 +1,11 @@
+# General parameters; point to input files.
+reference: "vc_reference.fasta"
+recombinant_mask: "cholera_gubbins_mask.gff"
+background_dataset: "test/trees/case1.fa"
+
+tree_building:
+  minimum_completeness: 0.75
+  outgroup: ""
+  model: GTR
+  iqtree_parameters: -nt AUTO -m TEST -bb 1000
+
