@@ -8,8 +8,8 @@ from Bio import SeqIO
 
 from bacpage.src import common_funcs
 
-OTHER_IUPAC = { 'r', 'y', 's', 'w', 'k', 'm', 'd', 'h', 'b', 'v' }
-VALID_CHARACTERS = [{ 'a' }, { 'c' }, { 'g' }, { 't' }, { 'n' }, OTHER_IUPAC, { '-' }, { '?' }]
+OTHER_IUPAC = {'r', 'y', 's', 'w', 'k', 'm', 'd', 'h', 'b', 'v'}
+VALID_CHARACTERS = [{'a'}, {'c'}, {'g'}, {'t'}, {'n'}, OTHER_IUPAC, {'-'}, {'?'}]
 
 
 def add_command_arguments( parser: argparse.ArgumentParser ):
@@ -87,7 +87,8 @@ def parse_names_fasta( dataset: Path ):
 
 
 def parse_names_vcf( dataset: Path ):
-    response = run( f"bcftools query -l {dataset}", shell=True, capture_output=True, text=True )
+    response = run( f"bcftools index {dataset} && bcftools query -l {dataset}", shell=True, capture_output=True,
+                    text=True )
     names = response.stdout.strip().split( "\n" )
     return names
 
@@ -102,7 +103,7 @@ def validate_sequences( sequence_paths: dict[str, Path], reference: str, backgro
     if background_dataset and background_dataset != "":
         if background_dataset.suffix in [".fa", ".fasta", ".fsa"]:
             seen_names.extend( parse_names_fasta( background_dataset ) )
-        elif background_dataset.suffix == ".vcf":
+        elif background_dataset.name.endswith( (".vcf", ".vcf.gz") ):
             seen_names.extend( parse_names_vcf( background_dataset ) )
         else:
             sys.stderr.write(

@@ -15,7 +15,7 @@ rule all:
 def calculate_complete_sequences( wildcards ):
     complete_sequences = list( config["SAMPLES"].values() )
     if config["BACKGROUND"] != "":
-        if not config["BACKGROUND"].suffix in [".vcf", ".vcf.gz", ".bcf", ".bcf.gz"]:
+        if not config["BACKGROUND"].name.endswith( (".vcf", ".vcf.gz", ".bcf", ".bcf.gz") ):
             complete_sequences.append( config["BACKGROUND"] )
     return complete_sequences
 
@@ -81,6 +81,7 @@ rule combine_sequences_and_background_vcf:
         bcftools merge \
             --output {output.combined_vcf} \
             --output-type b \
+            --missing-to-ref \
             {input.background_sequences} {input.user_sequences} &&\
         bcftools index {output.combined_vcf}
         """

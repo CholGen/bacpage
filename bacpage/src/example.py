@@ -11,18 +11,19 @@ def add_command_arguments( parser: argparse.ArgumentParser ):
     parser.description = "Set up project directory for analysis."
     parser.add_argument( "directory", help="Location to create project directory" )
     parser.add_argument( "--quiet", action="store_true", help="Do not display helpful messages during creation." )
+    parser.add_argument( "--force", action="store_true", help="Generate directory wihtout checking if it is empty." )
     parser.set_defaults( command=example_entrypoint )
 
 
 def example_entrypoint( args: argparse.Namespace ):
-    create_project_directory( args.directory, quiet=args.quiet )
+    create_project_directory( args.directory, quiet=args.quiet, force=args.force )
 
 
-def create_project_directory( directory: str, quiet: bool = False ):
+def create_project_directory( directory: str, quiet: bool = False, force: bool = False ):
     project_directory = Path( directory ).absolute()
 
     if project_directory.exists():
-        if any( project_directory.iterdir() ):
+        if any( project_directory.iterdir() ) and not force:
             sys.stderr.write( f"Could not create project directory. {project_directory} must be empty.\n" )
             sys.exit( -8 )
     else:
