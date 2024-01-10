@@ -97,4 +97,9 @@ task build_phylogeny {
         memory: memory + " GiB"
         disks: "local-disk " + disk_size + " HDD"
     }
+    meta {
+        author: "Nathaniel L. Matteson"
+        email: "nmatteson@bwh.harvard.edu"
+        description: "## Phylogenetic Reconstruction with bacpage \n This workflow performs a phylogenetic reconstruction using the bacpage pipeline."
+    }
 }

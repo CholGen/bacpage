@@ -157,4 +157,11 @@ task ref_based_assembly {
         memory: memory + " GiB"
         disks: "local-disk " + disk_size + " HDD"
     }
+    meta {
+        author: "Nathaniel L. Matteson"
+        email: "nmatteson@bwh.harvard.edu"
+        description: "## Reference-based assembly with bacpage \n This workflow performs referenced-based assembly using the bacpage pipeline."
+    }
 }
+
+
