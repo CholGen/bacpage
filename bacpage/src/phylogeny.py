@@ -87,7 +87,9 @@ def parse_names_fasta( dataset: Path ):
 
 
 def parse_names_vcf( dataset: Path ):
-    response = run( f"bcftools index {dataset} && bcftools query -l {dataset}", shell=True, capture_output=True,
+    if dataset.suffix == ".gz":
+        run( f"bcftools index {dataset}", shell=True )
+    response = run( f"bcftools query -l {dataset}", shell=True, capture_output=True,
                     text=True )
     names = response.stdout.strip().split( "\n" )
     return names
