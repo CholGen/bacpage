@@ -5,7 +5,7 @@ workflow reference_based_assembly {
         File read1
         File read2
         String sample_name
-        File reference = "https://github.com/CholGen/bacpage/raw/split_into_command/bacpage/resources/vc_reference.fasta"
+        File reference = "gs://andersen-lab_temp/vc_reference.fasta"
 
         String? bwa_parameters = "-M"
 
@@ -99,6 +99,7 @@ task ref_based_assembly {
     }
     command <<<
 
+        cp ~{reference} reference.fasta
         bacpage setup tmp/
         echo $'sample,read1,read2\n~{sample_name},~{read1},~{read2}' > tmp/sample_data.csv
 
@@ -107,7 +108,7 @@ task ref_based_assembly {
         # TODO: generate the config.yaml from optional inputs.
         cat << EOF > tmp/config.yaml
         run_type: "Illumina"
-        reference: ~{reference}
+        reference: reference.fasta
 
         preprocessing:
           check_size: False
