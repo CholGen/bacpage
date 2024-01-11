@@ -98,8 +98,8 @@ task ref_based_assembly {
         Int cpu = 8
     }
     command <<<
+        set -eux -o pipefail
 
-        cp ~{reference} reference.fasta
         bacpage setup tmp/
         echo $'sample,read1,read2\n~{sample_name},~{read1},~{read2}' > tmp/sample_data.csv
 
@@ -108,7 +108,7 @@ task ref_based_assembly {
         # TODO: generate the config.yaml from optional inputs.
         cat << EOF > tmp/config.yaml
         run_type: "Illumina"
-        reference: reference.fasta
+        reference: ~{reference}
 
         preprocessing:
           check_size: False
@@ -144,6 +144,7 @@ task ref_based_assembly {
           consensus_parameters: ~{consensus_parameters}
         EOF
 
+        sudo su - root
         bacpage assemble --no-qa tmp/
 
         # zip results
