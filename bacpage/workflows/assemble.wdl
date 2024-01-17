@@ -103,8 +103,9 @@ task ref_based_assembly {
         bacpage setup tmp/
         echo $'sample,read1,read2\n~{sample_name},~{read1},~{read2}' > tmp/sample_data.csv
 
-        cp ~{reference} tmp/reference.fasta
-        ref=$(realpath tmp/reference.fasta)
+        cp ~{reference} reference.fasta
+
+        ref=$(realpath reference.fasta)
 
         # TODO: generate the config.yaml from optional inputs.
         cat << EOF > tmp/config.yaml
