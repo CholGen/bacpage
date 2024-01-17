@@ -4,8 +4,8 @@ workflow phylogeny_reconstruction {
     input {
         Array[File] consensus_sequences
         File background_dataset
-        File reference = "https://github.com/CholGen/bacpage/raw/split_into_command/bacpage/resources/vc_reference.fastaclear"
-        File? recombinant_mask = "https://github.com/CholGen/bacpage/raw/split_into_command/bacpage/resources/cholera_mask.gff"
+        File reference = "https://github.com/CholGen/bacpage/raw/split_into_command/bacpage/resources/vc_reference.fasta"
+        File? recombinant_mask
 
         Float? minimum_completeness = 0.9
         String? outgroup = ""
@@ -45,7 +45,7 @@ task build_phylogeny {
         Array[File] consensus_sequences
         File background_dataset
         File reference = "https://github.com/CholGen/bacpage/raw/split_into_command/bacpage/resources/vc_reference.fasta"
-        File? recombinant_mask = "https://github.com/CholGen/bacpage/raw/split_into_command/bacpage/resources/cholera_mask.gff"
+        File? recombinant_mask
 
         Float? minimum_completeness = 0.9
         String? outgroup = ""
