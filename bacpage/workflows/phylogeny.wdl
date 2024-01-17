@@ -85,6 +85,7 @@ task build_phylogeny {
         mv tmp/results/phylogeny/phylogeny.tree tmp/results/phylogeny/sparse_alignment.fasta .
         if [ ~{!skip_detection} ] ; then
             mv tmp/results/phylogeny/recombinant_regions.gff .
+        fi
     >>>
     output {
         File phylogeny = "phylogeny.tree"
