@@ -208,6 +208,13 @@ def load_sampledata( specified_loc: str, project_directory: Path, check_size: bo
 
     md = pd.read_csv( sampledata_loc )
 
+    if "sample" not in md.columns:
+        sys.stderr.write(
+            f"Unable to find columns `sample` in {sampledata_loc}. Please make sure file contains columns: `sample`, `read1`, and `read2`" )
+        sys.exit( -1 )
+    # Accept numbers as sample names.
+    md["sample"] = md["sample"].astype( "string" )
+
     schema_location = common_funcs.PACKAGE_DIR / "schemas/Illumina_metadata.schema.yaml"
     validate( md, schema_location )
 
@@ -219,7 +226,7 @@ def load_sampledata( specified_loc: str, project_directory: Path, check_size: bo
         sys.stderr.write(
             f"Sample data contains duplicate samples ({', '.join( duplicate_samples.to_list() )}) at rows {duplicate_samples.index.to_list()}\n"
         )
-        sys.exit( -1 )
+        sys.exit( -2 )
 
     skipped_samples = list()
     if check_size:

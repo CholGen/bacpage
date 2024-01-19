@@ -4,6 +4,7 @@ properties:
   sample:
     description: "Name or identifier of sample."
     type: string
+    pattern: '^[a-zA-Z0-9_\-]+$'
   read1:
     description: "Location of first set of reads from a paired-end run in FASTQ format."
     type: string

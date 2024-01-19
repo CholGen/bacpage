@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+from snakemake import WorkflowError
 from snakemake.utils import validate
 
 from bacpage.src import assemble, common_funcs
@@ -94,9 +95,20 @@ def test_sample_data_is_valid_dataframe():
 def test_duplicate_samples_causes_exit():
     with pytest.raises( SystemExit ) as excinfo:
         sample_data, skipped_samples = assemble.load_sampledata(
-            "duplicate_names.csv", Path( "test/sample_datas" ).absolute()
+            "test/sample_datas/duplicate_names.csv", Path( "." )
         )
-    assert excinfo.value.code == -1
+    assert excinfo.value.code == -2
+
+
+def test_number_name_is_accepted():
+    sample_data, skipped_samples = assemble.load_sampledata( "test/sample_datas/number_name.csv", Path( "." ) )
+
+
+def test_error_when_sample_name_contains_illegal_characters():
+    with pytest.raises( WorkflowError ) as excinfo:
+        sample_data, skipped_samples = assemble.load_sampledata(
+            "test/sample_datas/illegal_characters.csv", Path( "." )
+        )
 
 
 @pytest.mark.slow
