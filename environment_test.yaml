@@ -27,3 +27,4 @@ dependencies:
   - abricate
   - gubbins
   - pytest
+  - kmc

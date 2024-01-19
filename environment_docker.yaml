@@ -25,3 +25,4 @@ dependencies:
   - quast
   - abricate
   - gubbins
+  - kmc

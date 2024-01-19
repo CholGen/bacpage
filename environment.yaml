@@ -21,6 +21,7 @@ dependencies:
   - fastp
   - lighter
   - flash
+  - kmc
   - unicycler
   - prokka
   - quast
