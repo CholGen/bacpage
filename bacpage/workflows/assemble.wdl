@@ -69,7 +69,7 @@ task ref_based_assembly {
         File read1
         File read2
         String sample_name
-        File reference = "vc_reference.fasta"
+        File reference
 
         String? bwa_parameters = "-M"
 
