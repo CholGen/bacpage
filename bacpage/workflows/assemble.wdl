@@ -64,7 +64,8 @@ workflow reference_based_assembly {
         Float total_reads = ref_based_assembly.total_reads
         Float mapped_reads = ref_based_assembly.mapped_reads
         Float percent_mapped_reads = ref_based_assembly.percent_mapped_reads
-
+        Float percent_coverage = ref_based_assembly.percent_coverage
+        Int median_depth = ref_based_assembly.median_depth
     }
 }
 
@@ -152,9 +153,18 @@ task ref_based_assembly {
 
         bacpage assemble tmp/
 
-        # Get total reads
-        cut -f2 tmp/results/reports/qc_report_data/multiqc_samtools_stats.txt | tail -n1 > total_reads
-        cut -f8 tmp/results/reports/qc_report_data/multiqc_samtools_stats.txt | tail -n1 > mapped_reads
+        # Collect the stats!
+        python << CODE > mapped_reads
+        import pandas as pd
+        df = pd.read_csv( "tmp/results/reports/qc_report_data/multiqc_samtools_stats.txt", sep="\t" )
+        with open( "total_reads", "w" ) as f: f.write( f"{df['sequences'][0]}\n" )
+        with open( "mapped_reads", "w" ) as f: f.write( f"{df['reads_mapped'][0]}\n" )
+        with open( "percent_mapped", "w" ) as f: f.write( f"{df['reads_mapped_percent'][0]:.1f}\n" )
+
+        df = pd.read_csv( "tmp/results/reports/qc_report_data/multiqc_general_stats.txt", sep="\t" )
+        with open( "coverage", "w" ) as f: f.write( f"{df['QualiMap_mqc-generalstats-qualimap-10_x_pc'][0]:.1f}\n" )
+        with open( "median_depth", "w" ) as f: f.write( f"{df['QualiMap_mqc-generalstats-qualimap-median_coverage'][0]:d}\n" )
+        CODE
 
         # zip results
         mv tmp/results/consensus/~{sample_name}.consensus.fasta ~{sample_name}.consensus.fasta
@@ -163,7 +173,9 @@ task ref_based_assembly {
         File consensus_sequence = "~{sample_name}.consensus.fasta"
         Float total_reads = read_float("total_reads")
         Float mapped_reads = read_float( "mapped_reads" )
-        Float percent_mapped_reads = ( mapped_reads / total_reads) * 100
+        Float percent_mapped_reads = read_float( "percent_mapped" )
+        Float percent_coverage = read_float( "coverage" )
+        Int median_depth = read_int( "median_depth" )
 
     }
     runtime {
