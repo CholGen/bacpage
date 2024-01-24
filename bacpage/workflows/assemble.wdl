@@ -101,8 +101,8 @@ task ref_based_assembly {
         set -eux -o pipefail
 
         bacpage setup tmp/
-        echo $'sample,read1,read2\n~{sample_name},~{read1},~{read2}' > tmp/sample_data.csv
-
+        cp ~{read1} tmp/input/~{sample_name}_R1.fastq.gz
+        cp ~{read2} tmp/input/~{sample_name}_R2.fastq.gz
         cp ~{reference} reference.fasta
 
         ref=$(realpath reference.fasta)
@@ -146,13 +146,21 @@ task ref_based_assembly {
           consensus_parameters: ~{consensus_parameters}
         EOF
 
-        bacpage assemble --no-qa tmp/
+        bacpage assemble tmp/
+
+        # Get total reads
+        cut -f2 tmp/results/reports/qc_report_data/multiqc_samtools_stats.txt | tail -n1 > total_reads
+        cut -f8 tmp/results/reports/qc_report_data/multiqc_samtools_stats.txt | tail -n1 > mapped_reads
 
         # zip results
         mv tmp/results/consensus/~{sample_name}.consensus.fasta ~{sample_name}.consensus.fasta
     >>>
     output {
         File consensus_sequence = "~{sample_name}.consensus.fasta"
+        Int total_reads = read_int("total_reads")
+        Int mapped_reads = read_int( "mapped_reads" )
+        Float percent_mapped_reads = (total_reads / mapped_reads) * 100
+
     }
     runtime {
         docker: "watronfire/bacpage:latest"
