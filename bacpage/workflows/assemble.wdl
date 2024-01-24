@@ -163,7 +163,7 @@ task ref_based_assembly {
         File consensus_sequence = "~{sample_name}.consensus.fasta"
         Float total_reads = read_float("total_reads")
         Float mapped_reads = read_float( "mapped_reads" )
-        Float percent_mapped_reads = (total_reads / mapped_reads) * 100
+        Float percent_mapped_reads = ( mapped_reads / total_reads) * 100
 
     }
     runtime {
