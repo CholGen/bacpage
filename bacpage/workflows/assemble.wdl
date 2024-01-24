@@ -61,9 +61,9 @@ workflow reference_based_assembly {
 
     output {
         File consensus_sequence = ref_based_assembly.consensus_sequence
-        Int total_reads = ref_based_assembly.total_reads
-        Int mapped_reads = ref_based_assembly.total_reads
-        Float percent_mapped_reads = ref_based_assembly.total_reads
+        Float total_reads = ref_based_assembly.total_reads
+        Float mapped_reads = ref_based_assembly.mapped_reads
+        Float percent_mapped_reads = ref_based_assembly.percent_mapped_reads
 
     }
 }
