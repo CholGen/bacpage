@@ -154,7 +154,7 @@ task ref_based_assembly {
         bacpage assemble tmp/
 
         # Collect the stats!
-        python << CODE > mapped_reads
+        python << CODE
         import pandas as pd
         df = pd.read_csv( "tmp/results/reports/qc_report_data/multiqc_samtools_stats.txt", sep="\t" )
         with open( "total_reads", "w" ) as f: f.write( f"{df['sequences'][0]}\n" )
