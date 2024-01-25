@@ -1,0 +1,4 @@
+sample,read1,read2
+testA,input/testA_R1.fastq.gz,input/testA_R2.fastq.gz
+tes'tB,input/testB_R1.fastq.gz,input/testB_R2.fastq.gz
+tes(tA,input/testC_R1.fastq.gz,input/testC_R2.fastq.gz
