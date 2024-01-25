@@ -67,13 +67,24 @@ rule convert_to_vcf:
         bcftools index {output.vcf}
         """
 
+rule index_background_vcf:
+    input:
+        background_vcf=config["BACKGROUND"]
+    output:
+        background_index=str( config["BACKGROUND"] ) + ".csi"
+    shell:
+        """
+        bcftools index --force {input.background_vcf}
+        """
+
 
 # TODO: Would love to test that this works as expected.
 # TODO: test that phylogeny.py throws an error if given a vcf file as input and the #CHROM field doesn't match the reference being used.
 rule combine_sequences_and_background_vcf:
     input:
         user_sequences=rules.convert_to_vcf.output.vcf,
-        background_sequences=config["BACKGROUND"]
+        background_sequences=config["BACKGROUND"],
+        background_index=rules.index_background_vcf.output.background_index
     output:
         combined_vcf="intermediates/illumina/alignment/combined_alignment.bcf.gz"
     shell:

@@ -58,17 +58,23 @@ task build_phylogeny {
         Int memory = 16
         Int cpu = 16
     }
+
+    String background_name = basename( background_dataset )
+
     command <<<
         set -euxo pipefail
 
         mkdir tmp/
         cp ~{sep=" " consensus_sequences} tmp/
 
+        cp ~{background_dataset} .
+        background="$(pwd)/~{background_name}"
+
         # Construct config
         cat << EOF > tmp/config.yaml
         reference: ~{reference}
         recombinant_mask: "~{default="" recombinant_mask}"
-        background_dataset: "~{default="" background_dataset}"
+        background_dataset: "$background"
 
         tree_building:
           minimum_completeness: ~{minimum_completeness}

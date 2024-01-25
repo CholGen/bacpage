@@ -160,7 +160,7 @@ def test_correct_rules_run_if_vcf_background():
         dryrun=True,
     )
     estimated_rules = get_rules_dryrun( snakefile, config, search_directory )
-    expected_rules = ["concatenate_sequences", "concatenate_reference", "convert_to_vcf",
+    expected_rules = ["concatenate_sequences", "concatenate_reference", "convert_to_vcf", "index_background_vcf",
                       "combine_sequences_and_background_vcf", "generate_alignment_from_vcf", "run_gubbins",
                       "sparsify_alignment", "generate_tree", "move_tree_and_rename", "move_recombinant_mask"]
 
