@@ -1,6 +1,25 @@
 name: Test pipeline quickly
 
-on: [ pull_request, push, workflow_dispatch ]
+on:
+  pull_request:
+    paths-ignore:
+      - '.*'
+      - '.github/**'
+      - 'Dockerfile'
+      - 'LICENSE'
+      - 'pyproject.toml'
+      - 'README.md'
+      - 'bacpage/workflows/**'
+  push:
+    paths-ignore:
+      - '.*'
+      - '.github/**'
+      - 'Dockerfile'
+      - 'LICENSE'
+      - 'pyproject.toml'
+      - 'README.md'
+      - 'bacpage/workflows/**'
+  workflow_dispatch:
 
 jobs:
   test:
