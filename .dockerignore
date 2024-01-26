@@ -5,6 +5,9 @@
 config/
 example/
 test/
+build/
+bacpage.egg-info
+.dockstore.yml
 .dockerignore
 .editorconfig
 .gitattributes
