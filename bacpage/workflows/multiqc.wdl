@@ -70,35 +70,35 @@ workflow MultiQC {
 
 task MultiQC_task {
     input {
-        Array[File]    input_files
+        Array[Array[File]]  input_files
 
-        Boolean        force = false
-        Boolean        full_names = false
-        String?        title
-        String?        comment
-        String?        file_name
-        String         out_dir = "./multiqc-output"
-        String?        template
-        String?        tag
-        String?        ignore_analysis_files
-        String?        ignore_sample_names
-        File?          sample_names
-        Array[String]? exclude_modules
-        Array[String]? module_to_use
-        Boolean        data_dir = false
-        Boolean        no_data_dir = false
-        String?        output_data_format
-        Boolean        zip_data_dir = false
-        Boolean        export = false
-        Boolean        flat = false
-        Boolean        interactive = true
-        Boolean        lint = false
-        Boolean        pdf = false
-        Boolean        megaQC_upload = false # Upload generated report to MegaQC if MegaQC options are found
-        File?          config = "gs://bacpage-resources/multiqc_config.yaml"
-        String?        config_yaml
+        Boolean             force = false
+        Boolean             full_names = false
+        String?             title
+        String?             comment
+        String?             file_name
+        String              out_dir = "./multiqc-output"
+        String?             template
+        String?             tag
+        String?             ignore_analysis_files
+        String?             ignore_sample_names
+        File?               sample_names
+        Array[String]?      exclude_modules
+        Array[String]?      module_to_use
+        Boolean             data_dir = false
+        Boolean             no_data_dir = false
+        String?             output_data_format
+        Boolean             zip_data_dir = false
+        Boolean             export = false
+        Boolean             flat = false
+        Boolean             interactive = true
+        Boolean             lint = false
+        Boolean             pdf = false
+        Boolean             megaQC_upload = false # Upload generated report to MegaQC if MegaQC options are found
+        File?               config = "gs://bacpage-resources/multiqc_config.yaml"
+        String?             config_yaml
 
-        String         docker = "quay.io/biocontainers/multiqc:1.8--py_2"
+        String              docker = "quay.io/biocontainers/multiqc:1.8--py_2"
     }
 
     parameter_meta {
