@@ -2,7 +2,7 @@ version 1.0
 
 workflow MultiQC {
     input {
-        Array[File]    input_files
+        Array[Array[File]]    input_files
 
         Boolean        force = false
         Boolean        full_names = false
@@ -114,7 +114,7 @@ task MultiQC_task {
 
         # Move files
         mkdir tmp/
-        cp ~{input_files} tmp/
+        cp ~{flatten(input_files)} tmp/
 
         # Expand bamqc directories
         find tmp/ -name '*_bamqc.tar.gz' -execdir tar -xcf '{}' ';'
