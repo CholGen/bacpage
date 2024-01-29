@@ -107,7 +107,7 @@ task MultiQC_task {
   String report_filename = if (defined(file_name)) then basename(select_first([file_name]), ".html") else "multiqc"
   Int disk_size = 375
 
-  command {
+  command <<<
       set -ex -o pipefail
 
       # Move files
@@ -115,52 +115,52 @@ task MultiQC_task {
       cp ~{input_files} tmp/
 
       # Expand bamqc directories
-      # find tmp/ -name '*_bamqc.tar.gz' -execdir tar -xcf '{}' ';'
+      find tmp/ -name '*_bamqc.tar.gz' -execdir tar -xcf '{}' ';'
 
       multiqc \
-      --outdir "${out_dir}" \
-      ${true="--force" false="" force} \
-      ${true="--fullnames" false="" full_names} \
-      ${"--title " + title} \
-      ${"--comment " + comment} \
-      ${"--filename " + file_name} \
-      ${"--template " + template} \
-      ${"--tag " + tag} \
-      ${"--ignore " + ignore_analysis_files} \
-      ${"--ignore-samples" + ignore_sample_names} \
-      ${"--sample-names " + sample_names} \
-      ${true="--exclude " false="" defined(exclude_modules)}${sep=' --exclude ' select_first([exclude_modules,[]])} \
-      ${true="--module " false="" defined(module_to_use)}${sep=' --module ' select_first([module_to_use,[]])} \
-      ${true="--data-dir" false="" data_dir} \
-      ${true="--no-data-dir" false="" no_data_dir} \
-      ${"--data-format " + output_data_format} \
-      ${true="--zip-data-dir" false="" zip_data_dir} \
-      ${true="--export" false="" export} \
-      ${true="--flat" false="" flat} \
-      ${true="--interactive" false="" interactive} \
-      ${true="--lint" false="" lint} \
-      ${true="--pdf" false="" pdf} \
-      ${false="--no-megaqc-upload" true="" megaQC_upload} \
-      ${"--config " + config} \
-      ${"--cl-config " + config_yaml } \
+      --outdir "~{out_dir}" \
+      ~{true="--force" false="" force} \
+      ~{true="--fullnames" false="" full_names} \
+      ~{"--title " + title} \
+      ~{"--comment " + comment} \
+      ~{"--filename " + file_name} \
+      ~{"--template " + template} \
+      ~{"--tag " + tag} \
+      ~{"--ignore " + ignore_analysis_files} \
+      ~{"--ignore-samples" + ignore_sample_names} \
+      ~{"--sample-names " + sample_names} \
+      ~{true="--exclude " false="" defined(exclude_modules)}~{sep=' --exclude ' select_first([exclude_modules,[]])} \
+      ~{true="--module " false="" defined(module_to_use)}~{sep=' --module ' select_first([module_to_use,[]])} \
+      ~{true="--data-dir" false="" data_dir} \
+      ~{true="--no-data-dir" false="" no_data_dir} \
+      ~{"--data-format " + output_data_format} \
+      ~{true="--zip-data-dir" false="" zip_data_dir} \
+      ~{true="--export" false="" export} \
+      ~{true="--flat" false="" flat} \
+      ~{true="--interactive" false="" interactive} \
+      ~{true="--lint" false="" lint} \
+      ~{true="--pdf" false="" pdf} \
+      ~{false="--no-megaqc-upload" true="" megaQC_upload} \
+      ~{"--config " + config} \
+      ~{"--cl-config " + config_yaml } \
       tmp/
 
-      if [ -z "${file_name}" ]; then
-        mv "${out_dir}/${report_filename}_report.html" "${out_dir}/${report_filename}.html"
+      if [ -z "~{file_name}" ]; then
+        mv "~{out_dir}/~{report_filename}_report.html" "~{out_dir}/~{report_filename}.html"
       fi
 
-      tar -c "${out_dir}/${report_filename}_data" | gzip -c > "${report_filename}_data.tar.gz"
-  }
+      tar -c "~{out_dir}/~{report_filename}_data" | gzip -c > "~{report_filename}_data.tar.gz"
+  >>>
 
   output {
-      File multiqc_report           = "${out_dir}/${report_filename}.html"
-      File multiqc_data_dir_tarball = "${report_filename}_data.tar.gz"
+      File multiqc_report           = "~{out_dir}/~{report_filename}.html"
+      File multiqc_data_dir_tarball = "~{report_filename}_data.tar.gz"
   }
 
   runtime {
     memory: "8 GB"
     cpu: 16
-    docker: "${docker}"
+    docker: "~{docker}"
     disks:  "local-disk " + disk_size + " LOCAL"
     disk: disk_size + " GB" # TES
     dx_instance_type: "mem2_ssd1_v2_x2"
