@@ -115,7 +115,7 @@ task MultiQC_task {
       cp ~{input_files} tmp/
 
       # Expand bamqc directories
-      find tmp/ -name '*_bamqc.tar.gz' -execdir tar -xcf '{}' ';'
+      # find tmp/ -name '*_bamqc.tar.gz' -execdir tar -xcf '{}' ';'
 
       multiqc \
       --outdir "${out_dir}" \
