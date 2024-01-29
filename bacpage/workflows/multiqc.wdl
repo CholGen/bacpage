@@ -1,4 +1,72 @@
-task MultiQC {
+workflow MultiQC {
+    input {
+        Array[File]    input_files
+
+        Boolean        force = false
+        Boolean        full_names = false
+        String?        title
+        String?        comment
+        String?        file_name
+        String         out_dir = "./multiqc-output"
+        String?        template
+        String?        tag
+        String?        ignore_analysis_files
+        String?        ignore_sample_names
+        File?          sample_names
+        Array[String]? exclude_modules
+        Array[String]? module_to_use
+        Boolean        data_dir = false
+        Boolean        no_data_dir = false
+        String?        output_data_format
+        Boolean        zip_data_dir = false
+        Boolean        export = false
+        Boolean        flat = false
+        Boolean        interactive = true
+        Boolean        lint = false
+        Boolean        pdf = false
+        Boolean        megaQC_upload = false # Upload generated report to MegaQC if MegaQC options are found
+        File?          config = "gs://bacpage-resources/multiqc_config.yaml"
+        String?        config_yaml
+
+        String         docker = "quay.io/biocontainers/multiqc:1.8--py_2"
+    }
+    call MultiQC_task {
+        input:
+            input_files = input_files,
+            force = force,
+            full_names = full_names,
+            title = title,
+            comment = comment,
+            file_name = file_name,
+            out_dir = out_dir,
+            template = template,
+            tag = tag,
+            ignore_analysis_files = ignore_analysis_files,
+            ignore_sample_names = ignore_sample_names,
+            sample_names = sample_names,
+            exclude_modules = exclude_modules,
+            module_to_use = module_to_use,
+            data_dir = data_dir,
+            no_data_dir = no_data_dir,
+            output_data_format = output_data_format,
+            zip_data_dir = zip_data_dir,
+            export = export,
+            flat = flat,
+            interactive = interactive,
+            lint = lint,
+            pdf = pdf,
+            megaQC_upload = megaQC_upload,
+            config = config,
+            config_yaml = config_yaml,
+            docker = docker,
+    }
+    output {
+      File multiqc_report = MultiQC_task.multiqc_report
+      File multiqc_data_dir_tarball = MultiQC_task.multiqc_data_dir_tarball
+    }
+}
+
+task MultiQC_task {
   input {
     Array[File]    input_files
 
@@ -42,11 +110,14 @@ task MultiQC {
   command {
       set -ex -o pipefail
 
-      echo "${sep='\n' input_files}" > input-filenames.txt
-      echo "" >> input-filenames.txt
+      # Move files
+      mkdir tmp/
+      cp ~{input_files} tmp/
+
+      # Expand bamqc directories
+      find tmp/ -name '*_bamqc.tar.gz' -execdir tar -xcf '{}' ';'
 
       multiqc \
-      --file-list input-filenames.txt \
       --outdir "${out_dir}" \
       ${true="--force" false="" force} \
       ${true="--fullnames" false="" full_names} \
@@ -71,7 +142,8 @@ task MultiQC {
       ${true="--pdf" false="" pdf} \
       ${false="--no-megaqc-upload" true="" megaQC_upload} \
       ${"--config " + config} \
-      ${"--cl-config " + config_yaml }
+      ${"--cl-config " + config_yaml } \
+      tmp/
 
       if [ -z "${file_name}" ]; then
         mv "${out_dir}/${report_filename}_report.html" "${out_dir}/${report_filename}.html"

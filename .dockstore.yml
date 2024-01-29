@@ -12,3 +12,9 @@ workflows:
     authors:
       - name: Nathaniel L. Matteson
         email: nmatteson@bwh.harvard.edu
+  - subclass: WDL
+    primaryDescriptorPath: /bacpage/workflows/multiqc.wdl
+    name: bacpage-quality-assessment
+    authors:
+      - name: Nathaniel L. Matteson
+        email: nmatteson@bwh.harvard.edu
