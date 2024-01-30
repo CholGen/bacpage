@@ -115,7 +115,7 @@ task ref_based_assembly {
         # Generate the sample_data file so that weird names can be used.
         r1=$(realpath tmp/input/~{sample_name}_R1.fastq.gz)
         r2=$(realpath tmp/input/~{sample_name}_R2.fastq.gz)
-        echo $'sample,read1,read2\n~{sample_name},${r1},${r2}\n' > tmp/sample_data.csv
+        echo "sample,read1,read2\n~{sample_name},${r1},${r2}\n" > tmp/sample_data.csv
 
         cp ~{reference} reference.fasta
 
