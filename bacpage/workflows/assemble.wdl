@@ -65,7 +65,7 @@ workflow reference_based_assembly {
         File        samtools_stats = ref_based_assembly.samtools_stats
         File        fastqc_data = ref_based_assembly.fastqc_data
         File        bamqc_data = ref_based_assembly.bamqc_data
-        Array[File] qa_data = ref_based_assembly.qa_data
+        file        qa_data = ref_based_assembly.qa_data
         Float       total_reads = ref_based_assembly.total_reads
         Float       mapped_reads = ref_based_assembly.mapped_reads
         Float       percent_mapped_reads = ref_based_assembly.percent_mapped_reads
@@ -112,6 +112,12 @@ task ref_based_assembly {
         bacpage setup tmp/
         cp ~{read1} tmp/input/~{sample_name}_R1.fastq.gz
         cp ~{read2} tmp/input/~{sample_name}_R2.fastq.gz
+
+        # Generate the sample_data file so that weird names can be used.
+        r1=$(realpath tmp/input/~{sample_name}_R1.fastq.gz)
+        r2=$(realpath tmp/input/~{sample_name}_R2.fastq.gz)
+        echo $'sample,read1,read2\n~{sample_name},${r1},${r2}\n' > tmp/sample_data.csv
+
         cp ~{reference} reference.fasta
 
         ref=$(realpath reference.fasta)
@@ -175,6 +181,14 @@ task ref_based_assembly {
 
         # save bamqc output to a tar.gz file
         tar --directory=tmp/results/reports/bamqc/ -czf ~{sample_name}_bamqc.tar.gz ~{sample_name}/
+
+        # compress all qa_data
+        tar -czf ~{sample_name}.qa_data.tar.gz \
+            ~{sample_name}_bamqc.tar.gz \
+            tmp/results/reports/samtools/~{sample_name}.idxstats.txt \
+            tmp/results/reports/samtools/~{sample_name}.stats.txt \
+            tmp/results/reports/fastqc/~{sample_name}/~{sample_name}_fastqc.zip
+
     >>>
     output {
         File        consensus_sequence = "~{sample_name}.consensus.fasta"
@@ -182,7 +196,7 @@ task ref_based_assembly {
         File        samtools_stats = "tmp/results/reports/samtools/~{sample_name}.stats.txt"
         File        fastqc_data = "tmp/results/reports/fastqc/~{sample_name}/~{sample_name}_fastqc.zip"
         File        bamqc_data = "~{sample_name}_bamqc.tar.gz"
-        Array[File] qa_data = [samtools_idxstats, samtools_stats, fastqc_data, bamqc_data]
+        File        qa_data = "~{sample_name}.qa_data.tar.gz"
         Float       total_reads = read_float("total_reads")
         Float       mapped_reads = read_float( "mapped_reads" )
         Float       percent_mapped_reads = read_float( "percent_mapped" )
