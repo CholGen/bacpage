@@ -183,11 +183,11 @@ task ref_based_assembly {
         tar --directory=tmp/results/reports/bamqc/ -czf ~{sample_name}_bamqc.tar.gz ~{sample_name}/
 
         # compress all qa_data
-        tar -czf ~{sample_name}.qa_data.tar.gz \
-            ~{sample_name}_bamqc.tar.gz \
-            tmp/results/reports/samtools/~{sample_name}.idxstats.txt \
-            tmp/results/reports/samtools/~{sample_name}.stats.txt \
-            tmp/results/reports/fastqc/~{sample_name}/~{sample_name}_fastqc.zip
+        # tar -czf ~{sample_name}.qa_data.tar.gz \
+        #     ~{sample_name}_bamqc.tar.gz \
+        #     tmp/results/reports/samtools/~{sample_name}.idxstats.txt \
+        #     tmp/results/reports/samtools/~{sample_name}.stats.txt \
+        #     tmp/results/reports/fastqc/~{sample_name}/~{sample_name}_fastqc.zip
 
     >>>
     output {
