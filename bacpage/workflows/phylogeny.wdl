@@ -37,6 +37,7 @@ workflow phylogeny_reconstruction {
         File phylogeny = build_phylogeny.phylogeny
         File sparse_alignment = build_phylogeny.sparse_alignment
         File? recombinant_regions = build_phylogeny.recombinant_regions
+        File? alignment = "masked_alignment.bcf.gz"
     }
 }
 
@@ -91,12 +92,14 @@ task build_phylogeny {
         mv tmp/results/phylogeny/phylogeny.tree tmp/results/phylogeny/sparse_alignment.fasta .
         if [ ~{!skip_detection} ] ; then
             mv tmp/results/phylogeny/recombinant_regions.gff .
+            mv tmp/intermediates/illumina/alignment/masked_alignment.bcf.gz .
         fi
     >>>
     output {
         File phylogeny = "phylogeny.tree"
         File sparse_alignment = "sparse_alignment.fasta"
         File? recombinant_regions = "recombinant_regions.gff"
+        File? alignment = "masked_alignment.bcf.gz"
     }
     runtime {
         docker: "watronfire/bacpage:latest"
