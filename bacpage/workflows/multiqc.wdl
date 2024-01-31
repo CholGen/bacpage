@@ -123,10 +123,10 @@ task MultiQC_task {
 
         # Move files
         mkdir tmp/
-        cp ~{samtools_idxstats} tmp/
-        cp ~{samtools_stats} tmp/
-        cp ~{fastqc_data} tmp/
-        cp ~{bamqc_data} tmp/
+        cp ~{sep=" " samtools_idxstats} tmp/
+        cp ~{sep=" " samtools_stats} tmp/
+        cp ~{sep=" " fastqc_data} tmp/
+        cp ~{sep=" " bamqc_data} tmp/
 
         # Expand bamqc directories
         find tmp/ -name '*_bamqc.tar.gz' -execdir tar -xcf '{}' ';'
