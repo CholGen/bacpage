@@ -90,9 +90,9 @@ task build_phylogeny {
 
         # Move output
         mv tmp/results/phylogeny/phylogeny.tree tmp/results/phylogeny/sparse_alignment.fasta .
+        mv tmp/intermediates/illumina/alignment/masked_alignment.bcf.gz .
         if [ ~{!skip_detection} ] ; then
             mv tmp/results/phylogeny/recombinant_regions.gff .
-            mv tmp/intermediates/illumina/alignment/masked_alignment.bcf.gz .
         fi
     >>>
     output {
