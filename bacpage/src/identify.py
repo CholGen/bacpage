@@ -1,4 +1,5 @@
 import argparse
+import sys
 from pathlib import Path
 
 
@@ -25,7 +26,11 @@ def write_samples_to_file( sample_data: dict[str, list[str]], output: Path ):
         output_file.write( "sample,read1,read2\n" )
         for sample in sample_data:
             files = sorted( sample_data[sample] )
-            output_file.write( f"{sample},{files[0]},{files[1]}\n" )
+            try:
+                output_file.write( f"{sample},{files[0]},{files[1]}\n" )
+            except IndexError:
+                sys.stderr.write( f"Unable to find paired sequencing reads for {sample}. Only {files[0]} is present." )
+                sys.exit( -1 )
 
 
 def identify_entrypoint( args: argparse.Namespace ):
