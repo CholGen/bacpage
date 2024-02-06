@@ -106,6 +106,7 @@ task build_phylogeny {
         cpu: cpu
         memory: memory + " GiB"
         disks: "local-disk " + disk_size + " HDD"
+        bootDiskSizeGb: 50
     }
     meta {
         author: "Nathaniel L. Matteson"
