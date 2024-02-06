@@ -14,7 +14,7 @@ workflow phylogeny_reconstruction {
 
         Boolean skip_detection = false
 
-        Int disk_size = 32 # in GiB? Should check the size of the input.
+        Int disk_size = 64 # in GiB? Should check the size of the input.
         Int memory = 16
         Int cpu = 16
     }
@@ -55,7 +55,7 @@ task build_phylogeny {
 
         Boolean skip_detection = false
 
-        Int disk_size = 32 # in GiB? Should check the size of the input.
+        Int disk_size = 64 # in GiB? Should check the size of the input.
         Int memory = 16
         Int cpu = 16
     }
