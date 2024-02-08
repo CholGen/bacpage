@@ -93,3 +93,9 @@ read_count_multiplier: 1
 read_count_prefix: ""
 read_count_desc: ""
 thousandsSep_format: ""
+
+sp:
+  busco:
+    fn: "*_busco-summary.txt"
+    contents: "BUSCO version is:"
+    num_lines: 1

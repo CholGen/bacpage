@@ -5,6 +5,7 @@ workflow phylogeny_reconstruction {
         Array[File] consensus_sequences
         File background_dataset
         File reference = "gs://andersen-lab_temp/vc_reference.fasta"
+        File? mask
         File? recombinant_mask
 
         Float? minimum_completeness = 0.9
@@ -22,6 +23,7 @@ workflow phylogeny_reconstruction {
         input:
             consensus_sequences = consensus_sequences,
             reference = reference,
+            mask = mask,
             recombinant_mask = recombinant_mask,
             background_dataset = background_dataset,
             minimum_completeness = minimum_completeness,
@@ -46,6 +48,7 @@ task build_phylogeny {
         Array[File] consensus_sequences
         File background_dataset
         File reference
+        File? mask
         File? recombinant_mask
 
         Float? minimum_completeness = 0.9
@@ -74,7 +77,7 @@ task build_phylogeny {
         # Construct config
         cat << EOF > tmp/config.yaml
         reference: ~{reference}
-        recombinant_mask: "~{default="" recombinant_mask}"
+        recombinant_mask: "~{default="" mask}"
         background_dataset: "$background"
 
         tree_building:
@@ -86,12 +89,13 @@ task build_phylogeny {
 
         bacpage phylogeny \
             ~{true='--no-detect' false='' skip_detection} \
+            ~{'--detect ' + recombinant_mask} \
             tmp/
 
         # Move output
         mv tmp/results/phylogeny/phylogeny.tree tmp/results/phylogeny/sparse_alignment.fasta .
         mv tmp/intermediates/illumina/alignment/combined_alignment.bcf.gz .
-        if [ ~{!skip_detection} ] ; then
+        if [ ~{!skip_detection && !defined(recombinant_mask)} ] ; then
             mv tmp/results/phylogeny/recombinant_regions.gff .
         fi
     >>>

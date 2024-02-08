@@ -2,9 +2,9 @@ version 1.0
 
 workflow MultiQC {
     input {
-        Array[File]     samtools_idxstats
-        Array[File]     samtools_stats
-        Array[File]     fastqc_data
+        Array[File]?    samtools_idxstats
+        Array[File]?    samtools_stats
+        Array[File]?    fastqc_data
         Array[File]     bamqc_data
 
         Boolean         force = false
@@ -76,9 +76,9 @@ workflow MultiQC {
 
 task MultiQC_task {
     input {
-        Array[File]         samtools_idxstats
-        Array[File]         samtools_stats
-        Array[File]         fastqc_data
+        Array[File]?        samtools_idxstats
+        Array[File]?        samtools_stats
+        Array[File]?        fastqc_data
         Array[File]         bamqc_data
 
         Boolean             force = false
@@ -123,13 +123,21 @@ task MultiQC_task {
 
         # Move files
         mkdir tmp/
-        cp ~{sep=" " samtools_idxstats} tmp/
-        cp ~{sep=" " samtools_stats} tmp/
-        cp ~{sep=" " fastqc_data} tmp/
-        cp ~{sep=" " bamqc_data} tmp/
 
-        # Expand bamqc directories
+        cp ~{sep=" " bamqc_data} tmp/
         find tmp/ -name '*_bamqc.tar.gz' -execdir tar -xzf '{}' ';'
+
+        if [ ~{defined(fastqc_data)} ]; then
+            cp ~{sep=" " fastqc_data} tmp/
+        fi
+
+        if [ ~{defined(samtools_idxstats)} ]; then
+            cp ~{sep=" " samtools_idxstats} tmp/
+        fi
+
+        if [ ~{defined( samtools_stats) } ]; then
+            cp ~{sep=" " samtools_stats} tmp/
+        fi
 
         multiqc \
         --outdir "~{out_dir}" \
