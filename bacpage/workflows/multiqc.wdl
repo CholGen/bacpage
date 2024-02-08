@@ -35,7 +35,7 @@ workflow MultiQC {
         File?           config = "gs://bacpage-resources/multiqc_config.yaml"
         String?         config_yaml
 
-        String          docker = "quay.io/biocontainers/multiqc:1.8--py_2"
+        String          docker = "quay.io/biocontainers/multiqc:1.19--pyhdfd78af_0"
     }
     call MultiQC_task {
         input:
@@ -113,7 +113,7 @@ task MultiQC_task {
         File?               config = "gs://bacpage-resources/multiqc_config.yaml"
         String?             config_yaml
 
-        String              docker = "quay.io/biocontainers/multiqc:1.8--py_2"
+        String              docker = "quay.io/biocontainers/multiqc:1.19--pyhdfd78af_0"
     }
 
     parameter_meta {
