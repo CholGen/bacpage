@@ -6,6 +6,8 @@ workflow MultiQC {
         Array[File]?    samtools_stats
         Array[File]?    fastqc_data
         Array[File]     bamqc_data
+        Array[File]?    quast_reports
+        Array[File]?    busco_reports
 
         Boolean         force = false
         Boolean         full_names = false
@@ -41,6 +43,8 @@ workflow MultiQC {
             samtools_stats = samtools_stats,
             fastqc_data = fastqc_data,
             bamqc_data = bamqc_data,
+            quast_reports = quast_reports,
+            busco_reports = busco_reports,
             force = force,
             full_names = full_names,
             title = title,
@@ -80,6 +84,8 @@ task MultiQC_task {
         Array[File]?        samtools_stats
         Array[File]?        fastqc_data
         Array[File]         bamqc_data
+        Array[File]?        quast_reports
+        Array[File]?        busco_reports
 
         Boolean             force = false
         Boolean             full_names = false
@@ -135,8 +141,16 @@ task MultiQC_task {
             cp ~{sep=" " samtools_idxstats} tmp/
         fi
 
-        if [ ~{defined( samtools_stats) } ]; then
+        if [ ~{defined(samtools_stats)} ]; then
             cp ~{sep=" " samtools_stats} tmp/
+        fi
+
+        if [ ~{defined(busco_reports)} ]; then
+            cp ~{sep=" " busco_reports} tmp/
+        fi
+
+        if [ ~{defined(quast_reports)} ]; then
+            cp ~{sep=" " quast_reports} tmp/
         fi
 
         multiqc \

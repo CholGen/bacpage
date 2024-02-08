@@ -99,3 +99,7 @@ sp:
     fn: "*_busco-summary.txt"
     contents: "BUSCO version is:"
     num_lines: 1
+  quast:
+    fn: "*_report.tsv"
+    contents: "Assembly\t"
+    num_lines: 2
