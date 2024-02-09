@@ -8,9 +8,7 @@ workflow MultiQC {
         Array[File]     bamqc_data
         Array[File]?    quast_reports
         Array[File]?    busco_reports
-
-        Array[String?]?  gambit_results
-        Array[String]  sample_ids
+        Array[File]?    gambit_reports
 
         Boolean         force = false
         Boolean         full_names = false
@@ -41,17 +39,6 @@ workflow MultiQC {
         String          docker = "quay.io/biocontainers/multiqc:1.19--pyhdfd78af_0"
     }
 
-    if (defined(gambit_results)) {
-        scatter( name_and_result in zip(sample_ids, select_first([gambit_results]) ) ) {
-            String filled_result = if defined( name_and_result.right ) then select_first([name_and_result.right]) else "Not determined"
-        }
-    }
-    if (!defined(gambit_results)) {
-        scatter( name in sample_ids ) {
-            String empty_result = "Not determined"
-        }
-    }
-    Array[String] guaranteed_result = select_first([filled_result, empty_result])
 
     call MultiQC_task {
         input:
@@ -61,8 +48,7 @@ workflow MultiQC {
             bamqc_data = bamqc_data,
             quast_reports = quast_reports,
             busco_reports = busco_reports,
-            gambit_results = guaranteed_result,
-            sample_ids = sample_ids,
+            gambit_reports = gambit_reports,
             force = force,
             full_names = full_names,
             title = title,
@@ -105,9 +91,7 @@ task MultiQC_task {
         Array[File]         bamqc_data
         Array[File]?        quast_reports
         Array[File]?        busco_reports
-
-        Array[String]     gambit_results
-        Array[String]       sample_ids
+        Array[File]?        gambit_reports
 
         Boolean             force = false
         Boolean             full_names = false
@@ -175,18 +159,35 @@ task MultiQC_task {
             cp ~{sep=" " quast_reports} tmp/
         fi
 
-        cat << EOF > tmp/gambit_mqc.tsv
-        # plot_type: 'generalstats'
+        if [ ~{defined(gambit_reports)}; then
+            for file in ~{sep=" " gambit_reports}; do
+                echo ${file} >> gambit_results.txt
+            done
+        fi
+
+        # Collect the stats!
+        python << CODE
+        import json
+        import os
+
+        if not os.path.exists( "gambit_results.txt" ):
+            exit( 0 )
+        with open( "tmp/gambit_mqc.tsv", "w" ) as output:
+            output.write( '''# plot_type: 'generalstats'
         # headers:
         #   gambit:
         #       title: "Species prediction"
         #       description: "Predicted taxonomic classification based on GAMBIT"
-        Sample\tgambit
-        EOF
-
-        paste ~{write_lines(sample_ids)} ~{write_lines(gambit_results)} > tmp.tsv
-
-        cat tmp.tsv >> tmp/gambit_mqc.tsv
+        Sample\tgambit''')
+            with open( "gambit_results.txt", "r" ) as results:
+                for line in results:
+                    with open( line.strip(), "r" ) as individual_result:
+                        result = json.load( individual_result )
+                        predicted = data['items'][0]['predicted_taxon']['name']
+                        name = data["items"][0]["query"]["name"]
+                        name = os.path.splitext( os.path.basename( name ) )[0].rstrip( "_contigs" )
+                        output.write( f"{name}\t{predicted}\n" )
+        CODE
 
         multiqc \
         --outdir "~{out_dir}" \
