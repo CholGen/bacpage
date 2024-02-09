@@ -42,7 +42,7 @@ workflow MultiQC {
     }
 
     if (defined(gambit_results)) {
-        scatter( name_and_result in zip(sample_ids, gambit_results) ) {
+        scatter( name_and_result in zip(sample_ids, select_first([gambit_results]) ) ) {
             String filled_result = if defined( name_and_result.right ) then select_first([name_and_result.right]) else "Not determined"
         }
     }
