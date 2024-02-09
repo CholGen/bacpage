@@ -178,7 +178,7 @@ task MultiQC_task {
         #   gambit:
         #       title: "Species prediction"
         #       description: "Predicted taxonomic classification based on GAMBIT"
-        Sample\tgambit''')
+        Sample\tgambit\n''')
             with open( "gambit_results.txt", "r" ) as results:
                 for line in results:
                     with open( line.strip(), "r" ) as individual_result:
