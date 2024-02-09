@@ -183,8 +183,8 @@ task MultiQC_task {
                 for line in results:
                     with open( line.strip(), "r" ) as individual_result:
                         result = json.load( individual_result )
-                        predicted = data['items'][0]['predicted_taxon']['name']
-                        name = data["items"][0]["query"]["name"]
+                        predicted = result['items'][0]['predicted_taxon']['name']
+                        name = result["items"][0]["query"]["name"]
                         name = os.path.splitext( os.path.basename( name ) )[0].rstrip( "_contigs" )
                         output.write( f"{name}\t{predicted}\n" )
         CODE
@@ -237,6 +237,5 @@ task MultiQC_task {
         disks:  "local-disk " + disk_size + " LOCAL"
         disk: disk_size + " GB" # TES
         dx_instance_type: "mem2_ssd1_v2_x2"
-        maxRetries: 2
     }
 }
