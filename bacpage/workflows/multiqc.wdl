@@ -9,6 +9,9 @@ workflow MultiQC {
         Array[File]?    quast_reports
         Array[File]?    busco_reports
 
+        Array[String]?  gambit_results
+        Array[String]?  sample_ids
+
         Boolean         force = false
         Boolean         full_names = false
         String?         title
@@ -45,6 +48,8 @@ workflow MultiQC {
             bamqc_data = bamqc_data,
             quast_reports = quast_reports,
             busco_reports = busco_reports,
+            gambit_results = gambit_results,
+            sample_ids = sample_ids,
             force = force,
             full_names = full_names,
             title = title,
@@ -75,6 +80,7 @@ workflow MultiQC {
     output {
       File multiqc_report = MultiQC_task.multiqc_report
       File multiqc_data_dir_tarball = MultiQC_task.multiqc_data_dir_tarball
+      File multiqc_gambit_file = MultiQC_task.gambit_table
     }
 }
 
@@ -86,6 +92,9 @@ task MultiQC_task {
         Array[File]         bamqc_data
         Array[File]?        quast_reports
         Array[File]?        busco_reports
+
+        Array[String]?      gambit_results
+        Array[String]?      sample_ids
 
         Boolean             force = false
         Boolean             full_names = false
@@ -124,6 +133,9 @@ task MultiQC_task {
     String report_filename = if (defined(file_name)) then basename(select_first([file_name]), ".html") else "multiqc"
     Int disk_size = 375
 
+    Map[String, String] gambit_map = as_map( zip( sample_ids, gambit_results ) )
+    File gambit_file = write_map( gambit_map )
+
     command <<<
         set -ex -o pipefail
 
@@ -152,6 +164,17 @@ task MultiQC_task {
         if [ ~{defined(quast_reports)} ]; then
             cp ~{sep=" " quast_reports} tmp/
         fi
+
+        cat << EOF > tmp/gambit_mqc.tsv
+        # plot_type: 'generalstats'
+        # headers:
+        #   gambit:
+        #       title: "Species prediction"
+        #       description: "Predicted taxonomic classification based on GAMBIT"
+        Sample\tgambit
+        EOF
+
+        cat ~{gambit_file} >> tmp/gambit_mqc.tsv
 
         multiqc \
         --outdir "~{out_dir}" \
@@ -191,6 +214,7 @@ task MultiQC_task {
     output {
         File multiqc_report           = "~{out_dir}/~{report_filename}.html"
         File multiqc_data_dir_tarball = "~{report_filename}_data.tar.gz"
+        File gambit_table = "tmp/gambit_mqc.tsv"
     }
 
     runtime {
