@@ -133,9 +133,6 @@ task MultiQC_task {
     String report_filename = if (defined(file_name)) then basename(select_first([file_name]), ".html") else "multiqc"
     Int disk_size = 375
 
-    Map[String, String] gambit_map = as_map( zip( sample_ids, gambit_results ) )
-    File gambit_file = write_map( gambit_map )
-
     command <<<
         set -ex -o pipefail
 
@@ -165,16 +162,20 @@ task MultiQC_task {
             cp ~{sep=" " quast_reports} tmp/
         fi
 
-        cat << EOF > tmp/gambit_mqc.tsv
-        # plot_type: 'generalstats'
-        # headers:
-        #   gambit:
-        #       title: "Species prediction"
-        #       description: "Predicted taxonomic classification based on GAMBIT"
-        Sample\tgambit
-        EOF
+        if [ ~{defined(gambit_results) && ~{defined(sample_ids)} ]; then
+            cat << EOF > tmp/gambit_mqc.tsv
+            # plot_type: 'generalstats'
+            # headers:
+            #   gambit:
+            #       title: "Species prediction"
+            #       description: "Predicted taxonomic classification based on GAMBIT"
+            Sample\tgambit
+            EOF
 
-        cat ~{gambit_file} >> tmp/gambit_mqc.tsv
+            paste ~{write_lines(sample_ids)} ~{write_lines(gambit_results)} > tmp.tsv
+
+            cat ~{gambit_file} >> tmp/gambit_mqc.tsv
+        fi
 
         multiqc \
         --outdir "~{out_dir}" \
