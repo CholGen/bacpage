@@ -162,7 +162,7 @@ task MultiQC_task {
             cp ~{sep=" " quast_reports} tmp/
         fi
 
-        if [ ~{defined(gambit_results) && ~{defined(sample_ids)} ]; then
+        if [ ~{defined(gambit_results) && defined(sample_ids)} ]; then
             cat << EOF > tmp/gambit_mqc.tsv
             # plot_type: 'generalstats'
             # headers:
@@ -174,7 +174,7 @@ task MultiQC_task {
 
             paste ~{write_lines(sample_ids)} ~{write_lines(gambit_results)} > tmp.tsv
 
-            cat ~{gambit_file} >> tmp/gambit_mqc.tsv
+            cat tmp.tsv >> tmp/gambit_mqc.tsv
         fi
 
         multiqc \
