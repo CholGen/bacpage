@@ -9,8 +9,8 @@ workflow MultiQC {
         Array[File]?    quast_reports
         Array[File]?    busco_reports
 
-        Array[String]?  gambit_results
-        Array[String]?  sample_ids
+        Array[String?]?  gambit_results
+        Array[String]  sample_ids
 
         Boolean         force = false
         Boolean         full_names = false
@@ -93,8 +93,8 @@ task MultiQC_task {
         Array[File]?        quast_reports
         Array[File]?        busco_reports
 
-        Array[String]?      gambit_results
-        Array[String]?      sample_ids
+        Array[String?]?     gambit_results
+        Array[String]       sample_ids
 
         Boolean             force = false
         Boolean             full_names = false
@@ -133,6 +133,18 @@ task MultiQC_task {
     String report_filename = if (defined(file_name)) then basename(select_first([file_name]), ".html") else "multiqc"
     Int disk_size = 375
 
+    if (defined(gambit_results)) {
+        scatter( name_and_result in zip(sample_ids, gambit_results) ) {
+            String filled_result = if defined( name_and_result.right ) then select_first([name_and_result.right]) else "Not determined"
+        }
+    }
+    if (!defined(gambit_results)) {
+        scatter( name in sample_ids ) {
+            String empty_result = "Not determined"
+        }
+    }
+    Array[String] guaranteed_result = select_first([filled_result, empty_result])
+
     command <<<
         set -ex -o pipefail
 
@@ -162,20 +174,18 @@ task MultiQC_task {
             cp ~{sep=" " quast_reports} tmp/
         fi
 
-        if [ ~{defined(gambit_results) && defined(sample_ids)} ]; then
-            cat << EOF > tmp/gambit_mqc.tsv
-            # plot_type: 'generalstats'
-            # headers:
-            #   gambit:
-            #       title: "Species prediction"
-            #       description: "Predicted taxonomic classification based on GAMBIT"
-            Sample\tgambit
-            EOF
+        cat << EOF > tmp/gambit_mqc.tsv
+        # plot_type: 'generalstats'
+        # headers:
+        #   gambit:
+        #       title: "Species prediction"
+        #       description: "Predicted taxonomic classification based on GAMBIT"
+        Sample\tgambit
+        EOF
 
-            paste ~{write_lines(sample_ids)} ~{write_lines(gambit_results)} > tmp.tsv
+        paste ~{write_lines(sample_ids)} ~{write_lines(guaranteed_result)} > tmp.tsv
 
-            cat tmp.tsv >> tmp/gambit_mqc.tsv
-        fi
+        cat tmp.tsv >> tmp/gambit_mqc.tsv
 
         multiqc \
         --outdir "~{out_dir}" \
