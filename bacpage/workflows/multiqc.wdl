@@ -159,7 +159,7 @@ task MultiQC_task {
             cp ~{sep=" " quast_reports} tmp/
         fi
 
-        if [ ~{defined(gambit_reports)}; then
+        if [ ~{defined(gambit_reports)} ]; then
             for file in ~{sep=" " gambit_reports}; do
                 echo ${file} >> gambit_results.txt
             done
