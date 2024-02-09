@@ -175,10 +175,12 @@ task MultiQC_task {
             exit( 0 )
         with open( "tmp/gambit_mqc.tsv", "w" ) as output:
             output.write( '''# plot_type: "generalstats"
-        # headers:
-        # \tgambit:
-        # \t\ttitle: "Species prediction"
-        # \t\tdescription: "Predicted taxonomic classification based on GAMBIT"
+        # namespace: "GAMBIT"
+        # pconfig:
+        #   - gambit:
+        #       title: "Species prediction"
+        #       description: "Predicted taxonomic classification based on GAMBIT"
+        #       scale: False
         Sample\tgambit\n''')
             with open( "gambit_results.txt", "r" ) as results:
                 for line in results:
