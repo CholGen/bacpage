@@ -223,7 +223,7 @@ task MultiQC_task {
         fi
 
         tar -c "~{out_dir}/~{report_filename}_data" | gzip -c > "~{report_filename}_data.tar.gz"
-        tar -czvf all_reports.tar.gz /tmp/*
+        tar -czvf all_reports.tar.gz tmp/*
         >>>
 
     output {
