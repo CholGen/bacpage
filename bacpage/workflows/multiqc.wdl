@@ -79,7 +79,7 @@ workflow MultiQC {
     output {
       File multiqc_report = MultiQC_task.multiqc_report
       File multiqc_data_dir_tarball = MultiQC_task.multiqc_data_dir_tarball
-      File multiqc_gambit_file = MultiQC_task.gambit_table
+      File? multiqc_gambit_file = MultiQC_task.gambit_table
     }
 }
 
@@ -227,7 +227,7 @@ task MultiQC_task {
     output {
         File multiqc_report           = "~{out_dir}/~{report_filename}.html"
         File multiqc_data_dir_tarball = "~{report_filename}_data.tar.gz"
-        File gambit_table = "tmp/gambit_mqc.tsv"
+        File? gambit_table = "tmp/gambit_mqc.tsv"
     }
 
     runtime {
