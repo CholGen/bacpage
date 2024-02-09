@@ -79,6 +79,7 @@ workflow MultiQC {
     output {
       File multiqc_report = MultiQC_task.multiqc_report
       File multiqc_data_dir_tarball = MultiQC_task.multiqc_data_dir_tarball
+      File all_reports = MultiQC_task.all_reports
       File? multiqc_gambit_file = MultiQC_task.gambit_table
     }
 }
@@ -175,9 +176,9 @@ task MultiQC_task {
         with open( "tmp/gambit_mqc.tsv", "w" ) as output:
             output.write( '''# plot_type: "generalstats"
         # headers:
-        #   gambit:
-        #       title: "Species prediction"
-        #       description: "Predicted taxonomic classification based on GAMBIT"
+        # \tgambit:
+        # \t\ttitle: "Species prediction"
+        # \t\tdescription: "Predicted taxonomic classification based on GAMBIT"
         Sample\tgambit\n''')
             with open( "gambit_results.txt", "r" ) as results:
                 for line in results:
@@ -222,11 +223,13 @@ task MultiQC_task {
         fi
 
         tar -c "~{out_dir}/~{report_filename}_data" | gzip -c > "~{report_filename}_data.tar.gz"
+        tar -czvf all_reports.tar.gz /tmp/*
         >>>
 
     output {
         File multiqc_report           = "~{out_dir}/~{report_filename}.html"
         File multiqc_data_dir_tarball = "~{report_filename}_data.tar.gz"
+        File all_reports = "all_reports.tar.gz"
         File? gambit_table = "tmp/gambit_mqc.tsv"
     }
 
