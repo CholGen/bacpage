@@ -173,7 +173,7 @@ task MultiQC_task {
         if not os.path.exists( "gambit_results.txt" ):
             exit( 0 )
         with open( "tmp/gambit_mqc.tsv", "w" ) as output:
-            output.write( '''# plot_type: 'generalstats'
+            output.write( '''# plot_type: "generalstats"
         # headers:
         #   gambit:
         #       title: "Species prediction"
