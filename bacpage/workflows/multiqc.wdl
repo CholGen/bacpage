@@ -165,6 +165,7 @@ task MultiQC_task {
                 echo ${file} >> gambit_results.txt
             done
         fi
+        tar -czvf all_reports.tar.gz tmp/*
 
         # Collect the stats!
         python << CODE
@@ -186,9 +187,16 @@ task MultiQC_task {
                 for line in results:
                     with open( line.strip(), "r" ) as individual_result:
                         result = json.load( individual_result )
-                        predicted = result['items'][0]['predicted_taxon']['name']
-                        name = result["items"][0]["query"]["name"]
-                        name = os.path.splitext( os.path.basename( name ) )[0].rstrip( "_contigs" )
+                        try:
+                            print( f"unable to parse GAMBIT result {line.strip()}" )
+                            predicted = result['items'][0]['predicted_taxon']['name']
+                        except TypeError:
+                            predicted = "None"
+                        try:
+                            name = result["items"][0]["query"]["name"]
+                        except TypeError:
+                            name = line.strip()
+                        name = os.path.splitext( os.path.basename( name ) )[0].rstrip( "_contigs" ).rstrip( "_gambit" )
                         output.write( f"{name}\t{predicted}\n" )
         CODE
 
@@ -225,7 +233,6 @@ task MultiQC_task {
         fi
 
         tar -c "~{out_dir}/~{report_filename}_data" | gzip -c > "~{report_filename}_data.tar.gz"
-        tar -czvf all_reports.tar.gz tmp/*
         >>>
 
     output {
