@@ -243,4 +243,10 @@ task MultiQC_task {
         disk: disk_size + " GB" # TES
         dx_instance_type: "mem2_ssd1_v2_x2"
     }
+
+    meta {
+        author: "Nathaniel L. Matteson"
+        email: "nmatteson@bwh.harvard.edu"
+        description: "## Assess quality of bacteria sequencing data \n This workflow performs combines QC reports from a variety of tools using MultiQC."
+    }
 }

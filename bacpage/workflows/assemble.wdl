@@ -5,7 +5,7 @@ workflow reference_based_assembly {
         File read1
         File read2
         String sample_name
-        File reference = "gs://andersen-lab_temp/vc_reference.fasta"
+        File reference = "gs://bacpage-resources/vc_reference.fasta"
 
         String? bwa_parameters = "-M"
 

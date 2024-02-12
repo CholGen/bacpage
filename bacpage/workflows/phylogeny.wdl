@@ -4,7 +4,7 @@ workflow phylogeny_reconstruction {
     input {
         Array[File] consensus_sequences
         File background_dataset
-        File reference = "gs://andersen-lab_temp/vc_reference.fasta"
+        File reference = "gs://bacpage-resources/vc_reference.fasta"
         File? mask
         File? recombinant_mask
 
