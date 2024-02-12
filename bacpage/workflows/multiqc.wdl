@@ -14,8 +14,6 @@ workflow MultiQC {
         Boolean         full_names = false
         String?         title
         String?         comment
-        String?         file_name
-        String          out_dir = "./multiqc-output"
         String?         template
         String?         tag
         String?         ignore_analysis_files
@@ -53,8 +51,6 @@ workflow MultiQC {
             full_names = full_names,
             title = title,
             comment = comment,
-            file_name = file_name,
-            out_dir = out_dir,
             template = template,
             tag = tag,
             ignore_analysis_files = ignore_analysis_files,
@@ -78,8 +74,8 @@ workflow MultiQC {
     }
     output {
       File multiqc_report = MultiQC_task.multiqc_report
-      File multiqc_data_dir_tarball = MultiQC_task.multiqc_data_dir_tarball
-      File all_reports = MultiQC_task.all_reports
+      File? multiqc_data_dir_tarball = MultiQC_task.multiqc_data_dir_tarball
+      File? all_reports = MultiQC_task.all_reports
       File? multiqc_gambit_file = MultiQC_task.gambit_table
     }
 }
@@ -165,7 +161,6 @@ task MultiQC_task {
                 echo ${file} >> gambit_results.txt
             done
         fi
-        tar -czvf all_reports.tar.gz tmp/*
 
         # Collect the stats!
         python << CODE
@@ -188,9 +183,9 @@ task MultiQC_task {
                     with open( line.strip(), "r" ) as individual_result:
                         result = json.load( individual_result )
                         try:
-                            print( f"unable to parse GAMBIT result {line.strip()}" )
                             predicted = result['items'][0]['predicted_taxon']['name']
                         except TypeError:
+                            print( f"unable to parse GAMBIT result {line.strip()}" )
                             predicted = "None"
                         try:
                             name = result["items"][0]["query"]["name"]
@@ -228,17 +223,14 @@ task MultiQC_task {
         ~{"--cl-config " + config_yaml } \
         tmp/
 
-        if [ -z "~{file_name}" ]; then
-            mv "~{out_dir}/~{report_filename}_report.html" "~{out_dir}/~{report_filename}.html"
-        fi
-
-        tar -c "~{out_dir}/~{report_filename}_data" | gzip -c > "~{report_filename}_data.tar.gz"
+        tar -c "./multiqc-output/multiqc_data" | gzip -c > "multiqc_data.tar.gz"
+        tar -czf all_reports.tar.gz tmp/*
         >>>
 
     output {
-        File multiqc_report           = "~{out_dir}/~{report_filename}.html"
-        File multiqc_data_dir_tarball = "~{report_filename}_data.tar.gz"
-        File all_reports = "all_reports.tar.gz"
+        File multiqc_report           = "./multiqc-output/multiqc_report.html"
+        File? multiqc_data_dir_tarball = "multiqc_data.tar.gz"
+        File? all_reports = "all_reports.tar.gz"
         File? gambit_table = "tmp/gambit_mqc.tsv"
     }
 
