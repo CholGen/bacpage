@@ -106,10 +106,6 @@ table_columns_name:
   Samtools:
     raw_total_sequences: "Total Reads"
 
-custom_plot_config:
-  quast_table:
-
-
 read_count_multiplier: 1
 read_count_prefix: ""
 read_count_desc: ""
