@@ -74,9 +74,6 @@ workflow MultiQC {
     }
     output {
       File multiqc_report = MultiQC_task.multiqc_report
-      File? multiqc_data_dir_tarball = MultiQC_task.multiqc_data_dir_tarball
-      File? all_reports = MultiQC_task.all_reports
-      File? multiqc_gambit_file = MultiQC_task.gambit_table
     }
 }
 
@@ -231,7 +228,6 @@ task MultiQC_task {
         File multiqc_report           = "./multiqc-output/multiqc_report.html"
         File? multiqc_data_dir_tarball = "multiqc_data.tar.gz"
         File? all_reports = "all_reports.tar.gz"
-        File? gambit_table = "tmp/gambit_mqc.tsv"
     }
 
     runtime {
