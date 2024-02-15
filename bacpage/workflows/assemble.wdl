@@ -65,6 +65,7 @@ workflow reference_based_assembly {
         File        samtools_stats = ref_based_assembly.samtools_stats
         File        fastqc_data = ref_based_assembly.fastqc_data
         File        bamqc_data = ref_based_assembly.bamqc_data
+        File?       coverage_plot = ref_based_assembly.coverage_plot
         Float       total_reads = ref_based_assembly.total_reads
         Float       mapped_reads = ref_based_assembly.mapped_reads
         Float       percent_mapped_reads = ref_based_assembly.percent_mapped_reads
@@ -178,6 +179,7 @@ task ref_based_assembly {
 
         # move results
         mv tmp/results/consensus/~{sample_name}.consensus.fasta ~{sample_name}.consensus.fasta
+        mv tmp/results/reports/depth/~{sample_name}.depth.pdf ~{sample_name}.depth.pdf
 
         # save bamqc output to a tar.gz file
         tar --directory=tmp/results/reports/bamqc/ -czf ~{sample_name}_bamqc.tar.gz ~{sample_name}/
@@ -196,6 +198,7 @@ task ref_based_assembly {
         File        samtools_stats = "tmp/results/reports/samtools/~{sample_name}.stats.txt"
         File        fastqc_data = "tmp/results/reports/fastqc/~{sample_name}/~{sample_name}_fastqc.zip"
         File        bamqc_data = "~{sample_name}_bamqc.tar.gz"
+        File?       coverage_plot = "~{sample_name}.depth.pdf"
         Float       total_reads = read_float("total_reads")
         Float       mapped_reads = read_float( "mapped_reads" )
         Float       percent_mapped_reads = read_float( "percent_mapped" )
