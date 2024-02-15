@@ -16,11 +16,13 @@ remove_sections:
   - fastqc_per_sequence_quality_scores
   - fastqc_per_base_n_content
   - fastqc_overrepresented_sequences
+  - fastqc_top_overrepresented_sequences_table
   - fastqc_status_checks
   - fastqc_adapter_content
   - fastqc_per_base_sequence_content
   - fastqc_per_sequence_gc_content
   - fastqc_sequence_duplication_levels
+  - fastqc_top_overrepresented_sequences_table
 
 qualimap_config:
   general_stats_coverage:
@@ -76,12 +78,13 @@ table_columns_visible:
     general_error_rate: False
   QUAST:
     N50: False
-    Total length: True
+    Total length: False
   quast_table:
     N50: False
     N75: False
     L50: False
     L75: False
+    Total length: True
 
 table_columns_placement:
   FastQC:
