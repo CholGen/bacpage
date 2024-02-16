@@ -11,7 +11,7 @@ workflow phylogeny_reconstruction {
         Float? minimum_completeness = 0.9
         String? outgroup = ""
         String? model = "GTR"
-        String? iqtree_parameters = "-nt AUTO -m TEST -bb 1000"
+        String? iqtree_parameters = "-bb 1000"
 
         Boolean skip_detection = false
 
