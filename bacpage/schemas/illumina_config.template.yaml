@@ -32,6 +32,7 @@ filter_variants:
 call_consensus:
   consensus_parameters: "--mark-del N"
 
+# Valid options are: 'card', 'ecoli_v', 'plasmidfinde', 'eco', 'ncb', 'resfinde', 'vfd', 'megare', 'argannot'
 antibiotic_resistance:
   database: card
 
