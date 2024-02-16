@@ -5,6 +5,7 @@ extra_fn_clean_exts:
 
 extra_fn_clean_trim:
   - "_contigs"
+  - "_busco-summary"
 
 remove_sections:
   - qualimap-coverage-histogram
