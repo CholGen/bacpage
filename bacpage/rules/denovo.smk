@@ -122,7 +122,7 @@ rule read_stitching:
     threads: 8
     shell:
         """
-        MAXOVERLAP=$(zcat < {input.raw_reads1} | awk '{{if(NR%4==2) {{count++; bases += length}} }} END{{print bases/count}}') &&\
+        MAXOVERLAP=$(zcat < {input.raw_reads1} | awk '{{if(NR%4==2) {{count++; bases += length}} }} END{{print int( bases/count )}}') &&\
         flash \
             -m {params.minimum_overlap} \
             -M $MAXOVERLAP \
