@@ -237,6 +237,7 @@ task MultiQC_task {
         disks:  "local-disk " + disk_size + " LOCAL"
         disk: disk_size + " GB" # TES
         dx_instance_type: "mem2_ssd1_v2_x2"
+        bootDiskSizeGb: 50
     }
 
     meta {
