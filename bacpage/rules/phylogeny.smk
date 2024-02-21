@@ -67,6 +67,7 @@ rule convert_to_vcf:
         bcftools index {output.vcf}
         """
 
+
 rule index_background_vcf:
     input:
         background_vcf=config["BACKGROUND"]
@@ -235,8 +236,14 @@ rule run_gubbins:
 
 def calculate_outgroup( wildcards ):
     outgroup = config["tree_building"]["outgroup"]
-    return f"-o {outgroup:q}" if outgroup != "" else ""
-
+    if outgroup == "":
+        return ""
+    if "'" in outgroup:
+        return f"-o {outgroup}"
+    if '"' in outgroup:
+        return f"-o {outgroup}"
+    return f"-o '{outgroup}'"
+    
 
 def determine_tree_input( wildcards ):
     if config["DETECT"]:
