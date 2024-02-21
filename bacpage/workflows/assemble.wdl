@@ -211,6 +211,7 @@ task ref_based_assembly {
         cpu: cpu
         memory: memory + " GiB"
         disks: "local-disk " + disk_size + " HDD"
+        bootDiskSizeGb: 50
     }
     meta {
         author: "Nathaniel L. Matteson"
