@@ -205,7 +205,7 @@ rule run_gubbins:
         tree_builder="hybrid",
         substitution_model=config["tree_building"]["model"] + "GAMMA",
         gubbins_options=""
-    threads: 16
+    threads: workflow.cores
     output:
         masked_alignment=temp( "intermediates/illumina/recombination_detection/gubbins.filtered_polymorphic_sites.fasta" ),
         recombinant_sites="intermediates/illumina/recombination_detection/gubbins.recombination_predictions.gff",
@@ -243,7 +243,7 @@ def calculate_outgroup( wildcards ):
     if '"' in outgroup:
         return f"-o {outgroup}"
     return f"-o '{outgroup}'"
-    
+
 
 def determine_tree_input( wildcards ):
     if config["DETECT"]:
@@ -278,7 +278,7 @@ rule generate_tree:
                                                                                        "splits.nex", "contree", "log"]
             )
         )
-    threads: min( 16,workflow.cores )
+    threads: workflow.cores
     shell:
         """
         iqtree \
