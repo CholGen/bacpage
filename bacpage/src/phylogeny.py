@@ -8,9 +8,6 @@ from Bio import SeqIO
 
 from bacpage.src import common_funcs
 
-OTHER_IUPAC = {'r', 'y', 's', 'w', 'k', 'm', 'd', 'h', 'b', 'v'}
-VALID_CHARACTERS = [{'a'}, {'c'}, {'g'}, {'t'}, {'n'}, OTHER_IUPAC, {'-'}, {'?'}]
-
 
 def add_command_arguments( parser: argparse.ArgumentParser ):
     parser.description = "Reconstructs maximum likelihood phylogeny from consensus sequences."
@@ -45,37 +42,6 @@ def add_command_arguments( parser: argparse.ArgumentParser ):
     parser.add_argument( "--verbose", action="store_true", help="Print lots of stuff to screen." )
 
     parser.set_defaults( command=phylogeny_entrypoint )
-
-
-def calculate_completeness( sequence_loc: Path ) -> float:
-    record = SeqIO.read( sequence_loc, "fasta" )
-    seq = record.seq.lower()
-    l = len( seq )
-    counts = []
-
-    for v in VALID_CHARACTERS:
-        counts.append( sum( map( lambda x: seq.count( x ), v ) ) )
-    invalid_nucleotides = l - sum( counts )
-
-    if invalid_nucleotides > 0:
-        print( "Invalid characters in sequence. Might not be a valid nucleotide sequence." )
-
-    return 1.0 - (counts[4] / l)
-
-
-def load_input( directory: str, minimum_completeness: float ) -> dict[str, Path]:
-    search_directory = Path( directory ).absolute()
-    if common_funcs.is_project_directory( search_directory ):
-        search_directory = search_directory / "results/consensus"
-
-    fastas = common_funcs.find_files( directory=search_directory, extensions=[".fa", ".fasta"] )
-
-    if minimum_completeness > 0:
-        for name in list( fastas.keys() ):
-            completeness = calculate_completeness( fastas[name] )
-            if completeness < minimum_completeness:
-                del fastas[name]
-    return fastas
 
 
 def parse_names_fasta( dataset: Path ):
@@ -160,7 +126,7 @@ def reconstruct_phylogeny( project_directory: str, configfile: str, minimum_comp
         config["BACKGROUND"] = ""
 
     print( "Loading and validating input sequences...", end="" )
-    input_sequences = load_input( project_directory, minimum_completeness=minimum_completeness )
+    input_sequences = common_funcs.load_input( project_directory, minimum_completeness=minimum_completeness )
     validate_sequences( input_sequences, config["reference"], config["BACKGROUND"] )
     print( f"Done. Found {len( input_sequences )} sequences in directory." )
 

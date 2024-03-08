@@ -32,6 +32,7 @@ dynamic = ["readme", "version"]
 packages = [
     "bacpage",
     "bacpage.src",
+    "bacpage.src.utils",
     "bacpage.rules",
     "bacpage.scripts",
     "bacpage.schemas",
