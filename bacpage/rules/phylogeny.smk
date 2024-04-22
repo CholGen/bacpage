@@ -40,13 +40,9 @@ rule concatenate_reference:
     shell:
         """
         SEDOPTION=
-        if [[ "$OSTYPE" == "darwin"* ]]; then
-          SEDOPTION="-i ''"
-        fi
         
         sed '1h;/>/d;H;$!d;x;s/\\n/@/;s/\\n//g;s/@/\\n/' {input.reference} |\
         sed $SEDOPTION -e '$a\\' > {output.concatenated_reference}
-        echo "" >> {output.concatenated_reference}
         """
 
 

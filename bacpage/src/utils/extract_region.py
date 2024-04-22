@@ -15,7 +15,6 @@ def add_command_arguments( parser: argparse.ArgumentParser ):
         "directory", default=".", help="location of FASTQ files [current directory]"
     )
     parser.add_argument( "--region", help="BED file containing region(s) to extract." )
-    parser.add_argument( "--output", help="Directory to save extraction alignments" )
 
     parser.set_defaults( command=extract_entrypoint )
 
