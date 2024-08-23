@@ -13,7 +13,7 @@ workflow transfer_pe_reads {
     }
     call transfer_files as transfer_read2 {
         input:
-            files_to_transfer = read1,
+            files_to_transfer = read2,
             target_bucket = target_bucket
     }
     output {
