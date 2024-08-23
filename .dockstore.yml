@@ -18,3 +18,9 @@ workflows:
     authors:
       - name: Nathaniel L. Matteson
         email: nmatteson@bwh.harvard.edu
+  - subclass: WDL
+    primaryDescriptorPath: /bacpage/workflows/transfer.wdl
+    name: Transfer_PE_Reads_GCP
+    authors:
+      - name: Nathaniel L. Matteson
+        email: nmatteson@bwh.harvard.edu
