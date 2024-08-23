@@ -3,7 +3,7 @@ version 1.0
 workflow transfer_pe_reads {
     input {
         Array[String] read1
-        Array[String] read1
+        Array[String] read2
         String target_bucket
     }
     call transfer_files as transfer_read1 {
