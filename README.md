@@ -41,10 +41,9 @@ bash Mambaforge-$(uname)-$(uname -m).sh
 git clone https://github.com/CholGen/bacpage.git
 ```
 
-3. Switch to the development branch of the pipeline:
+3. Move to the pipeline source directory:
 ```commandline
 cd bacpage/
-git checkout -b split_into_command
 ```
 
 3. Install and activate the pipeline's conda environment:
