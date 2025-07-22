@@ -4,26 +4,26 @@ channels:
   - bioconda
 dependencies:
   - python <3.12,>=3.9
-  - bc
+  - bc = 1.07.1
   - bcftools = 1.17
-  - bedtools
-  - biopython
-  - bwa
-  - emboss
-  - fastqc
-  - iqtree
-  - multiqc
-  - pandas
-  - qualimap
+  - bedtools = 2.31.1
+  - biopython = 1.85
+  - bwa = 0.7.17
+  - emboss = 6.6.0
+  - fastqc = 0.12.1
+  - iqtree = 2.2.5
+  - multiqc = 1.18
+  - pandas = 2.3.1
+  - qualimap = 2.3
   - samtools = 1.17
-  - snakemake-minimal
-  - snp-sites
-  - fastp
-  - lighter
-  - flash
-  - kmc
-  - unicycler
-  - prokka
-  - quast
-  - abricate
-  - gubbins
+  - snakemake-minimal = 8.30.0
+  - snp-sites = 2.5.1
+  - fastp = 0.23.4
+  - lighter = 1.1.2
+  - flash = 1.2.11
+  - kmc = 3.2.1
+  - unicycler = 0.5.1
+  - prokka = 1.14.6
+  - quast = 5.2.0
+  - abricate = 1.0.1
+  - gubbins = 3.4
