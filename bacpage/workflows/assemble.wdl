@@ -174,8 +174,8 @@ task ref_based_assembly {
 
         df = pd.read_csv( "tmp/results/reports/qc_report_data/multiqc_general_stats.txt", sep="\t" )
         print( df.columns )
-        with open( "coverage", "w" ) as f: f.write( f"{df['QualiMap_mqc-generalstats-qualimap-10_x_pc'][0]:.1f}\n" )
-        with open( "median_depth", "w" ) as f: f.write( f"{df['QualiMap_mqc-generalstats-qualimap-median_coverage'][0]:d}\n" )
+        with open( "coverage", "w" ) as f: f.write( f"{df['qualimap_bamqc-10_x_pc'][0]:.1f}\n" )
+        with open( "median_depth", "w" ) as f: f.write( f"{df['qualimap_bamqc-median_coverage'][0]:d}\n" )
         CODE
 
         # move results
