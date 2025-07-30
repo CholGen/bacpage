@@ -39,7 +39,7 @@ workflow phylogeny_reconstruction {
         File phylogeny = build_phylogeny.phylogeny
         File sparse_alignment = build_phylogeny.sparse_alignment
         File? recombinant_regions = build_phylogeny.recombinant_regions
-        File? alignment = "combined_alignment.bcf.gz"
+        File? alignment = build_phylogeny.alignment
     }
 }
 
