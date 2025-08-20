@@ -46,7 +46,8 @@ def postamble( denovo: bool, directory: Path ):
         print( "Successfully performed de novo assembly of your samples" )
         print( f"Annotated assemblies are available at {directory / 'results/assembly/'}." )
         print(
-            f"Quality metrics of your input data and assemblies are available at {directory / 'reports/qc_report.html'}. Open this file in a web browser to view." )
+            f"Quality metrics of your input data and assemblies are available at {directory / 'reports/qc_report.html'}. Open this file in a web browser to view."
+        )
         print()
         print( "To perform antimicrobial resistance profiling, run `bacpage profile`." )
     else:
@@ -54,7 +55,8 @@ def postamble( denovo: bool, directory: Path ):
         print( "Successfully performed reference-based assembly of your samples." )
         print( f"Consensus sequences are available at {directory / 'results/consensus'}." )
         print(
-            f"Quality metrics of your input data and consensus sequences are available at {directory / 'reports/qc_report.html'}. Open this file in a web browser to view." )
+            f"Quality metrics of your input data and consensus sequences are available at {directory / 'reports/qc_report.html'}. Open this file in a web browser to view."
+        )
         print()
         print( "Generate a phylogenetic tree incorporating these samples using `bacpage phylogeny`. " )
         print( "Or, determine the presense of antimicrobial resistance genes using `bacpage profile`." )
@@ -111,7 +113,7 @@ def run_assemble( project_directory: str, configfile: str, sample_data: str, den
     if len( skipped_samples ) > 0:
         print( f"Skipping samples [{', '.join( skipped_samples )}] because they have no reads." )
 
-    # Add samples dictionary to config, so snakemake can utilize it.
+    # Add samples dictionary to config, so snakemake can use it.
     config["SAMPLES"] = metadata.set_index( "sample" )[["read1", "read2"]].to_dict( orient="index" )
 
     # Calculate number of threads if not specified
@@ -152,7 +154,8 @@ def find_sampledata( specified_loc: str, project_directory: Path, delim: str = "
         specified_path = Path( specified_loc )
         if not specified_path.exists():
             sys.stderr.write(
-                f"Cannot parse sample data because {specified_loc} does not exists. Please specify a valid path." )
+                f"Cannot parse sample data because {specified_loc} does not exists. Please specify a valid path."
+            )
             sys.exit( -1 )
         return specified_path
 
@@ -163,7 +166,8 @@ def find_sampledata( specified_loc: str, project_directory: Path, delim: str = "
     search_directory = project_directory / "input"
     if not search_directory.exists():
         sys.stderr.write(
-            f"Cannot automatically find samples because {common_funcs.DEFAULT_SAMPLEDATA} and {project_directory / 'input'} do not exist. Please specify a sample data file or add input files to `input/`." )
+            f"Cannot automatically find samples because {common_funcs.DEFAULT_SAMPLEDATA} and {project_directory / 'input'} do not exist. Please specify a sample data file or add input files to `input/`."
+        )
         sys.exit( -1 )
 
     samples = identify.generate_sample_data( directory=search_directory, delim=delim, index=index )
@@ -210,7 +214,8 @@ def load_sampledata( specified_loc: str, project_directory: Path, check_size: bo
 
     if "sample" not in md.columns:
         sys.stderr.write(
-            f"Unable to find columns `sample` in {sampledata_loc}. Please make sure file contains columns: `sample`, `read1`, and `read2`" )
+            f"Unable to find columns `sample` in {sampledata_loc}. Please make sure file contains columns: `sample`, `read1`, and `read2`"
+        )
         sys.exit( -1 )
     # Accept numbers as sample names.
     md["sample"] = md["sample"].astype( "string" )
