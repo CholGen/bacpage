@@ -1,4 +1,5 @@
 import argparse
+import tempfile
 from io import StringIO
 from subprocess import run
 
@@ -6,9 +7,13 @@ from Bio import SeqIO
 
 
 def convert_vcf( vcf: str, reference: str, output: str ):
+    with tempfile.NamedTemporaryFile( delete=False, suffix=".fasta" ) as temp_file:
+        temp_file_path = temp_file.name
+
     # load reference and get id
     reference_seq = SeqIO.read( reference, "fasta" )
     reference_id = reference_seq.id
+    run( f"union -filter {reference} > {temp_file_path}", shell=True )
 
     # Load samples in vcf and remove reference if present.
     query = run( f"bcftools query -l {vcf}", shell=True, capture_output=True, text=True )
@@ -19,7 +24,8 @@ def convert_vcf( vcf: str, reference: str, output: str ):
     with open( output, "w" ) as output_file:
         for sample in samples:
             consensus = run(
-                f"bcftools consensus --mark-del N -f {reference} -s '{sample}' {vcf}", shell=True, capture_output=True,
+                f"bcftools consensus --mark-del N -f {temp_file_path} -s '{sample}' {vcf}", shell=True,
+                capture_output=True,
                 text=True
             )
             record = SeqIO.read( StringIO( consensus.stdout ), "fasta" )
