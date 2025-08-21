@@ -108,13 +108,13 @@ rule call_variants_from_alignment:
             -q {params.minimum_mapping_quality} \
             -Q {params.minimum_base_quality} \
             {params.mpileup_parameters} \
+            --ignore-overlaps \
+            --skip-indels \
             -f {input.reference} \
             {input.alignment} |\
         bcftools call \
             --threads {threads} \
             {params.call_parameters} \
-            --ignore-overlaps \
-            --skip-indels \
             -o {output.variants}
         """
 
