@@ -212,7 +212,7 @@ task ref_based_assembly {
 
     }
     runtime {
-        docker: "watronfire/bacpage:latest"
+        docker: "watronfire/bacpage:depth_change"
         cpu: cpu
         memory: memory + " GiB"
         disks: "local-disk " + disk_size + " HDD"
