@@ -15,7 +15,7 @@ COMMANDS = {
 }
 
 UTILITIES = {
-    "extract_region": [extract_region, "Extract substring(s) from all consensus sequences."]
+    "extract_region": [extract_region, "Extract substring from all consensus sequences."]
 }
 
 
