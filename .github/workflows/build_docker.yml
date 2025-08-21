@@ -1,9 +1,6 @@
 name: Build and push docker images
 on:
-  workflow_run:
-    workflows: [ Test pipeline quickly ]
-    types:
-      - completed
+  workflow_dispatch:
 
 jobs:
   docker:
