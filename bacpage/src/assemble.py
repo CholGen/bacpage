@@ -43,7 +43,7 @@ def add_command_arguments( parser: argparse.ArgumentParser ):
 def postamble( denovo: bool, directory: Path ):
     if denovo:
         print()
-        print( "Successfully performed de novo assembly of your samples" )
+        print( "Successfully performed de novo assembly of your samples " )
         print( f"Annotated assemblies are available at {directory / 'results/assembly/'}." )
         print(
             f"Quality metrics of your input data and assemblies are available at {directory / 'reports/qc_report.html'}. Open this file in a web browser to view."
