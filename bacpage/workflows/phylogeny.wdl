@@ -90,7 +90,7 @@ task build_phylogeny {
         bacpage phylogeny \
             ~{true='--no-detect' false='' skip_detection} \
             ~{'--detect ' + recombinant_mask} \
-            ~{'--minimum-completeness ` + minimum_completeness} \
+            ~{'--minimum-completeness ' + minimum_completeness} \
             tmp/
 
         # Move output
