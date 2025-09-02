@@ -1,0 +1,26 @@
+version: 1.2
+workflows:
+  - subclass: WDL
+    primaryDescriptorPath: /bacpage/workflows/assemble.wdl
+    name: bacpage-assemble
+    authors:
+      - name: Nathaniel L. Matteson
+        email: nmatteson@bwh.harvard.edu
+  - subclass: WDL
+    primaryDescriptorPath: /bacpage/workflows/phylogeny.wdl
+    name: bacpage-phylogeny
+    authors:
+      - name: Nathaniel L. Matteson
+        email: nmatteson@bwh.harvard.edu
+  - subclass: WDL
+    primaryDescriptorPath: /bacpage/workflows/multiqc.wdl
+    name: bacpage-quality-assessment
+    authors:
+      - name: Nathaniel L. Matteson
+        email: nmatteson@bwh.harvard.edu
+  - subclass: WDL
+    primaryDescriptorPath: /bacpage/workflows/transfer.wdl
+    name: Transfer_PE_Reads_GCP
+    authors:
+      - name: Nathaniel L. Matteson
+        email: nmatteson@bwh.harvard.edu

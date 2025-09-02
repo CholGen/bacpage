@@ -1,0 +1,50 @@
+IQ-TREE multicore version 2.2.3 COVID-edition for Mac OS X 64-bit built Aug 13 2023
+Developed by Bui Quang Minh, James Barbetti, Nguyen Lam Tung,
+Olga Chernomor, Heiko Schmidt, Dominik Schrempf, Michael Woodhams, Ly Trong Nhan.
+
+Host:    Nates-New-MacBook-Pro.local (SSE4.2, 32 GB RAM)
+Command: iqtree --alisim case1 -m GTR -t case1.tree --length 1000 --out-format fasta
+Seed:    392596 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Tue Oct 10 15:58:08 2023
+Kernel:  SSE2 - 1 threads (12 CPU cores detected)
+
+[Alignment Simulator] Executing
+WARNING: Without Inference Mode, we strongly recommend users to specify model parameters for more accuracy simulations. Users could use <Model_Name>{<param_0>/.../<param_n>} to specify the model parameters. For the model GTR, users should provide 5 params (see User Manuals).
+WARNING: GTR must have unequal base frequencies. The base frequencies could be randomly generated if users do not provide them. However, we strongly recommend users specify the base frequencies by using +F{freq1/.../freqN} for better simulation accuracy.
+ - Tree filepath: case1.tree
+ - Length of output sequences: 1000
+ - Model: GTR
+ - Number of output datasets: 1
+SUBSTITUTION PROCESS
+--------------------
+
+Model of substitution: GTR+F
+
+Rate parameter R:
+
+  A-C: 1.000
+  A-G: 1.000
+  A-T: 1.000
+  C-G: 1.000
+  C-T: 1.000
+  G-T: 1.000
+
+State frequencies: (empirical counts from alignment)
+
+  pi(A) = 0.314
+  pi(C) = 0.281
+  pi(G) = 0.247
+  pi(T) = 0.158
+
+Rate matrix Q:
+
+  A    -0.932     0.382     0.336     0.214
+  C     0.426    -0.976     0.336     0.214
+  G     0.426     0.382     -1.02     0.214
+  T     0.426     0.382     0.336     -1.14
+
+Model of rate heterogeneity: Uniform
+
+[Alignment Simulator] Done
+Simulation time: 0.018s
+Date and Time: Tue Oct 10 15:58:08 2023

@@ -1,0 +1,2 @@
+AE003852	Prodigal:002006	CDS	1566979	1567353	.	-	0	ID=JOHFLDDO_01415;inference=ab initio prediction:Prodigal:002006,similar to AA sequence:sequence.gb:AAF94613.1;locus_tag=JOHFLDDO_01415;product=cholera enterotoxin%2C B subunit
+AE003852	Prodigal:002006	CDS	1567350	1568126	.	-	0	ID=JOHFLDDO_01416;inference=ab initio prediction:Prodigal:002006,similar to AA sequence:sequence.gb:AAF94614.1;locus_tag=JOHFLDDO_01416;product=cholera enterotoxin%2C A subunit

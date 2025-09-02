@@ -1,0 +1,134 @@
+extra_fn_clean_exts:
+  - ".headed"
+  - type: regex
+    pattern: "_S\\d{1,3}_L\\d{3}_R[1,2]_\\d{3}"
+
+extra_fn_clean_trim:
+  - "_contigs"
+  - "_busco-summary"
+
+remove_sections:
+  - qualimap-coverage-histogram
+  - qualimap-gc-distribution
+  - qualimap-cumulative-genome-fraction-coverage
+  - qualimap-insert-size-histogram
+  - samtools-stats
+  - samtools-idxstats
+  - fastqc_per_sequence_quality_scores
+  - fastqc_per_base_n_content
+  - fastqc_overrepresented_sequences
+  - fastqc_top_overrepresented_sequences_table
+  - fastqc_status_checks
+  - fastqc_adapter_content
+  - fastqc_per_base_sequence_content
+  - fastqc_per_sequence_gc_content
+  - fastqc_sequence_duplication_levels
+  - fastqc_top_overrepresented_sequences_table
+
+qualimap_config:
+  general_stats_coverage:
+    - 1
+    - 10
+
+module_order:
+  - quast
+  - busco
+  - qualimap
+  - samtools
+  - fastqc
+
+report_section_order:
+  fastqc:
+    order: -1000
+  Samtools:
+    order: -1001
+  qualimap:
+    order: -1002
+  quast:
+    order: -1003
+  busco:
+    order: -1004
+
+table_columns_visible:
+  FastQC:
+    percent_duplicates: False
+    percent_gc: False
+    avg_sequence_length: False
+    median_sequence_length: False
+    percent_fails: False
+    total_sequences: False
+  Samtools:
+    error_rate: False
+    non-primary_alignments: False
+    reads_mapped: True
+    reads_mapped_percent: False
+    reads_properly_paired_percent: False
+    reads_MQ0_percent: False
+    raw_total_sequences: True
+  QualiMap:
+    avg_gc: False
+    median_insert_size: False
+    1_x_pc: False
+    10_x_pc: True
+    30_x_pc: False
+    median_coverage: True
+    mean_coverage: False
+    percentage_aligned: True
+    mapped_reads: False
+    total_reads: False
+    general_error_rate: False
+  QUAST:
+    N50: False
+    Total length: False
+  quast_table:
+    N50: False
+    N75: False
+    L50: False
+    L75: False
+    Total length: True
+
+table_columns_placement:
+  FastQC:
+    median_sequence_length: -999
+    percent_duplicates: -998
+    percent_gc: -997
+  Samtools:
+    reads_mapped: -996
+    raw_total_sequences: -1000
+  QualiMap:
+    percentage_aligned: -995
+    median_insert_size: -994
+    10_x_pc: -993
+    median_coverage: -992
+    error_rate: -991
+
+table_columns_name:
+  QualiMap:
+    10_x_pc: "Percent Coverage"
+    median_coverage: "Median Depth"
+    percentage_aligned: "Percent Reads Mapped"
+  Samtools:
+    raw_total_sequences: "Total Reads"
+
+read_count_multiplier: 1
+read_count_prefix: ""
+read_count_desc: ""
+thousandsSep_format: ""
+
+quast_config:
+  contig_length_multiplier: 1
+  contig_length_suffix: "bp"
+  total_length_multiplier: 1
+  total_length_suffix: "bp"
+  total_number_contigs_multiplier: 1
+  total_number_contigs_suffix: ""
+
+sp:
+  busco:
+    fn: "*_busco-summary.txt"
+    contents: "BUSCO version is:"
+    num_lines: 1
+  quast:
+    fn: "*_report.tsv"
+    contents: "Assembly\t"
+    num_lines: 2

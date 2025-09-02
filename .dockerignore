@@ -1,0 +1,17 @@
+.github
+.git
+.pytest_cache
+.snakemake
+config/
+example/
+test/
+build/
+bacpage.egg-info
+.dockstore.yml
+.dockerignore
+.editorconfig
+.gitattributes
+.gitignore
+Dockerfile
+environment.yaml
+environment_test.yaml
