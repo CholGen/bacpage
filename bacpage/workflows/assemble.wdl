@@ -71,6 +71,7 @@ workflow reference_based_assembly {
         Float       percent_mapped_reads = ref_based_assembly.percent_mapped_reads
         Float       percent_coverage = ref_based_assembly.percent_coverage
         Int         median_depth = ref_based_assembly.median_depth
+        String      bacpage_version = ref_based_assembly.bacpage_version
     }
 }
 task ref_based_assembly {
@@ -108,6 +109,8 @@ task ref_based_assembly {
     }
     command <<<
         set -eux -o pipefail
+
+        bacpage version > version
 
         bacpage setup tmp/
         cp ~{read1} tmp/input/~{sample_name}_R1.fastq.gz
@@ -205,10 +208,11 @@ task ref_based_assembly {
         Float       percent_mapped_reads = read_float( "percent_mapped" )
         Float       percent_coverage = read_float( "coverage" )
         Int         median_depth = read_int( "median_depth" )
+        String      bacpage_version = read_string( "version" )
 
     }
     runtime {
-        docker: "watronfire/bacpage:latest"
+        docker: "watronfire/bacpage:depth_change"
         cpu: cpu
         memory: memory + " GiB"
         disks: "local-disk " + disk_size + " HDD"

@@ -69,10 +69,14 @@ rule generate_low_coverage_mask:
         minimum_mapping_quality=config["call_variants"]["minimum_mapping_quality"],
     shell:
         """
+        samtools view \
+            -b \
+            -f 2 \
+            {input.alignment} |\
         samtools depth \
-            -aa {input.alignment} \
             -q {params.minimum_base_quality} \
-            -Q {params.minimum_mapping_quality} |\
+            -Q {params.minimum_mapping_quality} \
+            -aa - |\
         tee {output.depth} |\
         awk \
             -v depth="{params.minimum_depth}" \
@@ -104,6 +108,7 @@ rule call_variants_from_alignment:
             -q {params.minimum_mapping_quality} \
             -Q {params.minimum_base_quality} \
             {params.mpileup_parameters} \
+            --ignore-overlaps --skip-indels \
             -f {input.reference} \
             {input.alignment} |\
         bcftools call \
@@ -135,28 +140,6 @@ rule filter_variants:
             -i "INFO/AD[1]>{params.minimum_depth} && (INFO/AD[1])/(INFO/AD[0]+INFO/AD[1])>{params.minimum_support} && INFO/ADF[1]>{params.minimum_strand_depth} && INFO/ADR[1]>{params.minimum_strand_depth}" \
             -o {output.filtered_variants} \
             {input.variants}
-        """
-
-
-rule combine_depth_variants_mask:
-    message: "Something"
-    input:
-        variants=rules.call_variants_from_alignment.output.variants,
-        depth_mask=rules.generate_low_coverage_mask.output.depth_mask
-    params:
-        minimum_depth=config["filter_variants"]["minimum_depth"],
-        minimum_strand_depth=config["filter_variants"]["minimum_strand_depth"],
-        minimum_support=config["filter_variants"]["minimum_support"]
-    output:
-        bcftools_filtered_mask=temp( "intermediates/illumina/variants/{sample}.vcffiltered.bed" ),
-        depth_filtered_mask="intermediates/illumina/variants/{sample}.allmask.bed"
-    shell:
-        """
-        bcftools filter \
-            -i "(INFO/AD[1])/(INFO/AD[0]+INFO/AD[1])>{params.minimum_support} && INFO/ADF[1]>{params.minimum_strand_depth} && INFO/ADR[1]>{params.minimum_strand_depth}" \
-            {input.variants} |\
-        awk '(/^[^#]/ && length($4) == length($5)) {{printf "%s\\t%d\\t%d\\n", $1, $2 - 1, $2}}' > {output.bcftools_filtered_mask} &&\
-        cat {output.bcftools_filtered_mask} {input.depth_mask} | sort -u > {output.depth_filtered_mask}
         """
 
 

@@ -25,9 +25,9 @@ call_variants:
   call_parameters: -mv -Ov --ploidy 1
 
 filter_variants:
-  minimum_depth: 10
+  minimum_depth: 15
   minimum_support: 0.5
-  minimum_strand_depth: 5
+  minimum_strand_depth: 1
 
 call_consensus:
   consensus_parameters: "--mark-del N"
