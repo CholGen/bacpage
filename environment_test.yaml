@@ -11,7 +11,7 @@ dependencies:
   - bwa = 0.7.17
   - emboss = 6.6.0
   - fastqc
-  - iqtree=2.2.3
+  - iqtree>3
   - multiqc
   - pandas
   - qualimap
@@ -25,6 +25,6 @@ dependencies:
   - prokka
   - quast
   - abricate
-  - gubbins
+  - gubbins<3.4.2
   - pytest
   - kmc
