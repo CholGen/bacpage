@@ -40,7 +40,7 @@ tree_building:
   minimum_completeness: 0.90
   outgroup: ""
   model: "GTR"
-  iqtree_parameters: "-bb 1000"
+  iqtree_parameters: ""
 
 quality_trimming:
   window_size: 10

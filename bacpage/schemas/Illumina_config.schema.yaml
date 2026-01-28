@@ -292,7 +292,7 @@ properties:
       iqtree_parameters:
         description: "Parameters passed directly to iqtree."
         type: string
-        default: "-bb 1000"
+        default: ""
     required:
       - minimum_completeness
       - outgroup

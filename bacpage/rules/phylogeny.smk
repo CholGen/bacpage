@@ -202,6 +202,7 @@ rule run_gubbins:
     output:
         masked_alignment=temp( "intermediates/illumina/recombination_detection/gubbins.filtered_polymorphic_sites.fasta" ),
         recombinant_sites="intermediates/illumina/recombination_detection/gubbins.recombination_predictions.gff",
+        final_tree="intermediates/illumina/recombination_detection/gubbins.node_labelled.final_tree.tre",
         other=temp(
             expand(
                 "intermediates/illumina/recombination_detection/gubbins.{extension}",
@@ -211,7 +212,6 @@ rule run_gubbins:
                     "summary_of_snp_distribution.vcf",
                     "per_branch_statistics.csv",
                     "filtered_polymorphic_sites.phylip",
-                    "node_labelled.final_tree.tre",
                     "log"
                 ]
             )
@@ -267,8 +267,8 @@ rule generate_tree:
     output:
         tree=temp(
             expand(
-                "results/phylogeny/sparse_alignment.fasta" + '.{extension}',extension=["iqtree", "treefile", "mldist",
-                                                                                       "splits.nex", "contree", "log"]
+                "results/phylogeny/sparse_alignment.fasta" + '.{extension}',extension=["treefile", "log",
+                                                                                       "treefile.nex"]
             )
         )
     threads: workflow.cores
@@ -279,18 +279,19 @@ rule generate_tree:
             -m {params.model} \
             {params.outgroup} \
             {params.iqtree_parameters} \
+            --pathogen-force --sprta \
             -s {input.alignment}
         """
 
 
 rule move_tree_and_rename:
     input:
-        iqtree_output="results/phylogeny/sparse_alignment.fasta.treefile"
+        iqtree_output="results/phylogeny/sparse_alignment.fasta.treefile.nex"
     output:
         final_tree="results/phylogeny/phylogeny.tree"
     shell:
         """
-        cp {input.iqtree_output} {output.final_tree}
+        fgrep 'tree ' {input.iqtree_output} | cut -f5 -d' ' > {output.final_tree}
         """
 
 

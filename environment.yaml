@@ -11,7 +11,7 @@ dependencies:
   - bwa
   - emboss
   - fastqc
-  - iqtree
+  - iqtree>3
   - multiqc
   - pandas
   - qualimap
@@ -26,4 +26,4 @@ dependencies:
   - prokka
   - quast
   - abricate
-  - gubbins
+  - gubbins<3.4.2
