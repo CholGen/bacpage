@@ -147,16 +147,14 @@ rule generate_alignment_from_vcf:
     input:
         vcf=determine_alignment_from_vcf_input,
         reference=rules.concatenate_reference.output.concatenated_reference
-    params:
-        script_location=workflow.source_path( "../scripts/vcf_to_fasta.py" )
     output:
         fasta_alignment=temp( "intermediates/illumina/alignment/masked_alignment.fasta" )
     shell:
         """
-        python {params.script_location} \
-            --vcf {input.vcf} \
-            --reference {input.reference} \
-            --output {output.fasta_alignment}
+        for sample in $(bcftools query -l {input.vcf}); do
+            bcftools consensus --mark-del N -f {input.reference} -s ${{sample}} {input.vcf} |\
+            sed -E "s,>.+$,>${{sample}},g" >> {output.fasta_alignment}
+        done
         """
 
 
@@ -183,14 +181,12 @@ rule generate_alignment_from_bypassed_gubbins:
         reference=rules.concatenate_reference.output.concatenated_reference
     output:
         fasta_alignment=temp( "intermediates/illumina/recombination_detection/gubbins_masked_skipped.fasta" )
-    params:
-        script_location=workflow.source_path( "../scripts/vcf_to_fasta.py" )
     shell:
         """
-        python {params.script_location} \
-            --vcf {input.masked_vcf} \
-            --reference {input.reference} \
-            --output {output.fasta_alignment}
+        for sample in $(bcftools query -l {input.masked_vcf}); do
+            bcftools consensus --mark-del N -f {input.reference} -s ${{sample}} {input.masked_vcf} |\
+            sed -E "s,>.+$,>${{sample}},g" >> {output.fasta_alignment}
+        done
         """
 
 
