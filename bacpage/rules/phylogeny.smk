@@ -39,10 +39,7 @@ rule concatenate_reference:
         concatenated_reference=temp( "intermediates/illumina/reference.fasta" )
     shell:
         """
-        SEDOPTION=
-        
-        sed '1h;/>/d;H;$!d;x;s/\\n/@/;s/\\n//g;s/@/\\n/' {input.reference} |\
-        sed $SEDOPTION -e '$a\\' > {output.concatenated_reference}
+        union -filter {input.reference} > {output.concatenated_reference}
         """
 
 

@@ -107,7 +107,7 @@ task build_phylogeny {
         File? alignment = "combined_alignment.bcf.gz"
     }
     runtime {
-        docker: "watronfire/bacpage:latest"
+        docker: "watronfire/bacpage:2026.04.14"
         cpu: cpu
         memory: memory + " GiB"
         disks: "local-disk " + disk_size + " HDD"
