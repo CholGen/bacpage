@@ -150,7 +150,8 @@ rule generate_alignment_from_vcf:
         """
         for sample in $(bcftools query -l {input.vcf}); do
             bcftools consensus --mark-del N -f {input.reference} -s ${{sample}} {input.vcf} |\
-            sed -E "s,>.+$,>${{sample}},g" >> {output.fasta_alignment}
+            sed -E "s,>.+$,>${{sample}},g" |\
+            sed 's/\*/N/g' >> {output.fasta_alignment}
         done
         """
 
@@ -182,7 +183,8 @@ rule generate_alignment_from_bypassed_gubbins:
         """
         for sample in $(bcftools query -l {input.masked_vcf}); do
             bcftools consensus --mark-del N -f {input.reference} -s ${{sample}} {input.masked_vcf} |\
-            sed -E "s,>.+$,>${{sample}},g" >> {output.fasta_alignment}
+            sed -E "s,>.+$,>${{sample}},g" |\
+            sed 's/\*/N/g' >> {output.fasta_alignment}
         done
         """
 

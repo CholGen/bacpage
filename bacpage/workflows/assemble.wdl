@@ -212,7 +212,7 @@ task ref_based_assembly {
 
     }
     runtime {
-        docker: "watronfire/bacpage:2026.04.14"
+        docker: "watronfire/bacpage:2026.04.15"
         cpu: cpu
         memory: memory + " GiB"
         disks: "local-disk " + disk_size + " HDD"
